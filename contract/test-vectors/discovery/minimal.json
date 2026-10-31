@@ -1,0 +1,18 @@
+{
+  "payloadVersion": 1,
+  "instance": {
+    "name": "Universität Musterstadt",
+    "baseUrl": "https://studip.example.org",
+    "jsonApiUrl": "https://studip.example.org/jsonapi.php/v1",
+    "studipVersion": "6.2.3"
+  },
+  "oauth2": {
+    "clientId": "7",
+    "authorizationEndpoint": "https://studip.example.org/dispatch.php/api/oauth2/authorize",
+    "tokenEndpoint": "https://studip.example.org/jsonapi.php/v1/app-connect/token",
+    "pkce": "S256",
+    "scopes": [
+      "api"
+    ]
+  }
+}

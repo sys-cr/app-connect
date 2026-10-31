@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "app-connect discovery, payload version 1",
+  "description": "What GET /jsonapi.php/v1/app-connect/discovery returns. The schema is strict: the plugin emits nothing outside this allowlist. Apps still ignore unknown fields so that later additive versions keep working.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["payloadVersion", "instance", "oauth2"],
+  "properties": {
+    "payloadVersion": { "const": 1 },
+    "instance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "baseUrl", "jsonApiUrl", "studipVersion"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "shortName": { "type": "string", "minLength": 1, "maxLength": 40 },
+        "supportEmail": { "type": "string", "maxLength": 254, "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$" },
+        "baseUrl": { "$ref": "#/$defs/instanceUrl" },
+        "jsonApiUrl": { "$ref": "#/$defs/instanceUrl" },
+        "studipVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+" },
+        "pluginVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+" },
+        "locale": { "type": "string", "pattern": "^[a-z]{2}_[A-Z]{2}$" }
+      }
+    },
+    "oauth2": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["clientId", "authorizationEndpoint", "tokenEndpoint", "scopes", "pkce"],
+      "properties": {
+        "clientId": { "type": "string", "minLength": 1 },
+        "authorizationEndpoint": { "$ref": "#/$defs/instanceUrl" },
+        "tokenEndpoint": { "$ref": "#/$defs/instanceUrl" },
+        "revocationEndpoint": { "$ref": "#/$defs/instanceUrl" },
+        "redirectUri": { "const": "de.studapp2.open:/oauth2/callback" },
+        "pkce": { "const": "S256" },
+        "scopes": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1, "uniqueItems": true }
+      }
+    },
+    "features": {
+      "type": "object",
+      "propertyNames": { "pattern": "^([a-z][A-Za-z0-9]*|[a-z0-9-]+(\\.[a-z0-9-]+)+)$" },
+      "additionalProperties": {
+        "oneOf": [
+          { "const": false },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["version"],
+            "properties": {
+              "version": { "type": "integer", "minimum": 1 },
+              "route": { "type": "string" },
+              "displayName": { "type": "string" },
+              "categories": { "type": "array", "items": { "enum": ["messages", "blubber", "announcements"] } },
+              "hints": { "type": "object", "additionalProperties": { "type": ["string", "number", "boolean"] } }
+            }
+          }
+        ]
+      }
+    },
+    "pairing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version"],
+      "properties": { "version": { "const": 1 } }
+    },
+    "branding": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "accentColor": { "$ref": "#/$defs/hexColor" },
+        "gradient": { "type": "array", "items": { "$ref": "#/$defs/hexColor" }, "minItems": 1, "maxItems": 3 },
+        "logoUrl": { "$ref": "#/$defs/httpsUrl" }
+      }
+    },
+    "links": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "external": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["type", "url"],
+            "properties": {
+              "type": { "enum": ["campusManagement", "homepage", "mensa", "library", "itHelp", "privacyPolicy", "other"] },
+              "label": { "type": "string", "maxLength": 80 },
+              "url": { "$ref": "#/$defs/httpsUrl" }
+            }
+          }
+        },
+        "mensa": {
+          "oneOf": [
+            {
+              "type": "object", "additionalProperties": false, "required": ["provider", "canteenIds"],
+              "properties": {
+                "provider": { "const": "openmensa" },
+                "canteenIds": { "type": "array", "items": { "type": "integer", "minimum": 0 }, "minItems": 1 }
+              }
+            },
+            {
+              "type": "object", "additionalProperties": false, "required": ["provider", "url"],
+              "properties": { "provider": { "const": "link" }, "url": { "$ref": "#/$defs/httpsUrl" } }
+            }
+          ]
+        }
+      }
+    },
+    "sync": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": { "backgroundIntervalMinutes": { "type": "integer", "minimum": 15 } }
+    },
+    "pollIntervals": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "blubberChannel": { "type": "integer", "minimum": 5, "maximum": 600 },
+        "blubberList": { "type": "integer", "minimum": 5, "maximum": 600 },
+        "blubberMaxBackoff": { "type": "integer", "minimum": 5, "maximum": 600 }
+      }
+    },
+    "statistics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["matomoUrl", "siteId"],
+      "properties": { "matomoUrl": { "$ref": "#/$defs/httpsUrl" }, "siteId": { "type": "string", "minLength": 1 } }
+    },
+    "push": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["signingKeys"],
+      "properties": {
+        "signingKeys": {
+          "type": "array",
+          "items": {
+            "type": "object", "additionalProperties": false, "required": ["kid", "alg", "key"],
+            "properties": {
+              "kid": { "type": "string", "maxLength": 32 },
+              "alg": { "const": "ed25519" },
+              "key": { "type": "string", "pattern": "^[A-Za-z0-9_-]{43}$" }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "httpsUrl": { "type": "string", "pattern": "^https://[^\\s/?#@]+(/[^\\s]*)?$" },
+    "instanceUrl": {
+      "description": "https, or http on localhost/127.0.0.1 for a local test instance (apps accept the latter only in DEBUG builds).",
+      "type": "string",
+      "pattern": "^(https://[^\\s/?#@]+|http://(localhost|127\\.0\\.0\\.1)(:[0-9]{1,5})?)(/[^\\s]*)?$"
+    },
+    "hexColor": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" }
+  }
+}

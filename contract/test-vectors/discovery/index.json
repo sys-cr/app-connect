@@ -1,0 +1,51 @@
+{
+  "description": "Discovery responses as the apps receive them from https://studip.example.org. 'app' is the verdict the apps must reach: valid (use the instance), invalid (refuse it, e.g. endpoints on another host, another redirect URI, PKCE other than S256, no token endpoint) or updateRequired (payloadVersion newer than the app understands); 'schemaValid' says whether the plugin schema accepts it – the plugin never emits a schema-invalid response.",
+  "host": "studip.example.org",
+  "cases": [
+    {
+      "file": "full.json",
+      "app": "valid",
+      "schemaValid": true
+    },
+    {
+      "file": "minimal.json",
+      "app": "valid",
+      "schemaValid": true
+    },
+    {
+      "file": "unknown-fields.json",
+      "app": "valid",
+      "schemaValid": false
+    },
+    {
+      "file": "payload-version-too-high.json",
+      "app": "updateRequired",
+      "schemaValid": false
+    },
+    {
+      "file": "cross-host-token-endpoint.json",
+      "app": "invalid",
+      "schemaValid": true
+    },
+    {
+      "file": "cross-host-jsonapi.json",
+      "app": "invalid",
+      "schemaValid": true
+    },
+    {
+      "file": "wrong-redirect-uri.json",
+      "app": "invalid",
+      "schemaValid": false
+    },
+    {
+      "file": "pkce-plain.json",
+      "app": "invalid",
+      "schemaValid": false
+    },
+    {
+      "file": "missing-token-endpoint.json",
+      "app": "invalid",
+      "schemaValid": false
+    }
+  ]
+}

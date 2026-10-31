@@ -1,0 +1,72 @@
+{
+  "payloadVersion": 1,
+  "instance": {
+    "name": "Universität Musterstadt",
+    "shortName": "UMS",
+    "supportEmail": "support@uni-muster.example",
+    "baseUrl": "https://studip.example.org",
+    "jsonApiUrl": "https://studip.example.org/jsonapi.php/v1",
+    "studipVersion": "6.2.3",
+    "pluginVersion": "1.0.0",
+    "locale": "de_DE"
+  },
+  "oauth2": {
+    "clientId": "7",
+    "authorizationEndpoint": "https://studip.example.org/dispatch.php/api/oauth2/authorize",
+    "tokenEndpoint": "https://studip.example.org/jsonapi.php/v1/app-connect/token",
+    "redirectUri": "de.studapp2.open:/oauth2/callback",
+    "pkce": "S256",
+    "scopes": [
+      "api"
+    ]
+  },
+  "features": {
+    "courses": {
+      "version": 1
+    },
+    "files": {
+      "version": 1
+    },
+    "blubber": false,
+    "de.example.quiz": {
+      "version": 1,
+      "route": "/jsonapi.php/v1/quiz",
+      "displayName": "Quiz"
+    }
+  },
+  "pairing": {
+    "version": 1
+  },
+  "branding": {
+    "accentColor": "#28497C",
+    "gradient": [
+      "#28497C",
+      "#6B8FC7"
+    ],
+    "logoUrl": "https://studip.example.org/assets/logo.svg"
+  },
+  "links": {
+    "external": [
+      {
+        "type": "privacyPolicy",
+        "label": "Datenschutz",
+        "url": "https://www.example.org/datenschutz"
+      }
+    ],
+    "mensa": {
+      "provider": "openmensa",
+      "canteenIds": [
+        7,
+        8
+      ]
+    }
+  },
+  "sync": {
+    "backgroundIntervalMinutes": 30
+  },
+  "pollIntervals": {
+    "blubberChannel": 10,
+    "blubberList": 30,
+    "blubberMaxBackoff": 300
+  }
+}

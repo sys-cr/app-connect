@@ -1,0 +1,11 @@
+Additional Terms under Section 7 of the GNU General Public License, version 3:
+
+Pursuant to Section 7(b) of the GNU General Public License, version 3, this Program is subject to the following additional requirements:
+
+1.    Attribution and Source Notice: If the Program or any modified version thereof provides a graphical user interface (GUI), the interface must prominently display a visible notice identifying the original authors, the official source code repository, and the applicable license terms.
+
+2.    Integrity of Notices: These notices must continue to be displayed in modified versions in an appropriate form; content (authors, repository, license) must not be removed. Adjustments to layout/placement are permitted as long as the notices remain clearly visible.
+
+3.    Scope of Requirement: For the avoidance of doubt, these additional terms apply strictly to this Program and its components. They do not extend to the underlying Stud.IP core system or to any other separate, independent works or platforms with which this Program merely interacts or on which it runs.
+
+All other rights to modify and distribute the software remain governed by the terms of the GNU General Public License, version 3.
