@@ -193,6 +193,42 @@ Anmeldungen im Web (angefordert, angemeldet, abgelehnt) sowie Anlegen und Zurüc
 Kalender-Schlüssels stehen im Ereignisprotokoll von Stud.IP (Aktionen `APPCONNECT_*`) – mit
 der Person, nie mit Link oder Schlüssel.
 
+## Datenschutz-Textbaustein
+
+Die Nutzung der App ist eine Verarbeitung **eurer Hochschule**, nicht des Herausgebers der
+App. Ergänzt eure Datenschutzerklärung; ersetzt die Platzhalter und lasst den Text prüfen.
+
+```markdown
+### Nutzung der App Stud.App
+
+Sie können Stud.IP auch über die App Stud.App für iOS und Android nutzen. Die App verbindet
+sich ausschließlich mit unserer Stud.IP-Instanz. Die Anmeldung erfolgt über unsere
+Anmeldeseite im Browser Ihres Geräts oder über einen QR-Code aus Ihrem Stud.IP-Profil; die
+App erhält kein Passwort, sondern ein Zugriffstoken, das auf Ihrem Gerät gespeichert wird.
+Zu jedem verbundenen Gerät speichern wir Gerätename, Plattform, Zeitpunkt der Verbindung und
+der letzten Nutzung; Sie sehen und entfernen Ihre Geräte im Profil unter „Stud.App
+Verbindung“ und erhalten nach jeder Verbindung eine E-Mail. Die in der App angezeigten
+Inhalte werden auf Ihrem Gerät zwischengespeichert. Der Herausgeber der App erhält keine
+Daten.
+
+Für die Einrichtung ruft die App ohne Anmeldung öffentliche Angaben unserer Instanz ab
+(Name, Adressen, Farben, Links, verfügbare Funktionen). Dabei verarbeiten wir wie bei jedem
+Seitenaufruf Ihre IP-Adresse in den Server-Protokollen ({{SPEICHERDAUER-SERVERLOG}}).
+
+[Wenn der Kalender-Schlüssel eingeschaltet ist:] Richten Sie in der App ein Kalender-Abo
+ein, legt Stud.IP dafür einen persönlichen Schlüssel an. Ihre Kalender-App ruft Ihre Termine
+damit unmittelbar bei uns ab, auch wenn Sie sich in der App abmelden; dabei verarbeiten wir
+Ihre IP-Adresse in den Server-Protokollen. Sie können den Schlüssel in der App zurücksetzen,
+womit jedes Abo darauf endet.
+
+[Wenn Nutzungsstatistik eingerichtet:] Wenn Sie in der App der Nutzungsstatistik zustimmen,
+sendet die App pseudonyme Nutzungsereignisse (z. B. geöffnete Bereiche, App-Version,
+Plattform) an unsere Matomo-Instanz. Rechtsgrundlage ist Ihre Einwilligung (Art. 6 Abs. 1
+lit. a DSGVO, § 25 Abs. 1 TDDDG). Sie können sie in der App jederzeit widerrufen.
+
+Rechtsgrundlage der App-Nutzung ist {{RECHTSGRUNDLAGE}}.
+```
+
 ## Lizenzhinweis
 
 Die Hilfelasche („Hilfe“) von „Stud.App Verbindung“ und „App holen“ nennt Autor,
@@ -388,6 +424,15 @@ Switching on and off, creating or reusing the client, changing settings, web log
 (requested, signed in, refused) and creating or resetting the calendar key are recorded in
 the Stud.IP event log (actions `APPCONNECT_*`) – with the person, never the link or the
 key.
+
+### Privacy paragraph for your policy
+
+Using the app is processing by **your university**, not by the app's publisher. Add a
+paragraph to your privacy policy; replace the placeholders and have the text reviewed. The
+German section above carries the wording; translate it for your English policy, including
+the calendar-key paragraph where that feature is switched on: a subscription set up in the
+app keeps fetching the person's events directly from your instance, even after they sign out
+of the app, until the key is reset.
 
 ### License notice
 
