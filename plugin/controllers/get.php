@@ -34,7 +34,8 @@ class GetController extends PluginController
         Attribution::addToHelpbar();
 
         $base = parse_url(Runtime::baseUrl());
-        // The host comes from the configured base URL, never from the request.
+        // The host comes from ABSOLUTE_URI_STUDIP. Where a site has not set it,
+        // Stud.IP derives it from the request; the page is sent `no-store`.
         $host = (string) ($base['host'] ?? '') . (isset($base['port']) ? ':' . $base['port'] : '');
         $this->connect_link = ConnectLink::connectLink($host, null);
         $this->instance_name = $settings->arrayValue(Settings::INSTANCE)['name'] ?? ($GLOBALS['UNI_NAME_CLEAN'] ?? 'Stud.IP');
