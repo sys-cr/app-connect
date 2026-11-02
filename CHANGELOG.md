@@ -6,7 +6,7 @@ Alle nennenswerten Änderungen an diesem Projekt stehen in dieser Datei. Das For
 [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), die Versionen folgen
 [Semantic Versioning](https://semver.org/lang/de/).
 
-## [1.0.0] – 2026-10-31
+## [1.0.0] – 2026-11-02
 
 Erste veröffentlichte Version.
 
@@ -80,7 +80,7 @@ All notable changes to this project are documented in this file. The format foll
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/).
 
-### [1.0.0] – 2026-10-31
+### [1.0.0] – 2026-11-02
 
 First published version.
 
