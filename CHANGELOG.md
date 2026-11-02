@@ -18,7 +18,7 @@ Erste veröffentlichte Version.
   Instanz (`instance.locale`) und die eingeschalteten Funktionen.
 - **Ein OAuth2-Client** – ein öffentlicher PKCE-Client „Stud.App“ für alle
   App-Installationen, beim Einschalten angelegt oder wiederverwendet, beim Ausschalten
-  widerrufen.
+  sowie beim Deaktivieren oder Deinstallieren des Plugins widerrufen.
 - **Token-Endpunkt** – `POST /jsonapi.php/v1/app-connect/token` für den App-Client
   (`authorization_code`, `refresh_token`, `urn:studip:app-connect:pairing`); die
   Erneuerung führt die Gerätebindung mit.
@@ -93,7 +93,8 @@ First published version.
   while the app connection is off; it includes the site language (`instance.locale`) and
   the enabled features.
 - **One OAuth2 client** – one public PKCE client "Stud.App" for all app installations,
-  created or reused on switch-on and revoked on switch-off.
+  created or reused on switch-on and revoked on switch-off as well as when the plugin is
+  disabled or uninstalled.
 - **Token endpoint** – `POST /jsonapi.php/v1/app-connect/token` for the app client
   (`authorization_code`, `refresh_token`, `urn:studip:app-connect:pairing`); refreshing
   keeps the device binding.

@@ -8,6 +8,8 @@ declare(strict_types=1);
 require_once __DIR__ . '/../bootstrap.php';
 
 use AppConnect\Audit\EventLog;
+use AppConnect\OAuth2\ClientProvisioner;
+use AppConnect\Runtime;
 
 return new class extends Migration
 {
@@ -33,6 +35,9 @@ return new class extends Migration
 
     protected function down()
     {
+        // Uninstalling drops the table that holds the client id, so the app
+        // client is revoked first; otherwise its tokens would stay valid.
+        (new ClientProvisioner(Runtime::settings()))->revoke();
         foreach (array_keys(EventLog::ACTIONS) as $name) {
             StudipLog::unregisterAction($name);
         }

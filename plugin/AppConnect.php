@@ -70,6 +70,29 @@ class AppConnect extends StudIPPlugin implements SystemPlugin, JsonApiPlugin
         }
     }
 
+    /**
+     * Disabling the plugin in the plugin administration revokes the app
+     * client: without the plugin there is no device list left to end a
+     * connection, so no app may keep its access. The switch in the
+     * configuration stays as it is.
+     */
+    public static function onDisable($plugin_id)
+    {
+        (new ClientProvisioner(Runtime::settings()))->revoke();
+    }
+
+    /**
+     * Enabling the plugin again lifts the revocation while the app
+     * connection is switched on in the configuration.
+     */
+    public static function onEnable($plugin_id)
+    {
+        $settings = Runtime::settings();
+        if ($settings->isEnabled() && $settings->clientId() !== null) {
+            (new ClientProvisioner($settings))->provision(Runtime::baseUrl() . '/');
+        }
+    }
+
     public function registerAuthenticatedRoutes(RouteCollectorProxy $group)
     {
         $group->post('/app-connect/devices', DevicesCreate::class);

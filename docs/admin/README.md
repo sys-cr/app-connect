@@ -64,7 +64,9 @@ brauchen, kommt aus den eigenen Routen des Plugins.
    Instanz.
 
 Ausschalten widerruft den Client: Angemeldete Apps verlieren sofort den Zugang. Erneutes
-Einschalten verwendet denselben Client wieder.
+Einschalten verwendet denselben Client wieder. Dasselbe gilt, wenn ihr das Plugin in der
+Plugin-Verwaltung deaktiviert oder deinstalliert: Der Client wird widerrufen. Aktiviert ihr
+es wieder, während `APP_CONNECT_ENABLED` an ist, gilt der Client wieder.
 
 ## Geräte verbinden
 
@@ -305,7 +307,9 @@ from the plugin's own routes.
    your Stud.IP needs no entry: the plugin takes it from the instance.
 
 Switching off revokes the client: signed-in apps lose access immediately. Switching on
-again reuses the same client.
+again reuses the same client. The same happens when you disable or uninstall the plugin in
+the plugin administration: the client is revoked. Enabling it again while
+`APP_CONNECT_ENABLED` is on lifts the revocation.
 
 ### Connecting devices
 
