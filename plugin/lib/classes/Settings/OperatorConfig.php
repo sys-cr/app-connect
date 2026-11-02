@@ -33,6 +33,7 @@ final class OperatorConfig
     public const FEATURE_COURSEWARE = 'APP_CONNECT_FEATURE_COURSEWARE';
     public const FEATURE_WEB_LOGIN = 'APP_CONNECT_FEATURE_WEB_LOGIN';
     public const FEATURE_ICAL_KEY = 'APP_CONNECT_FEATURE_ICAL_KEY';
+    public const FEATURE_USER_EVENTS = 'APP_CONNECT_FEATURE_USER_EVENTS';
     public const SUPPORT_EMAIL = 'APP_CONNECT_SUPPORT_EMAIL';
     public const LOGO_URL = 'APP_CONNECT_LOGO_URL';
     public const ACCENT_COLOR = 'APP_CONNECT_ACCENT_COLOR';
@@ -53,6 +54,7 @@ final class OperatorConfig
         'courseware' => self::FEATURE_COURSEWARE,
         'webLogin' => self::FEATURE_WEB_LOGIN,
         'icalKey' => self::FEATURE_ICAL_KEY,
+        'userEvents' => self::FEATURE_USER_EVENTS,
     ];
 
     /** External link type of the discovery → configuration field. */
@@ -116,6 +118,8 @@ final class OperatorConfig
                 'Öffnet Stud.IP-Seiten aus der App ohne erneute Anmeldung im Browser (einmaliger Link, 60 Sekunden gültig). Ein zweiter Faktor des Identity Providers wird dabei nicht abgefragt.'],
             self::FEATURE_ICAL_KEY => ['type' => 'boolean', 'value' => true, 'description' =>
                 'Kalender aus der App abonnieren: die App holt den iCal-Schlüssel der Person und übergibt die webcal-Adresse an den Systemkalender. Wer den Schlüssel kennt, kann den Kalender lesen. Ausgeschaltet bleibt der Weg über die Kalender-Seite im Browser.'],
+            self::FEATURE_USER_EVENTS => ['type' => 'boolean', 'value' => true, 'description' =>
+                'Liefert der App den Kalender der Person in einem Abruf, mit den Farben der Veranstaltungen wie im Web-Kalender. Ausgeschaltet setzt die App den Kalender aus den Routen des Kerns zusammen.'],
             self::SUPPORT_EMAIL => ['type' => 'string', 'value' => '', 'description' =>
                 'E-Mail-Adresse des Supports der Hochschule; die App bietet sie für Hilfe und zum Melden von Inhalten an. Leer: kein Support-Kontakt der Hochschule in der App.'],
             self::LOGO_URL => ['type' => 'string', 'value' => '', 'description' =>

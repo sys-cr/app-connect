@@ -39,7 +39,8 @@ Erste veröffentlichte Version.
 - **Kalender** – `GET /jsonapi.php/v1/app-connect/user-events` liefert für zwei Wochen
   eigene Termine, Termine der im Kalender angezeigten Veranstaltungen und Ausfälle, jeder
   Veranstaltungstermin mit der Farbgruppe der Person (`color`), in den Ressourcen der
-  Kern-Route `users/{id}/events`; Funktion `userEvents`.
+  Kern-Route `users/{id}/events`; Funktion `userEvents`, Schalter
+  `APP_CONNECT_FEATURE_USER_EVENTS`.
 - **Kalender-Schlüssel** – `GET`/`DELETE /jsonapi.php/v1/app-connect/me/ical-key` gibt
   den eigenen iCal-Schlüssel und die `webcal://`-Adresse heraus bzw. setzt ihn zurück, nur
   für das Token der App; Funktion `icalKey`, Schalter `APP_CONNECT_FEATURE_ICAL_KEY`.
@@ -115,7 +116,8 @@ First published version.
 - **Calendar** – `GET /jsonapi.php/v1/app-connect/user-events` returns personal entries,
   dates of courses shown in the calendar and cancelled dates for two weeks, each course
   date with the person's colour group of the course (`color`), in the resource shapes of
-  the core route `users/{id}/events`; feature `userEvents`.
+  the core route `users/{id}/events`; feature `userEvents`, switch
+  `APP_CONNECT_FEATURE_USER_EVENTS`.
 - **Calendar key** – `GET`/`DELETE /jsonapi.php/v1/app-connect/me/ical-key` hands out the
   person's own iCal key and the `webcal://` address or resets it, only for the app's
   token; feature `icalKey`, switch `APP_CONNECT_FEATURE_ICAL_KEY`. New keys are made by

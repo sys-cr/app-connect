@@ -70,7 +70,7 @@ final class ConfigBackedSettingsStoreTest extends TestCase
     {
         $this->config->set(OperatorConfig::FEATURE_BLUBBER, true);
         self::assertSame(
-            ['courseCatalogue' => false, 'blubber' => true, 'mensa' => false, 'messages' => true, 'eventPlaces' => true, 'courseware' => true, 'webLogin' => true, 'icalKey' => true],
+            ['courseCatalogue' => false, 'blubber' => true, 'mensa' => false, 'messages' => true, 'eventPlaces' => true, 'courseware' => true, 'webLogin' => true, 'icalKey' => true, 'userEvents' => true],
             $this->settings->arrayValue(Settings::FEATURES)
         );
     }

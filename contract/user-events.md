@@ -22,6 +22,9 @@ The route is relative to the JSON:API base (`…/jsonapi.php/v1/`). Without this
 feature an app reads `users/{id}/events` and the dates per course
 (`courses/{id}/events`) and takes the colour from `course-memberships`.
 
+Operators switch it off with `APP_CONNECT_FEATURE_USER_EVENTS` in the
+configuration section "Stud.App"; the feature is then announced as `false`.
+
 ## Request
 
 `GET /jsonapi.php/v1/app-connect/user-events?filter[timestamp]=<unix>&page[offset]=0&page[limit]=30`

@@ -56,6 +56,7 @@ brauchen, kommt aus den eigenen Routen des Plugins.
    | `APP_CONNECT_FEATURE_COURSEWARE` | Courseware in der App lesen (ab Werk an; nur solange das Kernmodul Courseware aktiv ist) |
    | `APP_CONNECT_FEATURE_WEB_LOGIN` | Stud.IP-Seiten aus der App ohne erneute Anmeldung öffnen (ab Werk an, siehe [Anmeldung im Web aus der App](#anmeldung-im-web-aus-der-app)) |
    | `APP_CONNECT_FEATURE_ICAL_KEY` | Kalender aus der App abonnieren (ab Werk an, siehe [Kalender-Schlüssel](#kalender-schlüssel)) |
+   | `APP_CONNECT_FEATURE_USER_EVENTS` | Kalender der Person in einem Abruf mit den Farben der Veranstaltungen (ab Werk an); aus setzt die App ihn aus den Routen des Kerns zusammen |
 
    Adressen müssen mit `https://` beginnen, die Support-Adresse muss eine E-Mail-Adresse
    sein, die Farbe `#RRGGBB` und die OpenMensa-IDs Zahlen. Der Editor des Kerns nimmt alles
@@ -300,6 +301,7 @@ from the plugin's own routes.
    | `APP_CONNECT_FEATURE_COURSEWARE` | reading Courseware in the app (on by default; only while the core module Courseware is active) |
    | `APP_CONNECT_FEATURE_WEB_LOGIN` | web pages opened from the app without signing in again (on by default, see [Web login from the app](#web-login-from-the-app)) |
    | `APP_CONNECT_FEATURE_ICAL_KEY` | subscribing to the calendar from the app (on by default, see [Calendar key](#calendar-key)) |
+   | `APP_CONNECT_FEATURE_USER_EVENTS` | the person's calendar in one call with the course colours (on by default); when off, the app builds it from the core routes |
 
    Addresses must start with `https://`, the support address must be an e-mail address,
    the colour `#RRGGBB` and the OpenMensa ids numbers; the core editor accepts anything, so
