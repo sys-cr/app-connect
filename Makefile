@@ -10,7 +10,7 @@ help:
 	@echo "make test-plugin       – PHPUnit unit tests (plugin/tests/Unit)"
 	@echo "make test-contract     – schema and shared test vectors (plugin/tests/Contract)"
 	@echo "make test              – both test suites"
-	@echo "make dist              – plugin ZIP of the committed plugin/ (without tests/) in dist/"
+	@echo "make dist              – plugin ZIP of the committed plugin/ (without tests and Composer/PHPUnit files) in dist/"
 
 plugin/vendor:
 	cd plugin && composer install --no-interaction --quiet
@@ -37,7 +37,7 @@ dist:
 	@cmp -s SUPPLEMENTAL-TERMS.txt plugin/SUPPLEMENTAL-TERMS.txt \
 		|| { echo "plugin/SUPPLEMENTAL-TERMS.txt differs from SUPPLEMENTAL-TERMS.txt"; exit 1; }
 	@mkdir -p dist
-	git archive --format=zip --mtime="$$(git log -1 --format=%cI HEAD)" -o dist/app-connect-$(VERSION).zip HEAD:plugin -- . ':(exclude)tests'
+	git archive --format=zip --mtime="$$(git log -1 --format=%cI HEAD)" -o dist/app-connect-$(VERSION).zip HEAD:plugin -- . ':(exclude)tests' ':(exclude)composer.json' ':(exclude)composer.lock' ':(exclude)phpunit.xml'
 	@[ "$$(unzip -l dist/app-connect-$(VERSION).zip | grep -cE ' (LICENSE|SUPPLEMENTAL-TERMS\.txt)$$')" = 2 ] \
 		|| { echo "license texts missing from the archive (not committed yet?)"; rm -f dist/app-connect-$(VERSION).zip; exit 1; }
 	@echo "dist/app-connect-$(VERSION).zip"

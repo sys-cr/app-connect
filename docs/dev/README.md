@@ -69,7 +69,8 @@ reagiert auf `ConfigValueDidChange`: Dabei entsteht der OAuth2-Client, und das P
 für Anfragen ohne Sitzung freigegeben (Rolle „Nobody“), die Discovery und Token-Endpunkt
 brauchen.
 
-`make dist` packt das eingecheckte `plugin/` ohne `tests/` nach
+`make dist` packt das eingecheckte `plugin/` ohne `tests/`, `composer.json`,
+`composer.lock` und `phpunit.xml` nach
 `dist/app-connect-<version>.zip` für den Plugin-Upload unter Admin → System → Plugins; das
 Archiv enthält immer `LICENSE` und `SUPPLEMENTAL-TERMS.txt`, und derselbe Commit ergibt
 immer dieselbe Datei.
@@ -199,7 +200,8 @@ to `ConfigValueDidChange`: this creates the OAuth2 client and allows the plugin 
 requests without a session (role "Nobody"), which the discovery and the token endpoint
 need.
 
-`make dist` packs the committed `plugin/` without `tests/` into
+`make dist` packs the committed `plugin/` without `tests/`, `composer.json`,
+`composer.lock` and `phpunit.xml` into
 `dist/app-connect-<version>.zip` for the plugin upload under Admin → System → Plugins; the
 archive always contains `LICENSE` and `SUPPLEMENTAL-TERMS.txt`, and the same commit always
 yields the same file.
