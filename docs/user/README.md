@@ -67,8 +67,10 @@ Die App kann deinen Stud.IP-Kalender im Kalender des Geräts abonnieren. Dafür 
 deinen persönlichen Kalender-Schlüssel; gibt es noch keinen, wird er dabei angelegt. Wer
 den Schlüssel kennt, kann deinen Kalender lesen. Hast du ihn weitergegeben oder ein Gerät
 verloren, setze ihn in der App zurück: Danach funktioniert kein bisheriges Abo mehr, und
-ein neues Abo bekommt einen neuen Schlüssel. Deine Hochschule kann diese Funktion
-ausschalten.
+ein neues Abo bekommt einen neuen Schlüssel. Hast du schon vorher auf der Kalender-Seite
+von Stud.IP einen Schlüssel angelegt, nutzt die App diesen weiter; setzt du ihn in der App
+zurück, bekommst du einen längeren, schwerer zu erratenden. Deine Hochschule kann diese
+Funktion ausschalten.
 
 ## Was gespeichert wird
 
@@ -147,8 +149,9 @@ the course in Stud.IP ("Meine Veranstaltungen").
 The app can subscribe your Stud.IP calendar in the device's calendar. For that it fetches
 your personal calendar key; if there is none yet, one is created. Whoever knows the key can
 read your calendar. If you passed it on or lost a device, reset it in the app: every
-existing subscription stops working, and a new subscription gets a new key. Your university
-may switch this off.
+existing subscription stops working, and a new subscription gets a new key. If you created a
+key on Stud.IP's calendar page before, the app keeps using it; resetting it in the app gives
+you a longer one that is harder to guess. Your university may switch this off.
 
 ### What is stored
 

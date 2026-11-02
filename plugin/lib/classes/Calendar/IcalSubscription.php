@@ -12,9 +12,9 @@ namespace AppConnect\Calendar;
  *
  * Stud.IP serves the feed at `dispatch.php/ical/index/<key>` without a
  * session: the key is the whole authorisation, which is why a calendar app
- * can poll it at all. The plugin only hands the key out – it is the core's
- * own key (`IcalExport`), stored in the person's configuration, and nothing
- * here duplicates that logic.
+ * can poll it at all. The key is stored where the core keeps its own
+ * (`IcalExport`, the person's configuration); new ones come from
+ * {@see IcalKey}.
  *
  * `webcal://` rather than `https://` so the system calendar subscribes
  * instead of downloading one snapshot. Calendar apps fetch webcal over https
@@ -28,11 +28,11 @@ final class IcalSubscription
     public const EXPORT_PATH = 'dispatch.php/ical/index/';
 
     /**
-     * Whether the key can stand in a URL path as it is. The core's
-     * `IcalExport::makeKey()` writes eight letters and digits, and
-     * `setKeyLength()` lets a site choose another length, so the range is
-     * generous – but the alphabet is not, because anything outside it would
-     * have to be escaped and would no longer match the stored key.
+     * Whether the key can stand in a URL path as it is. {@see IcalKey} writes
+     * 32 letters and digits, the core's `IcalExport::makeKey()` eight or the
+     * length a site chose with `setKeyLength()`, so the range is generous –
+     * but the alphabet is not, because anything outside it would have to be
+     * escaped and would no longer match the stored key.
      */
     public static function isValidKey(mixed $key): bool
     {

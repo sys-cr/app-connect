@@ -43,6 +43,8 @@ Erste veröffentlichte Version.
 - **Kalender-Schlüssel** – `GET`/`DELETE /jsonapi.php/v1/app-connect/me/ical-key` gibt
   den eigenen iCal-Schlüssel und die `webcal://`-Adresse heraus bzw. setzt ihn zurück, nur
   für das Token der App; Funktion `icalKey`, Schalter `APP_CONNECT_FEATURE_ICAL_KEY`.
+  Neue Schlüssel erzeugt das Plugin selbst (32 Zeichen aus `random_int`), höchstens fünf
+  pro Person und Stunde (`429`); ein vorhandener Schlüssel bleibt.
 - **Orte von Terminen** – `GET /jsonapi.php/v1/app-connect/course-dates/places` liefert die
   gebuchten Räume von bis zu 50 Terminen mit Koordinaten und Raumfinder-Link, sonst die
   Freitext-Raumangabe; Funktion `eventPlaces`.
@@ -115,7 +117,9 @@ First published version.
   the core route `users/{id}/events`; feature `userEvents`.
 - **Calendar key** – `GET`/`DELETE /jsonapi.php/v1/app-connect/me/ical-key` hands out the
   person's own iCal key and the `webcal://` address or resets it, only for the app's
-  token; feature `icalKey`, switch `APP_CONNECT_FEATURE_ICAL_KEY`.
+  token; feature `icalKey`, switch `APP_CONNECT_FEATURE_ICAL_KEY`. New keys are made by
+  the plugin (32 characters from `random_int`), at most five per person and hour (`429`);
+  an existing key stays.
 - **Places of course dates** – `GET /jsonapi.php/v1/app-connect/course-dates/places`
   returns the booked rooms of up to 50 dates with coordinates and a room finder link, or
   the free-text room; feature `eventPlaces`.

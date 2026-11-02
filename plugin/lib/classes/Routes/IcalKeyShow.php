@@ -8,7 +8,10 @@ declare(strict_types=1);
 namespace AppConnect\Routes;
 
 use AppConnect\Audit\EventLog;
+use AppConnect\Calendar\IcalKey;
+use AppConnect\Calendar\IcalKeyLimit;
 use AppConnect\Calendar\IcalSubscription;
+use AppConnect\RateLimit\StudipCacheCounterStore;
 use AppConnect\Runtime;
 use AppConnect\Settings\Settings;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -22,13 +25,17 @@ use Psr\Http\Message\ServerRequestInterface as Request;
  * Stud.IP's own JSON:API has no route for the key: it is created on the
  * publish page of the calendar and otherwise lives in the person's
  * configuration, which means the way to the subscription leads through the
- * browser and a copied string. The route exists for that gap only; the key
- * itself and its generator belong to the core (`IcalExport`).
+ * browser and a copied string. The route exists for that gap; the key lives
+ * where the core keeps it, so the core's export serves it unchanged.
  *
  * The key is a standing read access to the person's calendar for whoever
  * holds it, so: only the token holder's own key is ever returned, the
  * answer is never cached, and a missing key is created here rather than
- * on a page the person has to find – they asked for the subscription.
+ * on a page the person has to find – they asked for the subscription. A
+ * key created here comes from {@see IcalKey}, not from the core's weaker
+ * generator, and only {@see IcalKeyLimit::MAX_CREATIONS} an hour. A key the
+ * person already has stays, since replacing it would end their
+ * subscriptions; a reset gives them a new one.
  */
 final class IcalKeyShow extends \JsonApi\NonJsonApiController
 {
@@ -53,8 +60,17 @@ final class IcalKeyShow extends \JsonApi\NonJsonApiController
 
         $key = \IcalExport::getKeyByUser($userId);
         if (!IcalSubscription::isValidKey($key)) {
-            $key = \IcalExport::setKey($userId);
-            EventLog::recordForUser(EventLog::ICAL_KEY_CREATE, $userId);
+            $limit = new IcalKeyLimit(new StudipCacheCounterStore());
+            if (!$limit->allows($userId)) {
+                return JsonErrors::write($response, 429, 'app-connect-too-many-requests', 'Too many new calendar keys, try again later')
+                    ->withHeader('Retry-After', (string) $limit->retryAfter());
+            }
+            $key = IcalKey::unused(static fn (string $candidate): bool => \IcalExport::getUserIdByKey($candidate) !== false);
+            if ($key !== null) {
+                \UserConfig::get($userId)->store('ICAL_EXPORT_KEY', $key);
+                $limit->record($userId);
+                EventLog::recordForUser(EventLog::ICAL_KEY_CREATE, $userId);
+            }
         }
         if (!IcalSubscription::isValidKey($key)) {
             return JsonErrors::write($response, 500, 'app-connect-ical-key-failed', 'The calendar key could not be prepared');

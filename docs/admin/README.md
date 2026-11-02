@@ -114,7 +114,12 @@ Stud.IP liefert den persönlichen Kalender einer Person unter
 Berechtigung. Die App holt diesen Schlüssel über das Plugin, damit die Person den Kalender
 mit einem Schritt im Gerätekalender abonnieren kann, und kann ihn zurücksetzen. Das geht
 nur mit dem Token der App, nie mit dem Token einer anderen Anwendung oder mit Passwort.
-Schlüssel und Erzeugung bleiben die des Kerns (`IcalExport`). Ausgeschaltet
+Der Schlüssel liegt dort, wo der Kern ihn ablegt, und der Export des Kerns liefert den
+Kalender wie gewohnt aus. Neue Schlüssel erzeugt das Plugin aber selbst: 32 Kleinbuchstaben
+und Ziffern aus einem kryptografischen Zufallsgenerator statt der acht Zeichen aus `rand()`,
+die der Kern auf der Kalender-Seite vergibt. Eine Person bekommt höchstens fünf neue
+Schlüssel pro Stunde (`429`). Ein vorhandener Schlüssel bleibt, bis die Person ihn
+zurücksetzt, damit bestehende Abos weiterlaufen. Ausgeschaltet
 (`APP_CONNECT_FEATURE_ICAL_KEY`) bleibt der Weg über die Kalender-Seite im Browser.
 Einzelheiten: [`contract/ical-key.md`](../../contract/ical-key.md).
 
@@ -134,7 +139,7 @@ Anwendungscode (`errors[0].code`); der Token-Endpunkt antwortet mit OAuth2-Fehle
 | `GET app-connect/user-language` | ja | Die Sprache, in der die Person Stud.IP nutzt (Profil, sonst die Vorgabe der Instanz). Funktion `userLanguage`. [`contract/user-language.md`](../../contract/user-language.md) |
 | `GET app-connect/user-events?filter[timestamp]=…` | ja | Der Kalender der Person für zwei Wochen wie im Web-Kalender: eigene Termine, Termine der im Kalender angezeigten Veranstaltungen und Ausfälle, jeder Veranstaltungstermin mit der Farbgruppe der Person (`color`, 0–8). Dieselben Ressourcen wie die Kern-Route `users/{id}/events`. Funktion `userEvents`. [`contract/user-events.md`](../../contract/user-events.md) |
 | `POST app-connect/web-login` | App-Token oder Passwort | Einmaliger Link für die Anmeldung im Web (oben). `429` nach 10 Links in 5 Minuten. [`contract/web-login.md`](../../contract/web-login.md) |
-| `GET`/`DELETE app-connect/me/ical-key` | App-Token | Der Kalender-Schlüssel der Person und die `webcal://`-Adresse; der erste Aufruf legt einen Schlüssel an, `DELETE` setzt ihn zurück und beendet jedes Abo darauf. `401`/`403` für andere Anmeldungen. Funktion `icalKey`. [`contract/ical-key.md`](../../contract/ical-key.md) |
+| `GET`/`DELETE app-connect/me/ical-key` | App-Token | Der Kalender-Schlüssel der Person und die `webcal://`-Adresse; der erste Aufruf legt einen Schlüssel an (höchstens fünf pro Stunde, sonst `429`), `DELETE` setzt ihn zurück und beendet jedes Abo darauf. `401`/`403` für andere Anmeldungen. Funktion `icalKey`. [`contract/ical-key.md`](../../contract/ical-key.md) |
 
 Seiten des Plugins (`plugins.php/appconnect/…`):
 
@@ -182,7 +187,7 @@ Ereignisprotokolls.
 | Kopplungscodes | `app_connect_pairing_codes` | SHA-256-Hash, Person, Geräte-ID, Zeitpunkte |
 | Geräte | `app_connect_devices` | in der App gewählter Gerätename, Plattform, Art der Verbindung, IDs der OAuth2-Tokens (nicht die Tokens), Zeitpunkte |
 | Links für die Anmeldung im Web | `app_connect_web_login_tickets` | SHA-256-Hash, Person, zu öffnende Seite, Verweis auf Token und Gerät, Zeitpunkte |
-| Kalender-Schlüssel | Konfiguration der Person (Kern, `IcalExport`) | wie vom Kern verwaltet; das Plugin legt ihn nur an oder löscht ihn |
+| Kalender-Schlüssel | Konfiguration der Person (Kern, `IcalExport`) | wie vom Kern verwaltet; das Plugin legt ihn an oder löscht ihn, ein Zähler der neuen Schlüssel liegt eine Stunde im Cache |
 | Einstellungen | `config` (Sektion „Stud.App“), `app_connect_settings` | eure Einstellungen, Client-ID, gespeicherte Adresse |
 | Fehlversuche beim Koppeln | Stud.IP-Cache | Zähler je gehashter Adresse, 10 Minuten |
 
@@ -349,7 +354,12 @@ Stud.IP serves a person's calendar at `dispatch.php/ical/index/<key>` without a 
 the key is the whole authorisation. The app fetches this key through the plugin, so the
 person can subscribe the calendar in the device calendar in one step, and can reset it.
 This works only with the app's token, never with another application's token or a
-password. The key and its generator stay the core's (`IcalExport`). Switched off
+password. The key lives where the core keeps it, and the core's export serves the calendar
+as before. New keys, however, are made by the plugin: 32 lower-case letters and digits from a
+cryptographic random generator instead of the eight characters from `rand()` that the core
+hands out on the calendar page. A person gets at most five new keys an hour (`429`). An
+existing key stays until the person resets it, so existing subscriptions keep working.
+Switched off
 (`APP_CONNECT_FEATURE_ICAL_KEY`), the way through the calendar page in the browser remains.
 Details: [`contract/ical-key.md`](../../contract/ical-key.md).
 
@@ -369,7 +379,7 @@ application code (`errors[0].code`); the token endpoint answers OAuth2 errors
 | `GET app-connect/user-language` | yes | The language the person uses Stud.IP in (profile, else the site default). Feature `userLanguage`. [`contract/user-language.md`](../../contract/user-language.md) |
 | `GET app-connect/user-events?filter[timestamp]=…` | yes | The person's calendar for two weeks as the web calendar shows it: personal entries, dates of courses shown in the calendar and cancelled dates, each course date with the person's colour group of the course (`color`, 0–8). Same resource shapes as the core route `users/{id}/events`. Feature `userEvents`. [`contract/user-events.md`](../../contract/user-events.md) |
 | `POST app-connect/web-login` | app token or password | One-time link for the web login (above). `429` after 10 links in 5 minutes. [`contract/web-login.md`](../../contract/web-login.md) |
-| `GET`/`DELETE app-connect/me/ical-key` | app token | The person's calendar key and the `webcal://` address; the first call creates a key, `DELETE` resets it and stops every subscription built on it. `401`/`403` for other sign-ins. Feature `icalKey`. [`contract/ical-key.md`](../../contract/ical-key.md) |
+| `GET`/`DELETE app-connect/me/ical-key` | app token | The person's calendar key and the `webcal://` address; the first call creates a key (at most five an hour, otherwise `429`), `DELETE` resets it and stops every subscription built on it. `401`/`403` for other sign-ins. Feature `icalKey`. [`contract/ical-key.md`](../../contract/ical-key.md) |
 
 Pages of the plugin (`plugins.php/appconnect/…`):
 
@@ -414,7 +424,7 @@ days; the other entries of the plugin follow your event log settings.
 | pairing codes | `app_connect_pairing_codes` | SHA-256 hash, person, device id, times |
 | devices | `app_connect_devices` | device name chosen in the app, platform, how it was connected, ids of the OAuth2 tokens (not the tokens), times |
 | web login links | `app_connect_web_login_tickets` | SHA-256 hash, person, page to open, token/device reference, times |
-| calendar key | the person's configuration (core, `IcalExport`) | as the core keeps it; the plugin only creates or deletes it |
+| calendar key | the person's configuration (core, `IcalExport`) | as the core keeps it; the plugin creates or deletes it, a count of new keys stays in the cache for an hour |
 | settings | `config` (section "Stud.App"), `app_connect_settings` | your settings, client id, recorded address |
 | failed pairing attempts | Stud.IP cache | counter per hashed address, 10 minutes |
 

@@ -25,7 +25,7 @@ Komponenten in `plugin/lib/classes/`:
 | `Pairing`, `Connect` | Kopplungscodes (nur Hash, fünf Minuten, die erste Einlösung gewinnt) und der Verbindungslink des QR-Codes |
 | `Devices` | Gerätezeilen, gebunden an eine Token-Kette; Entfernen und Widerruf in den Token-Tabellen des Kerns (`TokenLedger`), Aufbewahrung |
 | `WebLogin` | einmalige Tickets für die Anmeldung im Web, Prüfung von `return_to`, die Anmeldung wie im Kern-Login |
-| `Calendar` | der Kalender der Person in den Ressourcen der Kern-Route `users/{id}/events` mit Kursfarben (`UserEvents`); Abo-Adresse des Kalender-Schlüssels (`IcalSubscription`) |
+| `Calendar` | der Kalender der Person in den Ressourcen der Kern-Route `users/{id}/events` mit Kursfarben (`UserEvents`); Abo-Adresse des Kalender-Schlüssels (`IcalSubscription`), neue Schlüssel und ihre Grenze (`IcalKey`, `IcalKeyLimit`) |
 | `Places`, `Profile` | Orte von Terminen mit Koordinaten, die Profilsprache |
 | `RateLimit`, `Audit`, `Mail` | Grenzen für Fehlversuche, Aktionen des Ereignisprotokolls, die Verbindungsmail |
 | `Routes` | schlanke JSON:API-Controller der Routen unten; `AppToken` lässt nur das Token des App-Clients zu |
@@ -34,7 +34,8 @@ Komponenten in `plugin/lib/classes/`:
 
 Klassen ohne Abhängigkeit von Stud.IP (`Discovery\DiscoveryBuilder`,
 `Discovery\DiscoveryResponse`, `Connect\*`, `Settings\Settings`, `Calendar\UserEvents`,
-`Calendar\IcalSubscription`, `WebLogin\WebLoginService`, `RateLimit\RateLimiter`) sind mit
+`Calendar\IcalSubscription`, `Calendar\IcalKey`, `Calendar\IcalKeyLimit`,
+`WebLogin\WebLoginService`, `RateLimit\RateLimiter`) sind mit
 PHPUnit abgedeckt; die schlanke Stud.IP-Schicht (`Runtime`, `Routes\*`,
 `OAuth2\ClientProvisioner`, `Devices\TokenLedger`, die Controller) wird gegen ein laufendes
 Stud.IP getestet.
@@ -93,7 +94,7 @@ auf `localhost` oder `127.0.0.1`.
 | `GET /jsonapi.php/v1/app-connect/user-language` | angemeldet | Profilsprache der Person, sonst die Vorgabe der Instanz ([`contract/user-language.md`](../../contract/user-language.md)); Discovery-Funktion `userLanguage` |
 | `GET /jsonapi.php/v1/app-connect/user-events` | angemeldet | der Kalender der Person für zwei Wochen: eigene Termine, Veranstaltungstermine, Ausfälle, mit der Kursfarbe `color` ([`contract/user-events.md`](../../contract/user-events.md)); Discovery-Funktion `userEvents`; `200`, `400`, `401`, `404` |
 | `POST /jsonapi.php/v1/app-connect/web-login` | OAuth2-Token des App-Clients oder HTTP Basic (Passwort prüft das Plugin) | einmaliger Link (60 s), der die Person im Web anmeldet und `return_to` öffnet ([`contract/web-login.md`](../../contract/web-login.md)); Discovery-Funktion `webLogin`; `201`, `400`, `401`, `403`, `404`, `429` |
-| `GET`/`DELETE /jsonapi.php/v1/app-connect/me/ical-key` | OAuth2-Token des App-Clients | der eigene Kalender-Schlüssel der Person, beim ersten Abruf angelegt, und das Zurücksetzen ([`contract/ical-key.md`](../../contract/ical-key.md)); Discovery-Funktion `icalKey`; `200`, `204`, `401`, `403`, `404` |
+| `GET`/`DELETE /jsonapi.php/v1/app-connect/me/ical-key` | OAuth2-Token des App-Clients | der eigene Kalender-Schlüssel der Person, beim ersten Abruf angelegt, und das Zurücksetzen ([`contract/ical-key.md`](../../contract/ical-key.md)); Discovery-Funktion `icalKey`; `200`, `204`, `401`, `403`, `404`, `429` |
 | `plugins.php/appconnect/web/enter`, `…/web/redeem`, `…/web/confirm` | keine | der Link von `web-login`: Das Skript schickt das Ticket aus dem Fragment an `redeem`, das es einlöst; ist dieselbe Person angemeldet, wird weitergeleitet, sonst bestätigt die Person „Als … anmelden?“, und `confirm` meldet an |
 | `plugins.php/appconnect/connect` | Sitzung, `autor` | „Stud.App Verbindung“ unter Profil → Einstellungen, über Drittanwendungen: Kopplungscode, Geräteliste |
 | `plugins.php/appconnect/get` | keine | Landing-Page des QR-Codes; Code im Fragment `#p=` |
@@ -154,7 +155,7 @@ Components in `plugin/lib/classes/`:
 | `Pairing`, `Connect` | pairing codes (hash only, five minutes, first redemption wins) and the connect link of the QR code |
 | `Devices` | device rows bound to a token lineage, removal and revocation in the core token tables (`TokenLedger`), retention |
 | `WebLogin` | one-time tickets for the web login, `return_to` checks, the sign-in like the core login |
-| `Calendar` | the person's calendar in the shapes of the core route `users/{id}/events`, with course colours (`UserEvents`); the subscription address of the calendar key (`IcalSubscription`) |
+| `Calendar` | the person's calendar in the shapes of the core route `users/{id}/events`, with course colours (`UserEvents`); the subscription address of the calendar key (`IcalSubscription`), new keys and their limit (`IcalKey`, `IcalKeyLimit`) |
 | `Places`, `Profile` | places of course dates with coordinates, the profile language |
 | `RateLimit`, `Audit`, `Mail` | failure limits, event log actions, the connection mail |
 | `Routes` | thin JSON:API controllers of the routes below; `AppToken` admits only the app client's token |
@@ -163,7 +164,8 @@ Components in `plugin/lib/classes/`:
 
 Classes without a Stud.IP dependency (`Discovery\DiscoveryBuilder`,
 `Discovery\DiscoveryResponse`, `Connect\*`, `Settings\Settings`, `Calendar\UserEvents`,
-`Calendar\IcalSubscription`, `WebLogin\WebLoginService`, `RateLimit\RateLimiter`) are
+`Calendar\IcalSubscription`, `Calendar\IcalKey`, `Calendar\IcalKeyLimit`,
+`WebLogin\WebLoginService`, `RateLimit\RateLimiter`) are
 covered by PHPUnit; the thin Stud.IP layer (`Runtime`, `Routes\*`,
 `OAuth2\ClientProvisioner`, `Devices\TokenLedger`, the controllers) is tested against a
 running Stud.IP.
@@ -222,7 +224,7 @@ A local instance over plain `http` is accepted by the apps only in DEBUG builds 
 | `GET /jsonapi.php/v1/app-connect/user-language` | signed in | profile language of the person, else the site's default ([`contract/user-language.md`](../../contract/user-language.md)); discovery feature `userLanguage` |
 | `GET /jsonapi.php/v1/app-connect/user-events` | signed in | the person's calendar for two weeks: personal entries, course dates, cancellations, with the course colour `color` ([`contract/user-events.md`](../../contract/user-events.md)); discovery feature `userEvents`; `200`, `400`, `401`, `404` |
 | `POST /jsonapi.php/v1/app-connect/web-login` | OAuth2 token of the app client, or HTTP Basic (password checked by the plugin) | one-time link (60 s) that signs the person in on the web and opens `return_to` ([`contract/web-login.md`](../../contract/web-login.md)); discovery feature `webLogin`; `201`, `400`, `401`, `403`, `404`, `429` |
-| `GET`/`DELETE /jsonapi.php/v1/app-connect/me/ical-key` | OAuth2 token of the app client | the person's own calendar key, created on first ask, and the reset ([`contract/ical-key.md`](../../contract/ical-key.md)); discovery feature `icalKey`; `200`, `204`, `401`, `403`, `404` |
+| `GET`/`DELETE /jsonapi.php/v1/app-connect/me/ical-key` | OAuth2 token of the app client | the person's own calendar key, created on first ask, and the reset ([`contract/ical-key.md`](../../contract/ical-key.md)); discovery feature `icalKey`; `200`, `204`, `401`, `403`, `404`, `429` |
 | `plugins.php/appconnect/web/enter`, `…/web/redeem`, `…/web/confirm` | none | the link of `web-login`: the script posts the ticket from the fragment to `redeem`, which claims it; the same person signed in is redirected, anyone else confirms "Als … anmelden?" and `confirm` signs in |
 | `plugins.php/appconnect/connect` | session, `autor` | "Stud.App Verbindung" under Profile → Settings, above Drittanwendungen: pairing code, device list |
 | `plugins.php/appconnect/get` | none | landing page of the QR code; code in the fragment `#p=` |

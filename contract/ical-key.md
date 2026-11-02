@@ -11,8 +11,12 @@ key is created on the calendar's publish page in the web interface, and
 Stud.IP's JSON:API has no route that hands it out. Without this route the
 way into a subscription leads through the browser and a copied string.
 
-The route is the only thing the plugin adds here. The key, its format and
-its generator belong to the core (`IcalExport`); nothing is duplicated.
+The key lives where the core keeps it (`ICAL_EXPORT_KEY` in the person's
+configuration), so the core's export serves it unchanged. New keys are made
+by the plugin, not by the core's `IcalExport::makeKey()`: that one builds
+eight characters from `rand()`, whose state can be recovered from its output,
+and a route that creates keys on request would let anyone with an app token
+collect as many as they like.
 
 ## Announcement
 
@@ -40,6 +44,12 @@ configuration section "Stud.App".
   read another person's key.
 - Without a key one is created, so the person does not have to find a page
   first. They asked for the subscription, and the call is idempotent.
+- A key the person already has is returned as it is, even one the core made
+  on the calendar page; replacing it would end the subscriptions built on
+  it. A reset (below) gives a new key.
+- At most five keys are created per person and hour. Beyond that → `429
+  app-connect-too-many-requests` with `Retry-After` (seconds until the hour
+  ends); a key that already exists is still returned.
 - Without sign-in → `401`. App connection switched off → `404
   app-connect-disabled`. Feature switched off → `404
   app-connect-ical-key-disabled`.
@@ -51,15 +61,17 @@ configuration section "Stud.App".
 ```json
 {
   "data": {
-    "key": "XtlMLwYW",
-    "subscribeUrl": "webcal://studip.example/dispatch.php/ical/index/XtlMLwYW",
+    "key": "k3v9q2m7x8c4w1z6t5b0n2r8h4j7d9f3",
+    "subscribeUrl": "webcal://studip.example/dispatch.php/ical/index/k3v9q2m7x8c4w1z6t5b0n2r8h4j7d9f3",
     "active": true
   }
 }
 ```
 
-- `key`: the core's key, letters and digits (eight by default, a site may
-  set another length).
+- `key`: letters and digits, 6 to 32 of them. Keys created here are 32
+  lower-case letters and digits from a cryptographic random generator; a key
+  the core made earlier has eight characters by default, or the length the
+  site chose.
 - `subscribeUrl`: the `webcal://` address for the system calendar, or `null`
   when the site cannot be reached the way a calendar app needs it — https on
   the default port. Apps then show the key instead of a link that would
@@ -72,7 +84,7 @@ configuration section "Stud.App".
 
 Drops the key, which stops every subscription built on it: the way back once
 the key has been passed on or a device was lost. The next `GET` makes a new
-one. Idempotent — a person without a key gets `204` as well.
+one, within the limit above. Idempotent — a person without a key gets `204` as well.
 
 ## What is logged
 
