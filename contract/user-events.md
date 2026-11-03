@@ -46,8 +46,9 @@ configuration section "Stud.App"; the feature is then announced as `false`.
 
 As the web calendar assembles them:
 
-1. personal entries (`calendar_date_assignments` of the person, not declined),
-   series once with their first date and `recurrence`;
+1. personal entries (`calendar_date_assignments` of the person, not declined);
+   a series appears once per occurrence in the window, each with its own
+   start and end and the series rule in `recurrence`;
 2. dates of courses where the person has "show in calendar" on
    (`seminar_user.bind_calendar = 1`), without dates of hidden schedule
    entries and of groups the person is not in;
@@ -73,12 +74,13 @@ Resources are sorted by start time.
     },
     {
       "type": "calendar-events",
-      "id": "<calendar_date_id>",
+      "id": "<calendar_date_id>_<start as Unix time>",
       "attributes": {
         "title": "Lerngruppe", "description": "", "start": "…", "end": "…", "categories": "",
         "location": "Bibliothek", "mkdate": "…", "chdate": "…", "recurrence": ""
       },
-      "relationships": { "owner": { "data": { "type": "users", "id": "<user_id>" } } }
+      "relationships": { "owner": { "data": { "type": "users", "id": "<user_id>" } } },
+      "meta": { "calendar-date-id": "<calendar_date_id>" }
     }
   ],
   "meta": { "page": { "offset": 0, "limit": 30, "total": 2 } }
@@ -88,5 +90,8 @@ Resources are sorted by start time.
 - `course-events` carry the attributes of the core schema plus `color`: the
   person's colour group of the course, 0–8 as in the web interface (0 is a
   colour too). `is-cancelled` is `true` for cancelled dates.
-- `calendar-events` carry the attributes of the core schema; their `id` is the
-  calendar date id.
+- `calendar-events` carry the attributes of the core schema. There is one
+  resource per occurrence: the `id` is the calendar date id and the start time
+  of the occurrence (Unix time), joined by `_`, so every (`type`, `id`) pair is
+  unique. `meta.calendar-date-id` is the calendar date the occurrence belongs
+  to; occurrences of one series share it.

@@ -101,7 +101,19 @@ final class UserEvents
     }
 
     /**
-     * A personal calendar entry as `calendar-events`.
+     * Id of one occurrence of a personal entry. The core returns every
+     * occurrence of a series as an entry of its own, all with the id of the
+     * calendar date; the start time tells them apart, as in the core's own
+     * keys.
+     */
+    public static function occurrenceId(string $calendarDateId, int $start): string
+    {
+        return $calendarDateId . '_' . $start;
+    }
+
+    /**
+     * A personal calendar entry as `calendar-events`: one resource per
+     * occurrence, with the calendar date in `meta`.
      *
      * @param array{id: string, userId: string, title: string, description: string, start: int, end: int,
      *     categories: string, location: string, mkdate: int, chdate: int, recurrence: string} $entry
@@ -111,7 +123,7 @@ final class UserEvents
     {
         return [
             'type' => 'calendar-events',
-            'id' => $entry['id'],
+            'id' => self::occurrenceId($entry['id'], $entry['start']),
             'attributes' => [
                 'title' => $entry['title'],
                 'description' => $entry['description'],
@@ -124,6 +136,7 @@ final class UserEvents
                 'recurrence' => $entry['recurrence'],
             ],
             'relationships' => ['owner' => ['data' => ['type' => 'users', 'id' => $entry['userId']]]],
+            'meta' => ['calendar-date-id' => $entry['id']],
         ];
     }
 

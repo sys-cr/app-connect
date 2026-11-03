@@ -84,6 +84,22 @@ final class UserEventsTest extends TestCase
             array_keys($event['attributes'])
         );
         self::assertSame(['data' => ['type' => 'users', 'id' => 'u1']], $event['relationships']['owner']);
+        self::assertSame('p1_1800000000', $event['id']);
+        self::assertSame(['calendar-date-id' => 'p1'], $event['meta']);
+    }
+
+    public function testOccurrencesOfASeriesHaveIdsOfTheirOwn(): void
+    {
+        $entry = [
+            'id' => 'p1', 'userId' => 'u1', 'title' => 'Lerngruppe', 'description' => '', 'start' => 1_800_000_000,
+            'end' => 1_800_007_200, 'categories' => '', 'location' => '', 'mkdate' => 1, 'chdate' => 2,
+            'recurrence' => 'weekly',
+        ];
+        $first = UserEvents::personalEvent($entry);
+        $second = UserEvents::personalEvent(['start' => 1_800_604_800, 'end' => 1_800_612_000] + $entry);
+
+        self::assertNotSame($first['id'], $second['id']);
+        self::assertSame($first['meta'], $second['meta']);
     }
 
     public function testDocumentSortsByTimeAndPages(): void
