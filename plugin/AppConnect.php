@@ -10,6 +10,7 @@ require_once __DIR__ . '/bootstrap.php';
 use AppConnect\Audit\EventLog;
 use AppConnect\Devices\DeviceRetention;
 use AppConnect\OAuth2\ClientProvisioner;
+use AppConnect\Privacy\UserDataExport;
 use AppConnect\Routes\CourseDatePlacesShow;
 use AppConnect\Routes\DevicesCreate;
 use AppConnect\Routes\DiscoveryShow;
@@ -31,7 +32,7 @@ use Slim\Routing\RouteCollectorProxy;
  * "Stud.App Verbindung" under Profile → Settings and the operator settings in
  * the configuration section "Stud.App" (Admin → System → Konfiguration).
  */
-class AppConnect extends StudIPPlugin implements SystemPlugin, JsonApiPlugin
+class AppConnect extends StudIPPlugin implements SystemPlugin, JsonApiPlugin, PrivacyPlugin
 {
     /** Settings entry of the page "Stud.App Verbindung". */
     public const NAVIGATION_PATH = '/profile/settings/app_connect';
@@ -113,6 +114,12 @@ class AppConnect extends StudIPPlugin implements SystemPlugin, JsonApiPlugin
     public function registerSchemas(): array
     {
         return [];
+    }
+
+    /** Devices, pairing codes and web-login tickets of the person, for the core's data export. */
+    public function exportUserData(StoredUserData $storage)
+    {
+        UserDataExport::export($storage);
     }
 
     private function profileEntryIsOn(): bool

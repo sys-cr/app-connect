@@ -56,7 +56,7 @@ Composer (Dev-Abhängigkeiten aus `plugin/composer.lock`), git 2.40+ (`make dist
 
 Die Texte sind deutsch und stehen in der Textdomäne `app-connect` (`localedomain` im
 Manifest). Plugin-Klasse und Controller übersetzen mit `$this->_()`, Views mit `$_()`, Code
-ohne Plugin-Instanz (Cronjob, Mail) mit `Translation::text()`. Die
+ohne Plugin-Instanz (Cronjob, Mail, Datenauskunft) mit `Translation::text()`. Die
 Oberfläche siezt. Die englischen Texte stehen in
 `plugin/locale/en/LC_MESSAGES/app-connect.po`; `make locale` übersetzt sie mit `msgfmt` in
 die `.mo`-Datei, die mit eingecheckt wird. `LocaleTest` schlägt fehl, wenn ein Text im Code
@@ -206,7 +206,7 @@ dependencies from `plugin/composer.lock`), git 2.40+ (`make dist` uses
 
 The texts are German and live in the text domain `app-connect` (`localedomain` in the
 manifest). The plugin class and controllers translate with `$this->_()`, views with
-`$_()`, code without a plugin instance (cronjob, mail) with
+`$_()`, code without a plugin instance (cronjob, mail, data export) with
 `Translation::text()`. The interface addresses people formally ("Sie"). The English texts
 are in `plugin/locale/en/LC_MESSAGES/app-connect.po`; `make locale` compiles them with
 `msgfmt` into the committed `.mo` file. `LocaleTest` fails when a text in the code has no

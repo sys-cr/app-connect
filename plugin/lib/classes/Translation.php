@@ -11,8 +11,8 @@ namespace AppConnect;
  * Translation in the plugin's text domain (`localedomain` in plugin.manifest,
  * catalogues in locale/). The plugin class, its controllers and views use the
  * core's plugin translation (`$plugin->_()`, `$_` in views); this class serves
- * the code that runs without a plugin instance: the cron job and the mail.
- * Like the core's plugin translation it falls back to the
+ * the code that runs without a plugin instance: the cron job, the mail and
+ * the data export. Like the core's plugin translation it falls back to the
  * core catalogue and returns the German text when neither has an entry.
  */
 final class Translation

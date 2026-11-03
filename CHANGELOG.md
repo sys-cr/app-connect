@@ -67,6 +67,8 @@ Erste veröffentlichte Version.
   Ereignisprotokolls zu Web-Anmeldung und Kalender-Schlüssel laufen nach 90 Tagen ab.
 - **Sprachen** – Seiten, Verbindungsmail und Cronjob auf Deutsch und Englisch (eigene
   Textdomäne `app-connect`); die Seiten siezen wie die übrige Oberfläche von Stud.IP.
+- **Datenauskunft** – Geräte, Kopplungscodes und Links für die Anmeldung im Web erscheinen
+  in der Personendaten-Auskunft von Stud.IP (`PrivacyPlugin`).
 - **Schutz der Seiten** – die Seiten des Plugins lassen sich nicht einbetten
   (`X-Frame-Options`, `frame-ancestors`).
 - **Lizenz** – GPL-3.0-or-later mit Zusatzbedingungen nach Abschnitt 7
@@ -145,6 +147,8 @@ First published version.
   the calendar key expire after 90 days.
 - **Languages** – pages, connection mail and cronjob in German and English (own text
   domain `app-connect`); the pages address people formally, like the rest of Stud.IP.
+- **Data export** – devices, pairing codes and web login links appear in the Stud.IP
+  personal data view and export (`PrivacyPlugin`).
 - **Page protection** – the plugin's pages may not be framed (`X-Frame-Options`,
   `frame-ancestors`).
 - **License** – GPL-3.0-or-later with additional terms under section 7

@@ -162,6 +162,15 @@ msgstr "The code has expired. Create a new one if needed."
 msgid "Verbunden: %s · %s · %s Uhr. Waren Sie das nicht? Entfernen Sie das Gerät unten."
 msgstr "Connected: %s · %s · %s. Was this not you? Remove the device below."
 
+msgid "Verbundene Geräte"
+msgstr "Connected devices"
+
+msgid "Kopplungscodes"
+msgstr "Pairing codes"
+
+msgid "Links zur Web-Anmeldung"
+msgstr "Web sign-in links"
+
 msgid "QR-Code"
 msgstr "QR code"
 

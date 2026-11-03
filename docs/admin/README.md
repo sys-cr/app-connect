@@ -180,7 +180,10 @@ Ein Cronjob „app-connect: Aufräumen“ (vom Plugin angelegt und eingeschaltet
 - Gerätezeilen einen Monat nach Ablauf des Refresh-Tokens des Geräts – entfernte Geräte
   ebenso wie Geräte, die nicht mehr genutzt wurden.
 
-Wird ein Konto gelöscht, verschwinden seine Geräte, Codes und Links sofort.
+Wird ein Konto gelöscht, verschwinden seine Geräte, Codes und Links sofort. Die
+Personendaten von Stud.IP (Benutzerverwaltung → Aktionen → „Anzeige Personendaten“ bzw.
+„Export Personendaten als CSV“) enthalten Geräte, Kopplungscodes und Links einer Person;
+Codes und Links nur als Hash.
 Ereignisprotokoll-Einträge zu Web-Anmeldungen und zum Kalender-Schlüssel löscht der Kern
 nach 90 Tagen; die übrigen Einträge des Plugins folgen euren Einstellungen des
 Ereignisprotokolls.
@@ -422,6 +425,9 @@ on by the plugin, daily at 03:17; Admin → System → Cronjobs) deletes
   as devices that were not used again.
 
 When an account is deleted, its devices, codes and web login links are removed at once.
+The Stud.IP personal data view and export (user administration → actions → "Anzeige
+Personendaten" / "Export Personendaten als CSV") contain a person's devices, pairing
+codes and web login links; codes and links as hashes only.
 Event log entries about web logins and the calendar key are deleted by the core after 90
 days; the other entries of the plugin follow your event log settings.
 
