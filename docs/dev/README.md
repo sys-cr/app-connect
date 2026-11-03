@@ -52,6 +52,14 @@ Der Plugin-Code muss auf den PHP-Versionen aller unterstützten Stud.IP-Versione
 Composer (Dev-Abhängigkeiten aus `plugin/composer.lock`), git 2.40+ (`make dist` nutzt
 `git archive --mtime`).
 
+## Migrationen
+
+Eine Migration enthält die Werte, die sie anlegt – Konfigurationseinträge (`FIELDS`),
+Aktionen des Ereignisprotokolls (`ACTIONS`) –, statt sie aus den Klassen des Plugins zu
+lesen, wie die Migrationen des Kerns. Eine spätere Änderung an `OperatorConfig` oder
+`EventLog` braucht deshalb eine neue Migration. `MigrationsTest` prüft, dass alle
+Migrationen zusammen genau die Einträge und Aktionen anlegen, die der Code erwartet.
+
 ## Installation in ein lokales Stud.IP
 
 Das Plugin-Verzeichnis muss `public/plugins_packages/studapp/AppConnect` heißen (Herkunft
@@ -182,6 +190,14 @@ The plugin code must run on the PHP versions of every supported Stud.IP release 
 and later); run `php -l` with the oldest one as well. Tools: PHP 8.1+, Composer (dev
 dependencies from `plugin/composer.lock`), git 2.40+ (`make dist` uses
 `git archive --mtime`).
+
+### Migrations
+
+A migration contains the values it creates – configuration entries (`FIELDS`), event log
+actions (`ACTIONS`) – instead of reading them from the plugin's classes, like the core's
+migrations. A later change to `OperatorConfig` or `EventLog` therefore needs a new
+migration. `MigrationsTest` checks that all migrations together create exactly the entries
+and actions the code expects.
 
 ### Installing into a local Stud.IP
 

@@ -5,16 +5,19 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../bootstrap.php';
-
-use AppConnect\Settings\OperatorConfig;
-
 /**
- * Brings the descriptions of the entries in section "Stud.App" up to date;
- * Config::create() writes a description only once.
+ * Brings the descriptions of the entries created by migrations 004 to 007 up
+ * to date; Config::create() writes a description only once.
  */
 return new class extends Migration
 {
+    private const MIGRATIONS = [
+        '004_move_operator_settings_to_config',
+        '005_add_room_finder_property_setting',
+        '006_add_institution_settings',
+        '007_add_courseware_switch',
+    ];
+
     public function description()
     {
         return 'Refreshes the descriptions of the app-connect configuration entries.';
@@ -23,8 +26,11 @@ return new class extends Migration
     protected function up()
     {
         $statement = DBManager::get()->prepare('UPDATE `config` SET `description` = ? WHERE `field` = ?');
-        foreach (OperatorConfig::definitions() as $field => $definition) {
-            $statement->execute([$definition['description'], $field]);
+        foreach (self::MIGRATIONS as $name) {
+            $migration = require __DIR__ . '/' . $name . '.php';
+            foreach ($migration::FIELDS as $field => $definition) {
+                $statement->execute([$definition['description'], $field]);
+            }
         }
     }
 

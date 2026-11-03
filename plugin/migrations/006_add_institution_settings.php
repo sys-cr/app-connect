@@ -5,21 +5,71 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../bootstrap.php';
-
-use AppConnect\Settings\ConfigBackedSettingsStore;
-use AppConnect\Settings\DatabaseSettingsStore;
-use AppConnect\Settings\OperatorConfig;
-use AppConnect\Settings\Settings;
-use AppConnect\Settings\StudipConfigAccess;
-
 /**
- * Adds the institution settings of the section "Stud.App" – support address,
+ * Adds the institution settings of the section "Stud.App": support address,
  * logo, accent colour, links, mensa source and the switches for messages and
- * places – and carries branding and links over from the plugin table.
+ * places.
  */
 return new class extends Migration
 {
+    public const FIELDS = [
+        'APP_CONNECT_FEATURE_MESSAGES' => [
+            'type' => 'boolean',
+            'value' => 1,
+            'description' => 'Zeigt in der App die Nachrichten.',
+        ],
+        'APP_CONNECT_FEATURE_EVENT_PLACES' => [
+            'type' => 'boolean',
+            'value' => 1,
+            'description' => 'Zeigt in der App bei Terminen den gebuchten Raum mit Karte und Raumfinder (Raumverwaltung von Stud.IP).',
+        ],
+        'APP_CONNECT_SUPPORT_EMAIL' => [
+            'type' => 'string',
+            'value' => '',
+            'description' => 'E-Mail-Adresse des Supports der Hochschule; die App bietet sie für Hilfe und zum Melden von Inhalten an. Leer: kein Support-Kontakt der Hochschule in der App.',
+        ],
+        'APP_CONNECT_LOGO_URL' => [
+            'type' => 'string',
+            'value' => '',
+            'description' => 'Adresse des Hochschul-Logos für die App, beginnend mit https://.',
+        ],
+        'APP_CONNECT_ACCENT_COLOR' => [
+            'type' => 'string',
+            'value' => '',
+            'description' => 'Akzentfarbe der Hochschule als #RRGGBB. Die App leitet daraus ein kontrastsicheres Farbschema ab. Leer: Standardschema.',
+        ],
+        'APP_CONNECT_LINK_HOMEPAGE' => [
+            'type' => 'string',
+            'value' => '',
+            'description' => 'Link zur Website der Hochschule für die App, beginnend mit https://.',
+        ],
+        'APP_CONNECT_LINK_CAMPUS_MANAGEMENT' => [
+            'type' => 'string',
+            'value' => '',
+            'description' => 'Link zum Campus-Management-System der Hochschule, beginnend mit https://.',
+        ],
+        'APP_CONNECT_LINK_LIBRARY' => [
+            'type' => 'string',
+            'value' => '',
+            'description' => 'Link zur Bibliothek der Hochschule, beginnend mit https://.',
+        ],
+        'APP_CONNECT_LINK_IT_HELP' => [
+            'type' => 'string',
+            'value' => '',
+            'description' => 'Link zur IT-Hilfe der Hochschule, beginnend mit https://.',
+        ],
+        'APP_CONNECT_MENSA_OPENMENSA_IDS' => [
+            'type' => 'string',
+            'value' => '',
+            'description' => 'OpenMensa-IDs der Mensen, durch Komma getrennt; die erste ist die voreingestellte. Hat Vorrang vor APP_CONNECT_MENSA_URL.',
+        ],
+        'APP_CONNECT_MENSA_URL' => [
+            'type' => 'string',
+            'value' => '',
+            'description' => 'Link zum Web-Speiseplan, wenn die Mensen nicht bei OpenMensa stehen, beginnend mit https://.',
+        ],
+    ];
+
     public function description()
     {
         return 'Adds the app-connect institution settings (support, branding, links, mensa, feature switches).';
@@ -27,43 +77,16 @@ return new class extends Migration
 
     protected function up()
     {
-        $config = Config::get();
-        foreach (OperatorConfig::definitions() as $field => $definition) {
-            if (!$config->getMetadata($field)) {
-                $config->create($field, [
-                    'value' => $definition['type'] === 'boolean' ? (int) $definition['value'] : $definition['value'],
-                    'type' => $definition['type'],
-                    'range' => 'global',
-                    'section' => OperatorConfig::SECTION,
-                    'description' => $definition['description'],
-                ]);
-            }
-        }
-
-        $table = new DatabaseSettingsStore();
-        $store = new ConfigBackedSettingsStore(new StudipConfigAccess(), $table);
-        foreach ([Settings::BRANDING, Settings::LINKS] as $key) {
-            $value = $table->get($key);
-            if ($value !== null) {
-                $store->set($key, $value);
-                $table->set($key, null);
+        foreach (self::FIELDS as $field => $definition) {
+            if (!Config::get()->getMetadata($field)) {
+                Config::get()->create($field, $definition + ['range' => 'global', 'section' => 'Stud.App']);
             }
         }
     }
 
     protected function down()
     {
-        $table = new DatabaseSettingsStore();
-        $store = new ConfigBackedSettingsStore(new StudipConfigAccess(), $table);
-        foreach ([Settings::BRANDING, Settings::LINKS] as $key) {
-            $table->set($key, $store->get($key));
-        }
-        $fields = [
-            OperatorConfig::FEATURE_MESSAGES, OperatorConfig::FEATURE_EVENT_PLACES, OperatorConfig::SUPPORT_EMAIL,
-            OperatorConfig::LOGO_URL, OperatorConfig::ACCENT_COLOR, OperatorConfig::MENSA_OPENMENSA_IDS,
-            OperatorConfig::MENSA_URL, ...array_values(OperatorConfig::LINK_FIELDS),
-        ];
-        foreach ($fields as $field) {
+        foreach (array_keys(self::FIELDS) as $field) {
             Config::get()->delete($field);
         }
     }

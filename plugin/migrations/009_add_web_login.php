@@ -5,17 +5,36 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../bootstrap.php';
-
-use AppConnect\Audit\EventLog;
-use AppConnect\Settings\OperatorConfig;
-
 /**
  * Web login from the app: the ticket table (hashes only), its event log
  * actions and the switch in the section "Stud.App".
  */
 return new class extends Migration
 {
+    /** Action name => [description, info template]. */
+    public const ACTIONS = [
+        'APPCONNECT_WEB_LOGIN_ISSUE' => [
+            'Web-Anmeldung aus der App angefordert',
+            '%user fordert aus der App eine Anmeldung im Web an.',
+        ],
+        'APPCONNECT_WEB_LOGIN_REDEEM' => [
+            'Web-Anmeldung aus der App eingelöst',
+            '%user meldet sich aus der App im Web an.',
+        ],
+        'APPCONNECT_WEB_LOGIN_REJECT' => [
+            'Web-Anmeldung aus der App abgelehnt',
+            'Eine Anmeldung von %user aus der App im Web wird abgelehnt.',
+        ],
+    ];
+
+    public const FIELDS = [
+        'APP_CONNECT_FEATURE_WEB_LOGIN' => [
+            'type' => 'boolean',
+            'value' => 1,
+            'description' => 'Öffnet Stud.IP-Seiten aus der App ohne erneute Anmeldung im Browser (einmaliger Link, 60 Sekunden gültig). Ein zweiter Faktor des Identity Providers wird dabei nicht abgefragt.',
+        ],
+    ];
+
     public function description()
     {
         return 'Adds the web-login tickets of app-connect and their switch.';
@@ -38,30 +57,24 @@ return new class extends Migration
                 KEY `created_at` (`created_at`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
         );
-
-        foreach (EventLog::WEB_LOGIN_ACTIONS as $name) {
+        foreach (self::ACTIONS as $name => [$description, $template]) {
             if (!LogAction::findOneByName($name)) {
-                [$description, $template] = EventLog::ACTIONS[$name];
                 StudipLog::registerActionPlugin($name, $description, $template, 'AppConnect');
             }
         }
-
-        $definition = OperatorConfig::definitions()[OperatorConfig::FEATURE_WEB_LOGIN];
-        if (!Config::get()->getMetadata(OperatorConfig::FEATURE_WEB_LOGIN)) {
-            Config::get()->create(OperatorConfig::FEATURE_WEB_LOGIN, [
-                'value' => (int) $definition['value'],
-                'type' => $definition['type'],
-                'range' => 'global',
-                'section' => OperatorConfig::SECTION,
-                'description' => $definition['description'],
-            ]);
+        foreach (self::FIELDS as $field => $definition) {
+            if (!Config::get()->getMetadata($field)) {
+                Config::get()->create($field, $definition + ['range' => 'global', 'section' => 'Stud.App']);
+            }
         }
     }
 
     protected function down()
     {
-        Config::get()->delete(OperatorConfig::FEATURE_WEB_LOGIN);
-        foreach (EventLog::WEB_LOGIN_ACTIONS as $name) {
+        foreach (array_keys(self::FIELDS) as $field) {
+            Config::get()->delete($field);
+        }
+        foreach (array_keys(self::ACTIONS) as $name) {
             StudipLog::unregisterAction($name);
         }
         DBManager::get()->exec('DROP TABLE IF EXISTS `app_connect_web_login_tickets`');

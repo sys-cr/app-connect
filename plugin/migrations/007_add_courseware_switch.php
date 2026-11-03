@@ -5,15 +5,19 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../bootstrap.php';
-
-use AppConnect\Settings\OperatorConfig;
-
 /**
  * Adds the switch for Courseware in the app to the section "Stud.App".
  */
 return new class extends Migration
 {
+    public const FIELDS = [
+        'APP_CONNECT_FEATURE_COURSEWARE' => [
+            'type' => 'boolean',
+            'value' => 1,
+            'description' => 'Zeigt in der App die Courseware der Veranstaltungen zum Lesen. Wirkt nur, wenn das Modul Courseware aktiv ist.',
+        ],
+    ];
+
     public function description()
     {
         return 'Adds the app-connect switch for Courseware.';
@@ -21,20 +25,17 @@ return new class extends Migration
 
     protected function up()
     {
-        $definition = OperatorConfig::definitions()[OperatorConfig::FEATURE_COURSEWARE];
-        if (!Config::get()->getMetadata(OperatorConfig::FEATURE_COURSEWARE)) {
-            Config::get()->create(OperatorConfig::FEATURE_COURSEWARE, [
-                'value' => (int) $definition['value'],
-                'type' => $definition['type'],
-                'range' => 'global',
-                'section' => OperatorConfig::SECTION,
-                'description' => $definition['description'],
-            ]);
+        foreach (self::FIELDS as $field => $definition) {
+            if (!Config::get()->getMetadata($field)) {
+                Config::get()->create($field, $definition + ['range' => 'global', 'section' => 'Stud.App']);
+            }
         }
     }
 
     protected function down()
     {
-        Config::get()->delete(OperatorConfig::FEATURE_COURSEWARE);
+        foreach (array_keys(self::FIELDS) as $field) {
+            Config::get()->delete($field);
+        }
     }
 };
