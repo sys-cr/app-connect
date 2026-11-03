@@ -21,7 +21,8 @@ Funktionen erfahren sie über dieses Plugin.
 Unterstützt: Stud.IP 6.0 und neuere 6.x-Versionen. Für Betreiber:
 [`docs/admin/README.md`](docs/admin/README.md) mit Einrichtung, allen API-Endpunkten,
 gespeicherten Daten und Aufbewahrung. Für Studierende, Lehrende und Mitarbeitende:
-[`docs/user/README.md`](docs/user/README.md).
+[`docs/user/README.md`](docs/user/README.md). Wie die Funktionen in den Stud.IP-Kern
+wandern sollen: [`docs/core/README.md`](docs/core/README.md).
 
 ## Aufbau des Repositorys
 
@@ -29,7 +30,7 @@ gespeicherten Daten und Aufbewahrung. Für Studierende, Lehrende und Mitarbeiten
 |---|---|---|
 | `plugin/` | das Stud.IP-Plugin (PHP) | GPL-3.0-or-later |
 | `contract/` | JSON-Schema der Discovery, Regeln für Verbindungslinks und Routen, gemeinsame Test-Vektoren für Plugin und Apps | GPL-3.0-or-later |
-| `docs/` | Dokumentation für Nutzende (`docs/user`), Betreiber (`docs/admin`) und Entwicklung (`docs/dev`) | GPL-3.0-or-later |
+| `docs/` | Dokumentation für Nutzende (`docs/user`), Betreiber (`docs/admin`), Entwicklung (`docs/dev`) und den Weg in den Kern (`docs/core`) | GPL-3.0-or-later |
 
 ## Entwicklung
 
@@ -83,7 +84,8 @@ the OAuth2 client and the available features from this plugin.
 
 Supported: Stud.IP 6.0 and later 6.x releases. Operators: see
 [`docs/admin/README.md`](docs/admin/README.md) for setup, all API endpoints, stored data
-and retention. Students, teachers and staff: see [`docs/user/README.md`](docs/user/README.md).
+and retention. Students, teachers and staff: see [`docs/user/README.md`](docs/user/README.md). How the functions are meant to move
+into the Stud.IP core: [`docs/core/README.md`](docs/core/README.md).
 
 ### Repository layout
 
@@ -91,7 +93,7 @@ and retention. Students, teachers and staff: see [`docs/user/README.md`](docs/us
 |---|---|---|
 | `plugin/` | the Stud.IP plugin (PHP) | GPL-3.0-or-later |
 | `contract/` | JSON schema of the discovery, rules for connect links and routes, shared test vectors for plugin and apps | GPL-3.0-or-later |
-| `docs/` | user (`docs/user`), operator (`docs/admin`) and developer (`docs/dev`) documentation | GPL-3.0-or-later |
+| `docs/` | user (`docs/user`), operator (`docs/admin`), developer (`docs/dev`) and core migration (`docs/core`) documentation | GPL-3.0-or-later |
 
 ### Development
 
