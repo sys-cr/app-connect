@@ -30,7 +30,7 @@ class GetController extends PluginController
     {
         $settings = Runtime::settings();
         $this->enabled = $settings->isEnabled() && $settings->clientId() !== null;
-        PageLayout::setTitle(_('App holen'));
+        PageLayout::setTitle($this->_('App holen'));
         Attribution::addToHelpbar();
 
         $base = parse_url(Runtime::baseUrl());

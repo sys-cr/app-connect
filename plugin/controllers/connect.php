@@ -34,7 +34,7 @@ class ConnectController extends PluginController
         $GLOBALS['perm']->check('autor');
         $this->settings = Runtime::settings();
         if (!$this->settings->isEnabled() || !$this->settings->isProfileEntryEnabled() || $this->settings->clientId() === null) {
-            throw new AccessDeniedException(_('Die Verbindung mit der App ist an dieser Hochschule nicht eingeschaltet.'));
+            throw new AccessDeniedException($this->_('Die Verbindung mit der App ist an dieser Hochschule nicht eingeschaltet.'));
         }
         $this->userId = (string) $GLOBALS['user']->id;
         $this->devices = new DeviceService(new TokenLedger(), (string) $this->settings->clientId());
@@ -42,7 +42,7 @@ class ConnectController extends PluginController
         if (Navigation::hasItem(AppConnect::NAVIGATION_PATH)) {
             Navigation::activateItem(AppConnect::NAVIGATION_PATH);
         }
-        PageLayout::setTitle(_('Stud.App Verbindung'));
+        PageLayout::setTitle($this->_('Stud.App Verbindung'));
         Attribution::addToHelpbar();
     }
 
@@ -65,7 +65,7 @@ class ConnectController extends PluginController
         }
         $created = $this->pairing->create($this->userId);
         if ($created === null) {
-            PageLayout::postError(_('Du hast in der letzten Stunde zu viele Codes erzeugt. Bitte versuche es später noch einmal.'));
+            PageLayout::postError($this->_('Sie haben in der letzten Stunde zu viele Codes erzeugt. Bitte versuchen Sie es später noch einmal.'));
             $this->redirect('connect/index');
             return;
         }
@@ -108,7 +108,7 @@ class ConnectController extends PluginController
     {
         CSRFProtection::verifyUnsafeRequest();
         if ($this->devices->remove($this->userId, (int) $id)) {
-            PageLayout::postSuccess(_('Das Gerät wurde entfernt. Es kann nicht mehr auf dein Konto zugreifen.'));
+            PageLayout::postSuccess($this->_('Das Gerät wurde entfernt. Es kann nicht mehr auf Ihr Konto zugreifen.'));
         }
         $this->redirect('connect/index');
     }
@@ -118,7 +118,7 @@ class ConnectController extends PluginController
         CSRFProtection::verifyUnsafeRequest();
         $count = $this->devices->endUnassigned($this->userId);
         if ($count > 0) {
-            PageLayout::postSuccess(_('Die weiteren Anmeldungen wurden beendet.'));
+            PageLayout::postSuccess($this->_('Die weiteren Anmeldungen wurden beendet.'));
         }
         $this->redirect('connect/index');
     }

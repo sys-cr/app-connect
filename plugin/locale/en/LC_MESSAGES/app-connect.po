@@ -1,0 +1,212 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-FileCopyrightText: 2026 Bodo Steffen
+# Additional terms under GPL-3.0 section 7: see SUPPLEMENTAL-TERMS.txt
+#
+# English texts of app-connect. After a change: make locale
+msgid ""
+msgstr ""
+"Project-Id-Version: app-connect\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Stud.App Verbindung"
+msgstr "Stud.App connection"
+
+msgid "Die Adresse muss mit https:// beginnen."
+msgstr "The address must start with https://."
+
+msgid "Das ist keine gültige E-Mail-Adresse."
+msgstr "This is not a valid email address."
+
+msgid "Die Farbe muss die Form #RRGGBB haben."
+msgstr "The colour must have the form #RRGGBB."
+
+msgid "Erwartet werden OpenMensa-IDs (Zahlen), durch Komma getrennt."
+msgstr "Expected are OpenMensa ids (numbers), separated by commas."
+
+msgid "%s wird nicht verwendet: %s"
+msgstr "%s is not used: %s"
+
+msgid "App holen"
+msgstr "Get the app"
+
+msgid "Die Verbindung mit der App ist an dieser Hochschule nicht eingeschaltet."
+msgstr "The connection with the app is not switched on at this institution."
+
+msgid "Sie haben in der letzten Stunde zu viele Codes erzeugt. Bitte versuchen Sie es später noch einmal."
+msgstr "You have created too many codes in the last hour. Please try again later."
+
+msgid "Das Gerät wurde entfernt. Es kann nicht mehr auf Ihr Konto zugreifen."
+msgstr "The device has been removed. It can no longer access your account."
+
+msgid "Die weiteren Anmeldungen wurden beendet."
+msgstr "The other sign-ins have been ended."
+
+msgid "Anmeldung aus der App"
+msgstr "Sign-in from the app"
+
+msgid "Der Link ist abgelaufen oder ungültig. Bitte melden Sie sich an."
+msgstr "The link has expired or is invalid. Please sign in."
+
+msgid "Anmelden"
+msgstr "Sign in"
+
+msgid "In diesem Browser ist %s angemeldet. Wenn Sie fortfahren, wird diese Person abgemeldet."
+msgstr "%s is signed in in this browser. If you continue, this person will be signed out."
+
+msgid "Als %s anmelden?"
+msgstr "Sign in as %s?"
+
+msgid "Melden Sie sich nur an, wenn Sie diesen Link gerade selbst aus der App geöffnet haben. Ist das nicht Ihr Konto, brechen Sie ab."
+msgstr "Only sign in if you have just opened this link from the app yourself. If this is not your account, cancel."
+
+msgid "Abbrechen"
+msgstr "Cancel"
+
+msgid "Dieser Link funktioniert nur mit JavaScript. Bitte melden Sie sich an."
+msgstr "This link only works with JavaScript. Please sign in."
+
+msgid "Sie werden mit Ihrer Anmeldung aus der App angemeldet."
+msgstr "You are being signed in with your sign-in from the app."
+
+msgid "Weiter"
+msgstr "Continue"
+
+msgid "Die App für %s"
+msgstr "The app for %s"
+
+msgid "Ist die App schon installiert, öffnen Sie sie hier. Sonst installieren Sie sie und scannen den QR-Code danach in der App noch einmal – oder kommen Sie auf diese Seite zurück und tippen auf „In der App öffnen“."
+msgstr "If the app is already installed, open it here. Otherwise install it and scan the QR code again in the app afterwards – or come back to this page and tap “Open in the app”."
+
+msgid "In der App öffnen"
+msgstr "Open in the app"
+
+msgid "Im App Store laden"
+msgstr "Download on the App Store"
+
+msgid "Bei Google Play laden"
+msgstr "Get it on Google Play"
+
+msgid "Der Kopplungscode gilt fünf Minuten. Ist er abgelaufen, erzeugen Sie im Profil einen neuen."
+msgstr "The pairing code is valid for five minutes. If it has expired, create a new one in your profile."
+
+msgid "Datenschutzerklärung"
+msgstr "Privacy policy"
+
+msgid "App mit Ihrem Konto verbinden"
+msgstr "Connect the app with your account"
+
+msgid "Scannen Sie diesen QR-Code mit der App. Er gilt fünf Minuten und nur einmal."
+msgstr "Scan this QR code with the app. It is valid for five minutes and only once."
+
+msgid "Wartet auf die App …"
+msgstr "Waiting for the app …"
+
+msgid "Zeigen Sie den QR-Code niemandem und fotografieren Sie ihn nicht ab: Wer ihn zuerst scannt, ist mit Ihrem Konto verbunden."
+msgstr "Do not show the QR code to anyone and do not take a picture of it: whoever scans it first is connected with your account."
+
+msgid "Code verwerfen"
+msgstr "Discard code"
+
+msgid "Erzeugen Sie einen QR-Code und scannen Sie ihn mit der App. Die App ist danach ohne weitere Anmeldung mit Ihrem Konto verbunden."
+msgstr "Create a QR code and scan it with the app. The app is then connected with your account without signing in again."
+
+msgid "QR-Code erzeugen"
+msgstr "Create QR code"
+
+msgid "Mit der App verbundene Geräte"
+msgstr "Devices connected with the app"
+
+msgid "Es ist kein Gerät verbunden."
+msgstr "No device is connected."
+
+msgid "Gerät"
+msgstr "Device"
+
+msgid "Verbunden"
+msgstr "Connected"
+
+msgid "Zuletzt verwendet"
+msgstr "Last used"
+
+msgid "Aktionen"
+msgstr "Actions"
+
+msgid "per QR-Code"
+msgstr "via QR code"
+
+msgid "per Browser-Anmeldung"
+msgstr "via browser sign-in"
+
+msgid "Gerät entfernen"
+msgstr "Remove device"
+
+msgid "Das Gerät verliert den Zugang zu Ihrem Konto. Fortfahren?"
+msgstr "The device loses access to your account. Continue?"
+
+msgid "Weitere Anmeldungen der App ohne Gerätezuordnung: %u"
+msgstr "Other sign-ins of the app without a device: %u"
+
+msgid "Alle beenden"
+msgstr "End all"
+
+msgid "Wartet auf die App … noch %s"
+msgstr "Waiting for the app … %s left"
+
+msgid "Der Code ist abgelaufen. Erzeugen Sie bei Bedarf einen neuen."
+msgstr "The code has expired. Create a new one if needed."
+
+msgid "Verbunden: %s · %s · %s Uhr. Waren Sie das nicht? Entfernen Sie das Gerät unten."
+msgstr "Connected: %s · %s · %s. Was this not you? Remove the device below."
+
+msgid "QR-Code"
+msgstr "QR code"
+
+msgid "Browser-Anmeldung"
+msgstr "browser sign-in"
+
+msgid "Gerät verbunden"
+msgstr "Device connected"
+
+msgid ""
+"Mit Ihrem Konto wurde ein Gerät verbunden:\n"
+"\n"
+"Gerät: %1$s (%2$s)\n"
+"Zeitpunkt: %3$s\n"
+"Verbunden per: %4$s\n"
+"\n"
+"Waren Sie das nicht? Dann entfernen Sie das Gerät auf dieser Seite und ändern Sie Ihr Passwort:\n"
+"%5$s\n"
+msgstr ""
+"A device was connected to your account:\n"
+"\n"
+"Device: %1$s (%2$s)\n"
+"Time: %3$s\n"
+"Connected via: %4$s\n"
+"\n"
+"If this was not you, remove the device on this page and change your password:\n"
+"%5$s\n"
+
+msgid "d.m.Y, H:i T"
+msgstr "Y-m-d, H:i T"
+
+msgid ""
+"Autor: %1$s\n"
+"Quellcode: %2$s\n"
+"Lizenz: %3$s mit Zusatzbedingungen nach Abschnitt 7 der GPL-3.0 (%4$s)"
+msgstr ""
+"Author: %1$s\n"
+"Source code: %2$s\n"
+"License: %3$s with additional terms under section 7 of the GPL-3.0 (%4$s)"
+
+msgid "Über dieses Plugin"
+msgstr "About this plugin"
+
+msgid "app-connect: Aufräumen"
+msgstr "app-connect: cleanup"
+
+msgid "Löscht abgelaufene Kopplungscodes, Web-Anmeldelinks und Gerätezeilen der App-Anbindung nach Ablauf ihrer Aufbewahrungsfrist."
+msgstr "Deletes expired pairing codes, web sign-in links and device rows of the app connection once their retention period has passed."

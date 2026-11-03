@@ -112,7 +112,7 @@ plugin only, not to the Stud.IP core system it runs on.
 
 The additional terms require the graphical interface to visibly name the author, the
 source-code repository and the license. app-connect shows them in the help bar ("Hilfe")
-of the pages people use: "Stud.App Verbindung" in the profile and "App holen". The plugin
+of the pages people use: "Stud.App connection" in the profile and "Get the app". The plugin
 directory carries its own copies of both texts (`plugin/LICENSE`,
 `plugin/SUPPLEMENTAL-TERMS.txt`), so every installed copy includes them.
 

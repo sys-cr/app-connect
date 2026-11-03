@@ -92,20 +92,20 @@ ist an dieser Hochschule nicht eingeschaltet."
 
 ### Connecting the app with a QR code
 
-1. In Stud.IP, open Profile → Settings → **Stud.App Verbindung** (right above
+1. In Stud.IP, open Profile → Settings → **Stud.App connection** (right above
    "Drittanwendungen").
-2. Choose **QR-Code erzeugen** and scan the code with the app. The app is connected to your
+2. Choose **Create QR code** and scan the code with the app. The app is connected to your
    account without signing in again.
 3. The page shows "Verbunden" and the device appears in the list.
 
 The code is valid for five minutes and only once: whoever scans it first is connected to
 your account. Do not show it to anyone, do not photograph it, and scan only codes you
-created yourself. **Code verwerfen** discards an open code. You can create up to ten codes
+created yourself. **Discard code** discards an open code. You can create up to ten codes
 an hour.
 
-If the app is not installed yet, scanning the code with the camera opens the page **App
-holen** with the store links. Install the app, then scan the code again in the app, or come
-back to the page and tap **In der App öffnen**.
+If the app is not installed yet, scanning the code with the camera opens the page **Get the
+app** with the store links. Install the app, then scan the code again in the app, or come
+back to the page and tap **Open in the app**.
 
 ### Connecting the app by signing in
 
@@ -115,26 +115,26 @@ Verbindung".
 
 ### Seeing and removing devices
 
-"Stud.App Verbindung" lists every connected device with its name, the platform, how it was
+"Stud.App connection" lists every connected device with its name, the platform, how it was
 connected (per QR-Code, per Browser-Anmeldung) and when it was used last.
 
-- **Gerät entfernen** ends the device's access to your account at once. You can connect it
+- **Remove device** ends the device's access to your account at once. You can connect it
   again at any time.
-- Sign-ins of the app that belong to no device are listed separately; **Alle beenden** ends
+- Sign-ins of the app that belong to no device are listed separately; **End all** ends
   them.
 - The app is also listed under "Drittanwendungen". Revoking it there ends the device as
   well.
 
 Every new connection sends a mail to your account with the device name, the platform and
-the time. If it was not you, remove the device on "Stud.App Verbindung" and change your
+the time. If it was not you, remove the device on "Stud.App connection" and change your
 password.
 
 ### Opening Stud.IP pages from the app
 
 Some pages open in the browser (for example enrolling in a course). The app hands over its
 sign-in, so you do not need your password. If you are not signed in in that browser, it
-asks **"Als <your name> anmelden?"** first; choose **Anmelden** only if you have just opened
-the page from the app yourself and the name is yours, otherwise **Abbrechen**. If someone
+asks **"Sign in as <your name>?"** first; choose **Sign in** only if you have just opened
+the page from the app yourself and the name is yours, otherwise **Cancel**. If someone
 else is signed in in that browser, the page tells you before anything changes. Your
 university may switch this off; the app then opens the normal sign-in.
 
@@ -160,4 +160,4 @@ and references to the app's sign-in – never your password. Pairing codes and t
 opening pages are stored only as a hash and deleted a day after they expire; a device entry
 is deleted a month after the app's sign-in on that device expired, also when you removed
 it. When your account is deleted, all of it is deleted at once. Your university's privacy
-policy is linked on the page "App holen".
+policy is linked on the page "Get the app".

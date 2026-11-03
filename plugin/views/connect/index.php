@@ -14,10 +14,10 @@
 ?>
 <? if ($pairing_enabled) : ?>
 <section class="contentbox app-connect-pairing">
-    <header><h1><?= _('App mit deinem Konto verbinden') ?></h1></header>
+    <header><h1><?= $_('App mit Ihrem Konto verbinden') ?></h1></header>
     <section>
         <? if ($new_code) : ?>
-            <p><?= _('Scanne diesen QR-Code mit der App. Er gilt fünf Minuten und nur einmal.') ?></p>
+            <p><?= $_('Scannen Sie diesen QR-Code mit der App. Er gilt fünf Minuten und nur einmal.') ?></p>
             <? /* QR code of the core; .tfa-app-code gives it the core's sizing. */ ?>
             <div class="tfa-app-code">
                 <code class="qr hide-text"><?= htmlReady($new_code['landing_url']) ?></code>
@@ -25,18 +25,18 @@
             <p class="app-connect-status" data-status-url="<?= htmlReady($status_url) ?>"
                data-index-url="<?= htmlReady($index_url) ?>"
                data-expires-in="<?= max(0, $new_code['expires_at'] - time()) ?>" aria-live="polite">
-                <?= _('Wartet auf die App …') ?>
+                <?= $_('Wartet auf die App …') ?>
             </p>
-            <p><?= _('Zeige den QR-Code niemandem und fotografiere ihn nicht ab: Wer ihn zuerst scannt, ist mit deinem Konto verbunden.') ?></p>
+            <p><?= $_('Zeigen Sie den QR-Code niemandem und fotografieren Sie ihn nicht ab: Wer ihn zuerst scannt, ist mit Ihrem Konto verbunden.') ?></p>
             <form method="post" action="<?= $controller->link_for('connect/discard_code') ?>">
                 <?= CSRFProtection::tokenTag() ?>
-                <?= Studip\Button::create(_('Code verwerfen'), 'discard') ?>
+                <?= Studip\Button::create($_('Code verwerfen'), 'discard') ?>
             </form>
         <? else : ?>
-            <p><?= _('Erzeuge einen QR-Code und scanne ihn mit der App. Die App ist danach ohne weitere Anmeldung mit deinem Konto verbunden.') ?></p>
+            <p><?= $_('Erzeugen Sie einen QR-Code und scannen Sie ihn mit der App. Die App ist danach ohne weitere Anmeldung mit Ihrem Konto verbunden.') ?></p>
             <form method="post" action="<?= $controller->link_for('connect/create_code') ?>">
                 <?= CSRFProtection::tokenTag() ?>
-                <?= Studip\Button::createAccept(_('QR-Code erzeugen'), 'create') ?>
+                <?= Studip\Button::createAccept($_('QR-Code erzeugen'), 'create') ?>
             </form>
         <? endif ?>
     </section>
@@ -44,20 +44,20 @@
 <? endif ?>
 
 <section class="contentbox">
-    <header><h1><?= _('Mit der App verbundene Geräte') ?></h1></header>
+    <header><h1><?= $_('Mit der App verbundene Geräte') ?></h1></header>
     <section>
         <? if (!$device_list) : ?>
-            <p><?= _('Es ist kein Gerät verbunden.') ?></p>
+            <p><?= $_('Es ist kein Gerät verbunden.') ?></p>
         <? else : ?>
             <form method="post">
                 <?= CSRFProtection::tokenTag() ?>
                 <table class="default">
                     <thead>
                         <tr>
-                            <th><?= _('Gerät') ?></th>
-                            <th><?= _('Verbunden') ?></th>
-                            <th><?= _('Zuletzt verwendet') ?></th>
-                            <th class="actions"><?= _('Aktionen') ?></th>
+                            <th><?= $_('Gerät') ?></th>
+                            <th><?= $_('Verbunden') ?></th>
+                            <th><?= $_('Zuletzt verwendet') ?></th>
+                            <th class="actions"><?= $_('Aktionen') ?></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -69,17 +69,17 @@
                             </td>
                             <td>
                                 <?= date('d.m.Y H:i', (int) $device->paired_at) ?>,
-                                <?= $device->paired_via === 'pairing' ? _('per QR-Code') : _('per Browser-Anmeldung') ?>
+                                <?= $device->paired_via === 'pairing' ? $_('per QR-Code') : $_('per Browser-Anmeldung') ?>
                             </td>
                             <td><?= date('d.m.Y', (int) $device->bound_at) ?></td>
                             <td class="actions">
                                 <?= ActionMenu::get()->setContext($device->name)->addButton(
                                     'remove',
-                                    _('Gerät entfernen'),
+                                    $_('Gerät entfernen'),
                                     Icon::create('trash'),
                                     [
                                         'formaction' => $controller->link_for('connect/remove/' . $device->id),
-                                        'data-confirm' => _('Das Gerät verliert den Zugang zu deinem Konto. Fortfahren?'),
+                                        'data-confirm' => $_('Das Gerät verliert den Zugang zu Ihrem Konto. Fortfahren?'),
                                     ]
                                 ) ?>
                             </td>
@@ -91,14 +91,11 @@
         <? endif ?>
         <? if ($unassigned_count > 0) : ?>
             <p>
-                <?= sprintf(
-                    ngettext('Weitere Anmeldung der App ohne Gerätezuordnung: %u', 'Weitere Anmeldungen der App ohne Gerätezuordnung: %u', $unassigned_count),
-                    $unassigned_count
-                ) ?>
+                <?= sprintf($_('Weitere Anmeldungen der App ohne Gerätezuordnung: %u'), $unassigned_count) ?>
             </p>
             <form method="post" action="<?= $controller->link_for('connect/end_unassigned') ?>">
                 <?= CSRFProtection::tokenTag() ?>
-                <?= Studip\Button::create(_('Alle beenden'), 'end_unassigned') ?>
+                <?= Studip\Button::create($_('Alle beenden'), 'end_unassigned') ?>
             </form>
         <? endif ?>
     </section>
@@ -113,9 +110,9 @@
     }
     const deadline = Date.now() + Number(status.dataset.expiresIn) * 1000;
     const texts = {
-        waiting: <?= json_encode(_('Wartet auf die App … noch %s')) ?>,
-        expired: <?= json_encode(_('Der Code ist abgelaufen. Erzeuge bei Bedarf einen neuen.')) ?>,
-        connected: <?= json_encode(_('Verbunden: %s · %s · %s Uhr. Das warst nicht du? Entferne das Gerät unten.')) ?>
+        waiting: <?= json_encode($_('Wartet auf die App … noch %s')) ?>,
+        expired: <?= json_encode($_('Der Code ist abgelaufen. Erzeugen Sie bei Bedarf einen neuen.')) ?>,
+        connected: <?= json_encode($_('Verbunden: %s · %s · %s Uhr. Waren Sie das nicht? Entfernen Sie das Gerät unten.')) ?>
     };
     function format(text, values) {
         return values.reduce((result, value) => result.replace('%s', value), text);

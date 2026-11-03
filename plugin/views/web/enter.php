@@ -8,20 +8,20 @@
  */
 ?>
 <noscript>
-    <?= MessageBox::info(_('Dieser Link funktioniert nur mit JavaScript. Bitte melde dich an.')) ?>
-    <p><?= Studip\LinkButton::create(_('Anmelden'), $login_url) ?></p>
+    <?= MessageBox::info($_('Dieser Link funktioniert nur mit JavaScript. Bitte melden Sie sich an.')) ?>
+    <p><?= Studip\LinkButton::create($_('Anmelden'), $login_url) ?></p>
 </noscript>
 
 <div class="app-connect-web-failed" hidden>
-    <?= MessageBox::error(_('Der Link ist abgelaufen oder ungültig. Bitte melde dich an.')) ?>
-    <p><?= Studip\LinkButton::create(_('Anmelden'), $login_url) ?></p>
+    <?= MessageBox::error($_('Der Link ist abgelaufen oder ungültig. Bitte melden Sie sich an.')) ?>
+    <p><?= Studip\LinkButton::create($_('Anmelden'), $login_url) ?></p>
 </div>
 
 <form class="app-connect-web-login" method="post" action="<?= htmlReady($redeem_url) ?>" hidden>
     <?= CSRFProtection::tokenTag() ?>
     <input type="hidden" name="ticket" value="">
-    <p><?= _('Du wirst mit deiner Anmeldung aus der App angemeldet.') ?></p>
-    <?= Studip\Button::createAccept(_('Weiter'), 'redeem') ?>
+    <p><?= $_('Sie werden mit Ihrer Anmeldung aus der App angemeldet.') ?></p>
+    <?= Studip\Button::createAccept($_('Weiter'), 'redeem') ?>
 </form>
 
 <script>

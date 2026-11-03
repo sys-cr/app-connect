@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # SPDX-FileCopyrightText: 2026 Bodo Steffen
 # Additional terms under GPL-3.0 section 7: see SUPPLEMENTAL-TERMS.txt
-.PHONY: help lint test-plugin test-contract test dist
+.PHONY: help lint locale test-plugin test-contract test dist
 
 VERSION := $(shell sed -n 's/^version=//p' plugin/plugin.manifest)
 
@@ -10,6 +10,7 @@ help:
 	@echo "make test-plugin       – PHPUnit unit tests (plugin/tests/Unit)"
 	@echo "make test-contract     – schema and shared test vectors (plugin/tests/Contract)"
 	@echo "make test              – both test suites"
+	@echo "make locale            – compile the translations (plugin/locale/*/LC_MESSAGES/app-connect.po) with msgfmt"
 	@echo "make dist              – plugin ZIP of the committed plugin/ (without tests and Composer/PHPUnit files) in dist/"
 
 plugin/vendor:
@@ -17,6 +18,12 @@ plugin/vendor:
 
 lint:
 	@find plugin -path plugin/vendor -prune -o -name '*.php' -print0 | xargs -0 -n1 php -l >/dev/null && echo "php -l: ok"
+
+# The compiled catalogues are committed, so the plugin ZIP needs no gettext
+# tools; LocaleTest fails when a .mo lags behind its .po.
+locale:
+	@for po in plugin/locale/*/LC_MESSAGES/app-connect.po; do msgfmt -o "$${po%.po}.mo" "$$po" || exit 1; done
+	@echo "msgfmt: ok"
 
 test-plugin: plugin/vendor
 	cd plugin && vendor/bin/phpunit --testsuite unit

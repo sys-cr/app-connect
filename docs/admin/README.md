@@ -287,10 +287,10 @@ from the plugin's own routes.
    | Entry | Meaning |
    |---|---|
    | `APP_CONNECT_PAIRING_ENABLED` | connecting by QR code from the profile (off by default: switch it on once the instance is configured) |
-   | `APP_CONNECT_PROFILE_ENTRY` | the entry "Stud.App Verbindung" under Profile → Settings (on by default) |
+   | `APP_CONNECT_PROFILE_ENTRY` | the entry "Stud.App connection" under Profile → Settings (on by default) |
    | `APP_CONNECT_INSTANCE_NAME`, `APP_CONNECT_INSTANCE_SHORT_NAME` | name and short name shown in the app |
    | `APP_CONNECT_PRIVACY_POLICY_URL` | address of your privacy policy |
-   | `APP_CONNECT_STORE_APP_STORE`, `APP_CONNECT_STORE_GOOGLE_PLAY` | store links on the page "App holen" |
+   | `APP_CONNECT_STORE_APP_STORE`, `APP_CONNECT_STORE_GOOGLE_PLAY` | store links on the page "Get the app" |
    | `APP_CONNECT_FEATURE_COURSE_CATALOGUE`, `…_BLUBBER`, `…_MENSA` | additional features of the app |
    | `APP_CONNECT_ROOM_FINDER_PROPERTY` | name of the room property that holds a link to your room finder (e.g. `Lageplan`); the apps show it next to the room of a course date (https only) |
    | `APP_CONNECT_SUPPORT_EMAIL` | support address of your institution; the apps offer it for help and for reporting content (barriers in the app go to the Stud.App support) |
@@ -315,7 +315,7 @@ the plugin administration: the client is revoked. Enabling it again while
 
 ### Connecting devices
 
-People with at least `autor` status find **Stud.App Verbindung** under Profile → Settings,
+People with at least `autor` status find **Stud.App connection** under Profile → Settings,
 right above "Drittanwendungen". There they
 
 - create a QR code with a one-time pairing code (valid five minutes, the first scan wins;
@@ -326,12 +326,12 @@ right above "Drittanwendungen". There they
 - end app sign-ins that are not assigned to a device.
 
 Once connected, the app is also listed on "Drittanwendungen" (by the core). Devices are
-managed and removed on "Stud.App Verbindung"; revoking the app on "Drittanwendungen" ends
+managed and removed on "Stud.App connection"; revoking the app on "Drittanwendungen" ends
 the device as well.
 
 Every new connection sends a mail to the account with the device name, the platform, the
-time and a link to "Stud.App Verbindung". In the configuration section "Stud.App" you can
-switch off the entry "Stud.App Verbindung" or only the QR code (the apps then connect
+time and a link to "Stud.App connection". In the configuration section "Stud.App" you can
+switch off the entry "Stud.App connection" or only the QR code (the apps then connect
 through the browser sign-in), and set the App Store and Google Play links shown on the
 public page `plugins.php/appconnect/get`, which the QR code opens when the app is not
 installed.
@@ -391,8 +391,8 @@ Pages of the plugin (`plugins.php/appconnect/…`):
 
 | Page | Sign-in | What it does |
 |---|---|---|
-| `connect` | `autor` and up | "Stud.App Verbindung": QR code, device list, removing devices |
-| `get` | none | "App holen": store links and "In der App öffnen"; the pairing code stays in the URL fragment |
+| `connect` | `autor` and up | "Stud.App connection": QR code, device list, removing devices |
+| `get` | none | "Get the app": store links and "Open in the app"; the pairing code stays in the URL fragment |
 | `web/enter`, `web/redeem`, `web/confirm` | none | web login from the app |
 
 The features a route belongs to are announced in the discovery; the apps use a route only
@@ -413,8 +413,8 @@ the downloaded file. Keep `display_errors` off in production.
 
 ### Retention
 
-A cronjob "app-connect: Aufräumen" (registered and switched on by the plugin, daily at
-03:17; Admin → System → Cronjobs) deletes
+A cronjob "app-connect: cleanup" (German: "app-connect: Aufräumen"; registered and switched
+on by the plugin, daily at 03:17; Admin → System → Cronjobs) deletes
 
 - pairing codes a day after they expired,
 - web login links a day after they were issued,
@@ -452,7 +452,7 @@ of the app, until the key is reset.
 
 ### License notice
 
-The help bar ("Hilfe") of "Stud.App Verbindung" and "App holen" names the author, the
+The help bar ("Hilfe") of "Stud.App connection" and "Get the app" names the author, the
 source-code repository and the license (GPL-3.0-or-later with the additional terms in
 `SUPPLEMENTAL-TERMS.txt`). The additional terms require this notice; a modified version may
 move it but must keep it visible. The plugin directory contains `LICENSE` and

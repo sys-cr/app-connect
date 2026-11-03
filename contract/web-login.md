@@ -104,7 +104,8 @@ handling then runs as after any login: terms of use, visibility choice,
 Stud.IP's own two-factor prompt.
 
 Any failure shows one message, "Der Link ist abgelaufen oder ungültig. Bitte
-melde dich an.", and a login button; it never says which check failed. All
+melden Sie sich an." ("The link has expired or is invalid. Please sign in."),
+and a login button; it never says which check failed. All
 pages send `Cache-Control: no-store`, `Referrer-Policy: no-referrer`,
 `X-Frame-Options: DENY` and `Content-Security-Policy: frame-ancestors 'none'`.
 

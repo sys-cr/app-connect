@@ -52,6 +52,17 @@ Der Plugin-Code muss auf den PHP-Versionen aller unterstützten Stud.IP-Versione
 Composer (Dev-Abhängigkeiten aus `plugin/composer.lock`), git 2.40+ (`make dist` nutzt
 `git archive --mtime`).
 
+## Übersetzung
+
+Die Texte sind deutsch und stehen in der Textdomäne `app-connect` (`localedomain` im
+Manifest). Plugin-Klasse und Controller übersetzen mit `$this->_()`, Views mit `$_()`, Code
+ohne Plugin-Instanz (Cronjob, Mail) mit `Translation::text()`. Die
+Oberfläche siezt. Die englischen Texte stehen in
+`plugin/locale/en/LC_MESSAGES/app-connect.po`; `make locale` übersetzt sie mit `msgfmt` in
+die `.mo`-Datei, die mit eingecheckt wird. `LocaleTest` schlägt fehl, wenn ein Text im Code
+keine Übersetzung hat, eine Übersetzung nicht mehr gebraucht wird oder die `.mo`-Datei
+veraltet ist.
+
 ## Migrationen
 
 Eine Migration enthält die Werte, die sie anlegt – Konfigurationseinträge (`FIELDS`),
@@ -191,6 +202,16 @@ and later); run `php -l` with the oldest one as well. Tools: PHP 8.1+, Composer 
 dependencies from `plugin/composer.lock`), git 2.40+ (`make dist` uses
 `git archive --mtime`).
 
+### Translation
+
+The texts are German and live in the text domain `app-connect` (`localedomain` in the
+manifest). The plugin class and controllers translate with `$this->_()`, views with
+`$_()`, code without a plugin instance (cronjob, mail) with
+`Translation::text()`. The interface addresses people formally ("Sie"). The English texts
+are in `plugin/locale/en/LC_MESSAGES/app-connect.po`; `make locale` compiles them with
+`msgfmt` into the committed `.mo` file. `LocaleTest` fails when a text in the code has no
+translation, a translation is no longer used or the `.mo` file is out of date.
+
 ### Migrations
 
 A migration contains the values it creates – configuration entries (`FIELDS`), event log
@@ -244,7 +265,7 @@ A local instance over plain `http` is accepted by the apps only in DEBUG builds 
 | `POST /jsonapi.php/v1/app-connect/web-login` | OAuth2 token of the app client, or HTTP Basic (password checked by the plugin) | one-time link (60 s) that signs the person in on the web and opens `return_to` ([`contract/web-login.md`](../../contract/web-login.md)); discovery feature `webLogin`; `201`, `400`, `401`, `403`, `404`, `429` |
 | `GET`/`DELETE /jsonapi.php/v1/app-connect/me/ical-key` | OAuth2 token of the app client | the person's own calendar key, created on first ask, and the reset ([`contract/ical-key.md`](../../contract/ical-key.md)); discovery feature `icalKey`; `200`, `204`, `401`, `403`, `404`, `429` |
 | `plugins.php/appconnect/web/enter`, `…/web/redeem`, `…/web/confirm` | none | the link of `web-login`: the script posts the ticket from the fragment to `redeem`, which claims it; the same person signed in is redirected, anyone else confirms "Als … anmelden?" and `confirm` signs in |
-| `plugins.php/appconnect/connect` | session, `autor` | "Stud.App Verbindung" under Profile → Settings, above Drittanwendungen: pairing code, device list |
+| `plugins.php/appconnect/connect` | session, `autor` | "Stud.App connection" under Profile → Settings, above Drittanwendungen: pairing code, device list |
 | `plugins.php/appconnect/get` | none | landing page of the QR code; code in the fragment `#p=` |
 
 #### Pairing grant

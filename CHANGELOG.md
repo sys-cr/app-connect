@@ -32,8 +32,8 @@ Erste veröffentlichte Version.
 - **Widerruf** – Entfernen eines Geräts widerruft seine ganze Token-Kette, auch Tokens,
   die am Endpunkt des Kerns erneuert wurden; ein Widerruf unter „Drittanwendungen“ beendet
   das Gerät ebenfalls.
-- **Verbindungsmail** – bei jeder neuen Verbindung (Deutsch und Englisch), ohne Code und
-  ohne IP-Adresse; der Link führt auf die beim Einschalten gespeicherte Adresse.
+- **Verbindungsmail** – bei jeder neuen Verbindung (in der Sprache der Person), ohne
+  Code und ohne IP-Adresse; der Link führt auf die beim Einschalten gespeicherte Adresse.
 - **Landing-Page** – `plugins.php/appconnect/get` mit Store-Links und „In der App
   öffnen“; der Code bleibt im URL-Fragment (`no-store`, `no-referrer`).
 - **Kalender** – `GET /jsonapi.php/v1/app-connect/user-events` liefert für zwei Wochen
@@ -65,6 +65,8 @@ Erste veröffentlichte Version.
   Anmeldung im Web einen Tag nach Ausstellung, Gerätezeilen einen Monat nach Ablauf ihres
   Refresh-Tokens; das Löschen eines Kontos entfernt dessen Zeilen sofort. Einträge des
   Ereignisprotokolls zu Web-Anmeldung und Kalender-Schlüssel laufen nach 90 Tagen ab.
+- **Sprachen** – Seiten, Verbindungsmail und Cronjob auf Deutsch und Englisch (eigene
+  Textdomäne `app-connect`); die Seiten siezen wie die übrige Oberfläche von Stud.IP.
 - **Schutz der Seiten** – die Seiten des Plugins lassen sich nicht einbetten
   (`X-Frame-Options`, `frame-ancestors`).
 - **Lizenz** – GPL-3.0-or-later mit Zusatzbedingungen nach Abschnitt 7
@@ -109,10 +111,10 @@ First published version.
 - **Revocation** – removing a device revokes its whole token lineage, including tokens
   renewed at the core endpoint; revoking the app on "Drittanwendungen" ends the device as
   well.
-- **Connection mail** – on every new connection (German and English), without code or IP
-  address; the link uses the address recorded at switch-on.
-- **Landing page** – `plugins.php/appconnect/get` with store links and "In der App
-  öffnen"; the code stays in the URL fragment (`no-store`, `no-referrer`).
+- **Connection mail** – on every new connection (in the person's language), without
+  code or IP address; the link uses the address recorded at switch-on.
+- **Landing page** – `plugins.php/appconnect/get` with store links and "Open in the
+  app"; the code stays in the URL fragment (`no-store`, `no-referrer`).
 - **Calendar** – `GET /jsonapi.php/v1/app-connect/user-events` returns personal entries,
   dates of courses shown in the calendar and cancelled dates for two weeks, each course
   date with the person's colour group of the course (`color`), in the resource shapes of
@@ -141,10 +143,12 @@ First published version.
   day after they were issued, device rows a month after their refresh token expired;
   deleting an account removes its rows at once. Event log entries about the web login and
   the calendar key expire after 90 days.
+- **Languages** – pages, connection mail and cronjob in German and English (own text
+  domain `app-connect`); the pages address people formally, like the rest of Stud.IP.
 - **Page protection** – the plugin's pages may not be framed (`X-Frame-Options`,
   `frame-ancestors`).
 - **License** – GPL-3.0-or-later with additional terms under section 7
-  (`SUPPLEMENTAL-TERMS.txt`); the help bar of "Stud.App Verbindung" and "App holen" names
+  (`SUPPLEMENTAL-TERMS.txt`); the help bar of "Stud.App connection" and "Get the app" names
   author, source repository and license.
 - **Contract** – JSON schema of the discovery, rules for connect links, landing page and
   routes, and shared test vectors for plugin and apps.

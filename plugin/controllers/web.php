@@ -34,7 +34,7 @@ class WebController extends PluginController
         $this->response->add_header('Referrer-Policy', 'no-referrer');
         $this->response->add_header('X-Frame-Options', 'DENY');
         $this->response->add_header('Content-Security-Policy', "frame-ancestors 'none'");
-        PageLayout::setTitle(_('Anmeldung aus der App'));
+        PageLayout::setTitle($this->_('Anmeldung aus der App'));
         $this->login_url = URLHelper::getURL('dispatch.php/login');
     }
 

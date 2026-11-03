@@ -61,7 +61,7 @@ class AppConnect extends StudIPPlugin implements SystemPlugin, JsonApiPlugin
         // Own entry in the settings navigation, right above "Drittanwendungen";
         // connected apps appear in the core list there by themselves.
         if ($perm->have_perm('autor') && Navigation::hasItem('/profile/settings') && $this->profileEntryIsOn()) {
-            $entry = new Navigation(_('Stud.App Verbindung'), PluginEngine::getURL($this, [], 'connect'));
+            $entry = new Navigation($this->_('Stud.App Verbindung'), PluginEngine::getURL($this, [], 'connect'));
             if (Navigation::hasItem('/profile/settings/oauth2')) {
                 Navigation::insertItem(self::NAVIGATION_PATH, $entry, 'oauth2');
             } else {
@@ -145,17 +145,17 @@ class AppConnect extends StudIPPlugin implements SystemPlugin, JsonApiPlugin
         }
         $problem = match (true) {
             in_array($field, OperatorConfig::URL_FIELDS, true) && !OperatorConfig::isHttpsUrl($value)
-                => _('Die Adresse muss mit https:// beginnen.'),
+                => $this->_('Die Adresse muss mit https:// beginnen.'),
             $field === OperatorConfig::SUPPORT_EMAIL && !OperatorConfig::isEmail($value)
-                => _('Das ist keine gültige E-Mail-Adresse.'),
+                => $this->_('Das ist keine gültige E-Mail-Adresse.'),
             $field === OperatorConfig::ACCENT_COLOR && !OperatorConfig::isHexColor($value)
-                => _('Die Farbe muss die Form #RRGGBB haben.'),
+                => $this->_('Die Farbe muss die Form #RRGGBB haben.'),
             $field === OperatorConfig::MENSA_OPENMENSA_IDS && OperatorConfig::canteenIds($value) === null
-                => _('Erwartet werden OpenMensa-IDs (Zahlen), durch Komma getrennt.'),
+                => $this->_('Erwartet werden OpenMensa-IDs (Zahlen), durch Komma getrennt.'),
             default => null,
         };
         if ($problem !== null) {
-            PageLayout::postWarning(sprintf(_('%s wird nicht verwendet: %s'), htmlReady($field), $problem));
+            PageLayout::postWarning(sprintf($this->_('%s wird nicht verwendet: %s'), htmlReady($field), $problem));
         }
     }
 

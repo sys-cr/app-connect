@@ -6,5 +6,5 @@
  * @var string $login_url
  */
 ?>
-<?= MessageBox::error(_('Der Link ist abgelaufen oder ungültig. Bitte melde dich an.')) ?>
-<p><?= Studip\LinkButton::create(_('Anmelden'), $login_url) ?></p>
+<?= MessageBox::error($_('Der Link ist abgelaufen oder ungültig. Bitte melden Sie sich an.')) ?>
+<p><?= Studip\LinkButton::create($_('Anmelden'), $login_url) ?></p>

@@ -9,6 +9,7 @@ require_once __DIR__ . '/../bootstrap.php';
 
 use AppConnect\Devices\DeviceRetention;
 use AppConnect\Pairing\PairingService;
+use AppConnect\Translation;
 use AppConnect\WebLogin\DatabaseTicketStore;
 use AppConnect\WebLogin\WebLoginService;
 
@@ -23,12 +24,15 @@ class AppConnectCleanupJob extends CronJob
 {
     public static function getName()
     {
-        return 'app-connect: Aufräumen';
+        return Translation::text('app-connect: Aufräumen');
     }
 
     public static function getDescription()
     {
-        return 'Löscht abgelaufene Kopplungscodes, Web-Anmeldelinks und Gerätezeilen der App-Anbindung nach Ablauf ihrer Aufbewahrungsfrist.';
+        return Translation::text(
+            'Löscht abgelaufene Kopplungscodes, Web-Anmeldelinks und Gerätezeilen der App-Anbindung '
+            . 'nach Ablauf ihrer Aufbewahrungsfrist.'
+        );
     }
 
     public function execute($last_result, $parameters = [])

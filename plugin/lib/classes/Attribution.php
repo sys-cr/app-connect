@@ -29,7 +29,7 @@ final class Attribution
     public static function helpText(): string
     {
         return sprintf(
-            _("Autor: %1\$s\nQuellcode: %2\$s\nLizenz: %3\$s mit Zusatzbedingungen nach Abschnitt 7 der GPL-3.0 (%4\$s)"),
+            Translation::text("Autor: %1\$s\nQuellcode: %2\$s\nLizenz: %3\$s mit Zusatzbedingungen nach Abschnitt 7 der GPL-3.0 (%4\$s)"),
             self::AUTHOR,
             self::SOURCE_URL,
             self::LICENSE,
@@ -40,7 +40,7 @@ final class Attribution
     /** Adds the notice to the help bar of the current page. */
     public static function addToHelpbar(): void
     {
-        \Helpbar::get()->addPlainText(_('Über dieses Plugin'), self::helpText());
+        \Helpbar::get()->addPlainText(Translation::text('Über dieses Plugin'), self::helpText());
     }
 
     private function __construct()

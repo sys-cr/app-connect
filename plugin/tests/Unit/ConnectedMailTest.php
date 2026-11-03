@@ -16,7 +16,7 @@ final class ConnectedMailTest extends TestCase
 
     public function testGermanMailNamesDevicePlatformWayAndTheProfileLink(): void
     {
-        $texts = ConnectedMail::texts(false, 'Adas iPhone', 'ios', 'pairing', 1_790_000_000, self::URL);
+        $texts = ConnectedMail::texts('Adas iPhone', 'ios', 'pairing', 1_790_000_000, self::URL);
 
         self::assertSame('Gerät verbunden', $texts['subject']);
         self::assertStringContainsString('Gerät: Adas iPhone (iOS)', $texts['body']);
@@ -24,18 +24,17 @@ final class ConnectedMailTest extends TestCase
         self::assertStringContainsString(self::URL, $texts['body']);
     }
 
-    public function testEnglishMailForBrowserSignIn(): void
+    public function testBrowserSignInIsNamed(): void
     {
-        $texts = ConnectedMail::texts(true, 'Pixel', 'android', 'browser', 1_790_000_000, self::URL);
+        $texts = ConnectedMail::texts('Pixel', 'android', 'browser', 1_790_000_000, self::URL);
 
-        self::assertSame('Device connected', $texts['subject']);
-        self::assertStringContainsString('Device: Pixel (Android)', $texts['body']);
-        self::assertStringContainsString('Connected via: browser sign-in', $texts['body']);
+        self::assertStringContainsString('Gerät: Pixel (Android)', $texts['body']);
+        self::assertStringContainsString('Verbunden per: Browser-Anmeldung', $texts['body']);
     }
 
     public function testTheMailCarriesNoCodeOrAddress(): void
     {
-        $texts = ConnectedMail::texts(false, 'Phone', 'ios', 'pairing', 1_790_000_000, self::URL);
+        $texts = ConnectedMail::texts('Phone', 'ios', 'pairing', 1_790_000_000, self::URL);
 
         self::assertDoesNotMatchRegularExpression('/[0-9A-HJKMNP-TV-Z]{26}/', $texts['body']);
         self::assertDoesNotMatchRegularExpression('/\b\d{1,3}(\.\d{1,3}){3}\b/', $texts['body']);

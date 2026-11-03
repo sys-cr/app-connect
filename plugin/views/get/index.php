@@ -11,30 +11,30 @@
  */
 ?>
 <? if (!$enabled) : ?>
-    <?= MessageBox::info(_('Die Verbindung mit der App ist an dieser Hochschule nicht eingeschaltet.')) ?>
+    <?= MessageBox::info($_('Die Verbindung mit der App ist an dieser Hochschule nicht eingeschaltet.')) ?>
 <? else : ?>
 <section class="contentbox app-connect-get">
-    <header><h1><?= sprintf(_('Die App für %s'), htmlReady($instance_name)) ?></h1></header>
+    <header><h1><?= sprintf($_('Die App für %s'), htmlReady($instance_name)) ?></h1></header>
     <section>
-        <p><?= _('Ist die App schon installiert, öffne sie hier. Sonst installiere sie und scanne den QR-Code danach in der App noch einmal – oder komm auf diese Seite zurück und tippe auf „In der App öffnen“.') ?></p>
+        <p><?= $_('Ist die App schon installiert, öffnen Sie sie hier. Sonst installieren Sie sie und scannen den QR-Code danach in der App noch einmal – oder kommen Sie auf diese Seite zurück und tippen auf „In der App öffnen“.') ?></p>
         <p>
-            <?= Studip\LinkButton::createAccept(_('In der App öffnen'), $connect_link, [
+            <?= Studip\LinkButton::createAccept($_('In der App öffnen'), $connect_link, [
                 'data-connect-link' => $connect_link,
             ]) ?>
         </p>
         <? if ($store_links) : ?>
             <ul class="app-connect-stores">
                 <? if (isset($store_links['appStore'])) : ?>
-                    <li><a href="<?= htmlReady($store_links['appStore']) ?>" rel="noreferrer"><?= _('Im App Store laden') ?></a></li>
+                    <li><a href="<?= htmlReady($store_links['appStore']) ?>" rel="noreferrer"><?= $_('Im App Store laden') ?></a></li>
                 <? endif ?>
                 <? if (isset($store_links['googlePlay'])) : ?>
-                    <li><a href="<?= htmlReady($store_links['googlePlay']) ?>" rel="noreferrer"><?= _('Bei Google Play laden') ?></a></li>
+                    <li><a href="<?= htmlReady($store_links['googlePlay']) ?>" rel="noreferrer"><?= $_('Bei Google Play laden') ?></a></li>
                 <? endif ?>
             </ul>
         <? endif ?>
-        <p class="app-connect-code-note" hidden><?= _('Der Kopplungscode gilt fünf Minuten. Ist er abgelaufen, erzeuge im Profil einen neuen.') ?></p>
+        <p class="app-connect-code-note" hidden><?= $_('Der Kopplungscode gilt fünf Minuten. Ist er abgelaufen, erzeugen Sie im Profil einen neuen.') ?></p>
         <? if ($privacy_url) : ?>
-            <p><a href="<?= htmlReady($privacy_url) ?>" rel="noreferrer"><?= _('Datenschutzerklärung') ?></a></p>
+            <p><a href="<?= htmlReady($privacy_url) ?>" rel="noreferrer"><?= $_('Datenschutzerklärung') ?></a></p>
         <? endif ?>
     </section>
 </section>
