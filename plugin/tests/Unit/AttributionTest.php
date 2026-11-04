@@ -59,6 +59,17 @@ final class AttributionTest extends TestCase
         }
     }
 
+    /** The core hides the help bar from visitors who are not signed in; "App holen" shows them the notice itself. */
+    public function testGetPageShowsTheNoticeWithoutTheHelpBar(): void
+    {
+        $controller = (string) file_get_contents(self::PLUGIN_DIR . '/controllers/get.php');
+        $view = (string) file_get_contents(self::PLUGIN_DIR . '/views/get/index.php');
+
+        self::assertStringContainsString("have_perm('autor')", $controller);
+        self::assertStringContainsString(': Attribution::html(', $controller);
+        self::assertStringContainsString('<?= $attribution ?>', $view);
+    }
+
     /** The plugin directory is shipped on its own, so it carries both texts. */
     public function testPluginShipsLicenseAndAdditionalTerms(): void
     {

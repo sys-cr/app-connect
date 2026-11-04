@@ -34,6 +34,12 @@ class GetController extends PluginController
         PageLayout::setTitle($this->_('App holen'));
         Help::addToHelpbar(Help::GET);
         Attribution::addToHelpbar();
+        // The core shows the help bar from `autor` on; visitors who are not
+        // signed in get the notice at the end of the page instead.
+        $this->attribution = is_object($GLOBALS['perm']) && $GLOBALS['perm']->have_perm('autor')
+            ? null
+            : Attribution::html((string) Icon::create('link-extern', Icon::ROLE_INFO)
+                ->asImg(16, ['style' => 'vertical-align: text-bottom;', 'alt' => '']));
 
         $base = parse_url(Runtime::baseUrl());
         // The host comes from ABSOLUTE_URI_STUDIP. Where a site has not set it,

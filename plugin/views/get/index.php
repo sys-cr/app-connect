@@ -8,6 +8,7 @@
  * @var string $instance_name
  * @var array<string, string> $store_links
  * @var string|null $privacy_url
+ * @var string|null $attribution notice for visitors without the help bar
  */
 ?>
 <? if (!$enabled) : ?>
@@ -51,4 +52,7 @@
     document.querySelector('.app-connect-code-note').hidden = false;
 }());
 </script>
+<? endif ?>
+<? if ($attribution) : ?>
+    <?= $attribution ?>
 <? endif ?>
