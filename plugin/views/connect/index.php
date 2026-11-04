@@ -14,7 +14,7 @@
 ?>
 <? if ($pairing_enabled) : ?>
 <section class="contentbox app-connect-pairing">
-    <header><h1><?= $_('App mit Ihrem Konto verbinden') ?></h1></header>
+    <header><h2><?= $_('App mit Ihrem Konto verbinden') ?></h2></header>
     <section>
         <? if ($new_code) : ?>
             <p><?= $_('Scannen Sie diesen QR-Code mit der App. Er gilt fünf Minuten und nur einmal.') ?></p>
@@ -44,7 +44,7 @@
 <? endif ?>
 
 <section class="contentbox">
-    <header><h1><?= $_('Mit der App verbundene Geräte') ?></h1></header>
+    <header><h2><?= $_('Mit der App verbundene Geräte') ?></h2></header>
     <section>
         <? if (!$device_list) : ?>
             <p><?= $_('Es ist kein Gerät verbunden.') ?></p>
