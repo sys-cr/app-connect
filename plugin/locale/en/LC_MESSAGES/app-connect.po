@@ -78,8 +78,8 @@ msgstr "Continue"
 msgid "Die App für %s"
 msgstr "The app for %s"
 
-msgid "Ist die App schon installiert, öffnen Sie sie hier. Sonst installieren Sie sie und scannen den QR-Code danach in der App noch einmal – oder kommen Sie auf diese Seite zurück und tippen auf „In der App öffnen“."
-msgstr "If the app is already installed, open it here. Otherwise install it and scan the QR code again in the app afterwards – or come back to this page and tap “Open in the app”."
+msgid "Ist die App schon installiert, öffnen Sie sie hier. Sonst installieren Sie sie und scannen den QR-Code danach in der App noch einmal. Oder Sie kommen auf diese Seite zurück und tippen auf „In der App öffnen“."
+msgstr "If the app is already installed, open it here. Otherwise install it and scan the QR code again in the app afterwards. Or come back to this page and tap “Open in the app”."
 
 msgid "In der App öffnen"
 msgstr "Open in the app"

@@ -16,7 +16,7 @@
 <section class="contentbox app-connect-get">
     <header><h2><?= sprintf($_('Die App für %s'), htmlReady($instance_name)) ?></h2></header>
     <section>
-        <p><?= $_('Ist die App schon installiert, öffnen Sie sie hier. Sonst installieren Sie sie und scannen den QR-Code danach in der App noch einmal – oder kommen Sie auf diese Seite zurück und tippen auf „In der App öffnen“.') ?></p>
+        <p><?= $_('Ist die App schon installiert, öffnen Sie sie hier. Sonst installieren Sie sie und scannen den QR-Code danach in der App noch einmal. Oder Sie kommen auf diese Seite zurück und tippen auf „In der App öffnen“.') ?></p>
         <p>
             <?= Studip\LinkButton::createAccept($_('In der App öffnen'), $connect_link, [
                 'data-connect-link' => $connect_link,

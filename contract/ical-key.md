@@ -73,7 +73,7 @@ configuration section "Stud.App".
   the core made earlier has eight characters by default, or the length the
   site chose.
 - `subscribeUrl`: the `webcal://` address for the system calendar, or `null`
-  when the site cannot be reached the way a calendar app needs it — https on
+  when the site cannot be reached the way a calendar app needs it: https on
   the default port. Apps then show the key instead of a link that would
   point somewhere else.
 - `active`: `true` while a key is in place.
@@ -84,7 +84,7 @@ configuration section "Stud.App".
 
 Drops the key, which stops every subscription built on it: the way back once
 the key has been passed on or a device was lost. The next `GET` makes a new
-one, within the limit above. Idempotent — a person without a key gets `204` as well.
+one, within the limit above. Idempotent: a person without a key gets `204` as well.
 
 ## What is logged
 

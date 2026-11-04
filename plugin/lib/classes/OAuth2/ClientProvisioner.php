@@ -20,7 +20,7 @@ final class ClientProvisioner
 {
     public const CLIENT_NAME = 'Stud.App';
     public const CLIENT_OWNER = 'Stud.App';
-    public const CLIENT_DESCRIPTION = 'Mobile apps. Managed by the app-connect plugin – please do not edit it here.';
+    public const CLIENT_DESCRIPTION = 'Mobile apps. Managed by the app-connect plugin. Please do not edit it here.';
 
     public function __construct(private readonly Settings $settings)
     {
@@ -61,6 +61,7 @@ final class ClientProvisioner
             $client->revoked = 0;
             $client->name = self::CLIENT_NAME;
             $client->owner = self::CLIENT_OWNER;
+            $client->description = self::CLIENT_DESCRIPTION;
             if ($client->isDirty()) {
                 $client->store();
             }
