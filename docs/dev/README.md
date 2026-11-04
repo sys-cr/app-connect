@@ -29,7 +29,8 @@ Komponenten in `plugin/lib/classes/`:
 | `Places`, `Profile` | Orte von Terminen mit Koordinaten, die Profilsprache |
 | `RateLimit`, `Audit`, `Mail` | Grenzen für Fehlversuche, Aktionen des Ereignisprotokolls, die Verbindungsmail |
 | `Routes` | schlanke JSON:API-Controller der Routen unten; `AppToken` lässt nur das Token des App-Clients zu |
-| `Attribution` | Autor, Quellcode-Adresse und Lizenz; setzt den Hinweis in die Hilfelasche von `connect` und `get` |
+| `Help` | kurze Hilfetexte für die Hilfelasche von `connect` und `get` |
+| `Attribution` | Autor, Quellcode-Adresse und Lizenz; setzt den Hinweis ans Ende der Hilfelasche von `connect` und `get` |
 | `Runtime` | Verbindung zum laufenden Stud.IP (Einstellungen, Basis-Adresse, Instanzdaten) |
 
 Klassen ohne Abhängigkeit von Stud.IP (`Discovery\DiscoveryBuilder`,
@@ -179,7 +180,8 @@ Components in `plugin/lib/classes/`:
 | `Places`, `Profile` | places of course dates with coordinates, the profile language |
 | `RateLimit`, `Audit`, `Mail` | failure limits, event log actions, the connection mail |
 | `Routes` | thin JSON:API controllers of the routes below; `AppToken` admits only the app client's token |
-| `Attribution` | author, source URL and license; adds the notice to the help bar of `connect` and `get` |
+| `Help` | short help texts for the help bar of `connect` and `get` |
+| `Attribution` | author, source URL and license; adds the notice at the end of the help bar of `connect` and `get` |
 | `Runtime` | wiring to the running Stud.IP (settings, base URL, instance data) |
 
 Classes without a Stud.IP dependency (`Discovery\DiscoveryBuilder`,

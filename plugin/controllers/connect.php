@@ -9,6 +9,7 @@ use AppConnect\Attribution;
 use AppConnect\Connect\ConnectLink;
 use AppConnect\Devices\DeviceService;
 use AppConnect\Devices\TokenLedger;
+use AppConnect\Help;
 use AppConnect\Pairing\PairingService;
 use AppConnect\Runtime;
 use AppConnect\Settings\Settings;
@@ -43,6 +44,7 @@ class ConnectController extends PluginController
             Navigation::activateItem(AppConnect::NAVIGATION_PATH);
         }
         PageLayout::setTitle($this->_('Stud.App Verbindung'));
+        Help::addToHelpbar(Help::CONNECT, $this->settings->isPairingEnabled());
         Attribution::addToHelpbar();
     }
 

@@ -35,25 +35,26 @@ final class AttributionTest extends TestCase
         self::assertSame(Attribution::LICENSE, $composer['license']);
     }
 
-    public function testHelpTextNamesAuthorSourceAndLicense(): void
+    public function testNoticeNamesAuthorSourceAndLicense(): void
     {
         require_once __DIR__ . '/../Support/studip-view-functions.php';
 
-        $text = Attribution::helpText();
+        $html = Attribution::html('<img alt="">');
 
-        self::assertStringContainsString('Bodo Steffen', $text);
-        // On a line of its own, so Stud.IP's formatting links it without a trailing dot.
-        self::assertStringContainsString("https://github.com/sys-cr/app-connect\n", $text);
-        self::assertStringContainsString('GPL-3.0-or-later', $text);
-        self::assertStringContainsString('SUPPLEMENTAL-TERMS.txt', $text);
+        self::assertStringContainsString('Bodo Steffen', $html);
+        self::assertStringContainsString('Abschnitt 7', $html);
+        self::assertStringContainsString('href="https://github.com/sys-cr/app-connect"', $html);
+        self::assertStringContainsString('href="https://www.gnu.org/licenses/gpl-3.0.html"', $html);
+        self::assertSame(2, substr_count($html, '<img alt=""> '));
     }
 
-    /** The pages people use show the notice; the operator page does not need to. */
-    public function testUserPagesAddTheNoticeToTheHelpBar(): void
+    /** The pages people use show help and notice; the operator page does not need to. */
+    public function testUserPagesAddHelpAndNoticeToTheHelpBar(): void
     {
         foreach (['connect', 'get'] as $controller) {
             $source = (string) file_get_contents(self::PLUGIN_DIR . "/controllers/{$controller}.php");
 
+            self::assertMatchesRegularExpression('/Help::addToHelpbar\(Help::[A-Z]+/', $source, $controller);
             self::assertStringContainsString('Attribution::addToHelpbar();', $source, $controller);
         }
     }

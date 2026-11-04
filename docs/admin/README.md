@@ -242,8 +242,8 @@ Rechtsgrundlage der App-Nutzung ist {{RECHTSGRUNDLAGE}}.
 
 ## Lizenzhinweis
 
-Die Hilfelasche („Hilfe“) von „Stud.App Verbindung“ und „App holen“ nennt Autor,
-Quellcode-Repository und Lizenz (GPL-3.0-or-later mit den Zusatzbedingungen in
+Die Hilfelasche („Hilfe“) von „Stud.App Verbindung“ und „App holen“ erklärt kurz die Seite
+und nennt am Ende, klein abgesetzt, Autor, Quellcode-Repository und Lizenz (GPL-3.0-or-later mit den Zusatzbedingungen in
 `SUPPLEMENTAL-TERMS.txt`). Die Zusatzbedingungen verlangen diesen Hinweis; eine geänderte
 Fassung darf ihn verschieben, muss ihn aber sichtbar lassen. Das Plugin-Verzeichnis enthält
 `LICENSE` und `SUPPLEMENTAL-TERMS.txt`.
@@ -458,8 +458,9 @@ of the app, until the key is reset.
 
 ### License notice
 
-The help bar ("Hilfe") of "Stud.App connection" and "Get the app" names the author, the
-source-code repository and the license (GPL-3.0-or-later with the additional terms in
+The help bar ("Hilfe") of "Stud.App connection" and "Get the app" briefly explains the page
+and, small and set apart at the end, names the author, the source-code repository and the
+license (GPL-3.0-or-later with the additional terms in
 `SUPPLEMENTAL-TERMS.txt`). The additional terms require this notice; a modified version may
 move it but must keep it visible. The plugin directory contains `LICENSE` and
 `SUPPLEMENTAL-TERMS.txt`.

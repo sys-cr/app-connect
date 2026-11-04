@@ -74,7 +74,7 @@ Erste veröffentlichte Version.
   (`X-Frame-Options`, `frame-ancestors`).
 - **Lizenz** – GPL-3.0-or-later mit Zusatzbedingungen nach Abschnitt 7
   (`SUPPLEMENTAL-TERMS.txt`); die Hilfelasche von „Stud.App Verbindung“ und „App holen“
-  nennt Autor, Quellcode-Repository und Lizenz.
+  erklärt die Seite und nennt am Ende Autor, Quellcode-Repository und Lizenz.
 - **Vertrag** – JSON-Schema der Discovery, Regeln für Verbindungslinks, Landing-Page und
   Routen sowie gemeinsame Test-Vektoren für Plugin und Apps.
 - **Dokumentation** – Anleitungen für Nutzende, Betreiber und Entwicklung; `make dist`
@@ -153,8 +153,8 @@ First published version.
 - **Page protection** – the plugin's pages may not be framed (`X-Frame-Options`,
   `frame-ancestors`).
 - **License** – GPL-3.0-or-later with additional terms under section 7
-  (`SUPPLEMENTAL-TERMS.txt`); the help bar of "Stud.App connection" and "Get the app" names
-  author, source repository and license.
+  (`SUPPLEMENTAL-TERMS.txt`); the help bar of "Stud.App connection" and "Get the app"
+  explains the page and names author, source repository and license at the end.
 - **Contract** – JSON schema of the discovery, rules for connect links, landing page and
   routes, and shared test vectors for plugin and apps.
 - **Documentation** – guides for users, operators and developers; `make dist` builds the

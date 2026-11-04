@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 use AppConnect\Attribution;
 use AppConnect\Connect\ConnectLink;
+use AppConnect\Help;
 use AppConnect\Runtime;
 use AppConnect\Settings\Settings;
 
@@ -31,6 +32,7 @@ class GetController extends PluginController
         $settings = Runtime::settings();
         $this->enabled = $settings->isEnabled() && $settings->clientId() !== null;
         PageLayout::setTitle($this->_('App holen'));
+        Help::addToHelpbar(Help::GET);
         Attribution::addToHelpbar();
 
         $base = parse_url(Runtime::baseUrl());
