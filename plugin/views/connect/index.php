@@ -118,23 +118,34 @@
         return values.reduce((result, value) => result.replace('%s', value), text);
     }
     function remaining() {
-        const seconds = Math.max(0, Math.round((deadline - Date.now()) / 1000));
+        const seconds = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
         return Math.floor(seconds / 60) + ':' + String(seconds % 60).padStart(2, '0');
     }
     function done(text, reload) {
         clearInterval(timer);
+        clearInterval(poller);
         document.querySelectorAll('.app-connect-pairing code.qr, .app-connect-pairing canvas').forEach((node) => node.remove());
         status.textContent = text;
         if (reload) {
             setTimeout(() => window.location.assign(status.dataset.indexUrl), 4000);
         }
     }
-    const timer = setInterval(() => {
+    // The time counts every second in its own element; a timer is not read
+    // out by screen readers, unlike the live status around it.
+    const clock = document.createElement('span');
+    clock.setAttribute('role', 'timer');
+    const [before, after = ''] = texts.waiting.split('%s');
+    function tick() {
         if (Date.now() >= deadline) {
             done(texts.expired, false);
             return;
         }
-        status.textContent = format(texts.waiting, [remaining()]);
+        clock.textContent = remaining();
+        if (!clock.isConnected) {
+            status.replaceChildren(before, clock, after);
+        }
+    }
+    function poll() {
         fetch(status.dataset.statusUrl, { credentials: 'same-origin', headers: { 'Accept': 'application/json' } })
             .then((response) => response.ok ? response.json() : null)
             .then((data) => {
@@ -145,7 +156,10 @@
                 }
             })
             .catch(() => {});
-    }, 3000);
+    }
+    const timer = setInterval(tick, 1000);
+    const poller = setInterval(poll, 3000);
+    tick();
 }());
 </script>
 <? endif ?>
