@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace AppConnect\Tests\Unit;
 
 use AppConnect\Audit\EventLog;
+use AppConnect\OAuth2\ClientProvisioner;
 use AppConnect\Settings\OperatorConfig;
 use PHPUnit\Framework\TestCase;
 
@@ -73,6 +74,12 @@ final class MigrationsTest extends TestCase
         self::assertSame(EventLog::WEB_LOGIN_ACTIONS, $this->migration('010')::ACTIONS);
         self::assertSame(EventLog::WEB_LOGIN_RETENTION_SECONDS, $this->migration('011')::RETENTION_SECONDS);
         self::assertSame(EventLog::ICAL_KEY_ACTIONS, array_keys($this->migration('011')::ACTIONS));
+    }
+
+    public function testTheClientLinksToTheSameWebsite(): void
+    {
+        self::assertSame(ClientProvisioner::CLIENT_HOMEPAGE, $this->migration('013')::HOMEPAGE);
+        self::assertSame(ClientProvisioner::CLIENT_DESCRIPTION, $this->migration('013')::DESCRIPTION);
     }
 
     /** @return array<string, object> */

@@ -20,6 +20,8 @@ final class ClientProvisioner
 {
     public const CLIENT_NAME = 'Stud.App';
     public const CLIENT_OWNER = 'Stud.App';
+    /** Linked from "Entwickelt durch" on the core page "Drittanwendungen". */
+    public const CLIENT_HOMEPAGE = 'https://studapp2.de';
     public const CLIENT_DESCRIPTION = 'Mobile apps. Managed by the app-connect plugin. Please do not edit it here.';
 
     public function __construct(private readonly Settings $settings)
@@ -30,9 +32,9 @@ final class ClientProvisioner
      * Switches the app connection on: provides the client and sets the switch.
      * Returns the client id.
      */
-    public function enable(string $homepage): string
+    public function enable(string $baseUrl): string
     {
-        $clientId = $this->provision($homepage);
+        $clientId = $this->provision($baseUrl);
         $this->settings->set(Settings::ENABLED, true);
         return $clientId;
     }
@@ -45,22 +47,24 @@ final class ClientProvisioner
     }
 
     /**
-     * Reuses the stored client (lifting a revocation, bringing name and owner
-     * up to date) or creates a new public PKCE client. Leaves the switch
-     * alone: it runs when root switched it on in the configuration.
+     * Reuses the stored client (lifting a revocation, bringing name, owner,
+     * homepage and description up to date) or creates a new public PKCE
+     * client. Leaves the switch alone: it runs when root switched it on in
+     * the configuration.
      */
-    public function provision(string $homepage): string
+    public function provision(string $baseUrl): string
     {
         // Switching on happens in root's request, so its address is trusted;
         // later requests may carry any Host header.
-        if (self::isBaseUrl($homepage)) {
-            $this->settings->set(Settings::BASE_URL, rtrim($homepage, '/'));
+        if (self::isBaseUrl($baseUrl)) {
+            $this->settings->set(Settings::BASE_URL, rtrim($baseUrl, '/'));
         }
         $client = $this->storedClient();
         if ($client !== null) {
             $client->revoked = 0;
             $client->name = self::CLIENT_NAME;
             $client->owner = self::CLIENT_OWNER;
+            $client->homepage = self::CLIENT_HOMEPAGE;
             $client->description = self::CLIENT_DESCRIPTION;
             if ($client->isDirty()) {
                 $client->store();
@@ -72,7 +76,7 @@ final class ClientProvisioner
                 DiscoveryBuilder::REDIRECT_URI,
                 false,
                 self::CLIENT_OWNER,
-                $homepage,
+                self::CLIENT_HOMEPAGE,
                 self::CLIENT_DESCRIPTION,
                 null
             );

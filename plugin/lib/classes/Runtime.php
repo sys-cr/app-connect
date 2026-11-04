@@ -35,19 +35,14 @@ final class Runtime
     /**
      * Base URL for links that leave the request, such as the address in the
      * connection mail: the one recorded when root switched the connection
-     * on, else the homepage of the app client, else the request's. Without
-     * ABSOLUTE_URI_STUDIP the core derives the request's from the Host header.
+     * on, else the request's. Without ABSOLUTE_URI_STUDIP the core derives
+     * the request's from the Host header.
      */
     public static function canonicalBaseUrl(): string
     {
-        $settings = self::settings();
-        $recorded = $settings->stringValue(Settings::BASE_URL);
+        $recorded = self::settings()->stringValue(Settings::BASE_URL);
         if (ClientProvisioner::isBaseUrl($recorded)) {
             return rtrim((string) $recorded, '/');
-        }
-        $homepage = (new ClientProvisioner($settings))->storedClient()?->homepage;
-        if (ClientProvisioner::isBaseUrl($homepage)) {
-            return rtrim((string) $homepage, '/');
         }
         return self::baseUrl();
     }
