@@ -22,10 +22,13 @@ Das Projekt folgt dem
 
 ## Commit-Nachrichten
 
-[Conventional Commits](https://www.conventionalcommits.org/):
-`<typ>(<bereich>): <kurze Beschreibung>` mit den Typen `feat`, `fix`, `docs`,
-`refactor`, `test`, `chore`, `perf`; Bereiche wie `plugin`, `discovery`, `oauth2`,
-`contract`, `docs`.
+- Die erste Zeile fasst die Änderung auf Englisch im Imperativ zusammen, mit höchstens
+  etwa 70 Zeichen, ohne Präfix und ohne Punkt am Ende, etwa
+  `Count the pairing code's time down every second`.
+- Nach einer Leerzeile erklärt der Text in ganzen Sätzen, was sich ändert und warum.
+- Am Ende steht die Zeile `Signed-off-by` (siehe unten).
+- Ein Commit enthält eine in sich geschlossene Änderung mit ihren Tests und ihrer
+  Dokumentation und besteht `make lint` und `make test` für sich.
 
 ## Developer Certificate of Origin
 
@@ -47,13 +50,26 @@ Contributor License Agreement (CLA).
 - Kommentare sind englisch und beschreiben den Code, wie er ist.
 - Dokumentation ist auf Deutsch, mit einer englischen Fassung im selben Dokument.
 
+## Texte
+
+- Texte der Oberfläche, Übersetzungen und Mails sprechen die Person mit „Sie“ an.
+- Sie enthalten keinen Geviertstrich (—) und keinen Gedankenstrich (–). Sätze werden mit
+  Punkt, Doppelpunkt oder Semikolon getrennt.
+- Die Quellsprache ist Deutsch. Jeder neue Text bekommt seine englische Übersetzung in
+  `plugin/locale/en/LC_MESSAGES/app-connect.po`; `make locale` baut den Katalog, und
+  `make test` prüft, dass keine Übersetzung fehlt.
+- Code, Kommentare, Dokumentation und Commit-Nachrichten enthalten keine internen
+  Adressen, keine lokalen Pfade und keine Verweise auf Unterlagen, die nicht öffentlich
+  sind.
+
 ## Lizenz der Beiträge
 
 Beiträge werden unter GPL-3.0-or-later mit den Zusatzbedingungen nach Abschnitt 7 in
 [`SUPPLEMENTAL-TERMS.txt`](SUPPLEMENTAL-TERMS.txt) angenommen. Beiträge unter
-inkompatiblen Lizenzen können nicht angenommen werden. Der Hinweis in der Hilfelasche
-(Autor, Quellcode-Repository, Lizenz) muss sichtbar bleiben; ein Beitrag darf ihn
-verschieben, aber nicht entfernen.
+inkompatiblen Lizenzen können nicht angenommen werden. Der Lizenzhinweis (Autor,
+Quellcode-Repository, Lizenz) in der Hilfelasche und, für nicht angemeldete Besucher, am
+Ende von „App holen“ muss sichtbar bleiben; ein Beitrag darf ihn verschieben, aber nicht
+entfernen.
 
 Mit dem Einreichen stellst du deinen Beitrag zusätzlich unter GPL-2.0-or-later ohne die
 Zusatzbedingungen, damit er in das Stud.IP-Kernsystem (GPL-2.0-or-later) übernommen werden
@@ -89,10 +105,13 @@ v2.1: respectful, constructive, inclusive.
 
 ### Commit messages
 
-[Conventional Commits](https://www.conventionalcommits.org/):
-`<type>(<scope>): <short description>` with the types `feat`, `fix`, `docs`, `refactor`,
-`test`, `chore`, `perf`; scopes such as `plugin`, `discovery`, `oauth2`, `contract`,
-`docs`.
+- The first line sums up the change in English in the imperative, in about 70 characters
+  at most, without a prefix and without a full stop, such as
+  `Count the pairing code's time down every second`.
+- After a blank line, the body explains in full sentences what changes and why.
+- The last line is the `Signed-off-by` line (see below).
+- A commit holds one self-contained change with its tests and documentation and passes
+  `make lint` and `make test` on its own.
 
 ### Developer Certificate of Origin
 
@@ -114,12 +133,24 @@ contributor license agreement (CLA).
 - Comments are in English and describe the code as it is.
 - Documentation is in German, with an English version in the same document.
 
+### Texts
+
+- Texts in the interface, translations and mails address people formally ("Sie").
+- They contain no em dash (—) and no en dash used as a dash (–). Sentences are separated by
+  a full stop, a colon or a semicolon.
+- The source language is German. Every new text gets its English translation in
+  `plugin/locale/en/LC_MESSAGES/app-connect.po`; `make locale` builds the catalogue, and
+  `make test` checks that no translation is missing.
+- Code, comments, documentation and commit messages contain no internal addresses, no
+  local paths and no references to material that is not public.
+
 ### License of contributions
 
 Contributions are accepted under GPL-3.0-or-later with the additional terms under section
 7 in [`SUPPLEMENTAL-TERMS.txt`](SUPPLEMENTAL-TERMS.txt). Contributions under incompatible
-licenses cannot be accepted. The attribution notice in the help bar (author, source
-repository, license) must stay visible; a contribution may move it but not remove it.
+licenses cannot be accepted. The attribution notice (author, source repository, license)
+in the help bar and, for visitors who are not signed in, at the end of "Get the app" must
+stay visible; a contribution may move it but not remove it.
 
 By submitting a contribution you also license it under GPL-2.0-or-later, without the
 additional terms, for inclusion in the Stud.IP core system (licensed GPL-2.0-or-later).
