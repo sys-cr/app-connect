@@ -1,0 +1,21 @@
+# PHP tooling
+/plugin/vendor/
+/vendor/
+.phpunit.cache/
+.phpunit.result.cache
+.php-cs-fixer.cache
+
+# Build output
+/dist/
+*.zip
+
+# Local configuration and secrets
+.env
+.env.local
+*.key
+*.pem
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
