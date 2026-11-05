@@ -28,6 +28,17 @@ final class Attribution
     /** Additional terms under section 7 of the GPL-3.0, shipped with the plugin. */
     public const TERMS_FILE = 'SUPPLEMENTAL-TERMS.txt';
 
+    /**
+     * Text colour of the notice in the help bar: the help bar's text colour
+     * shaded towards its background. The background is `--color--brand-primary`
+     * from Stud.IP 6.1 on and `--color--info` in 6.0; at 85 % the notice keeps
+     * at least 4.5:1 on both and in the core's high-contrast mode.
+     */
+    public const HELPBAR_COLOR = 'color-mix(in srgb, var(--color--font-inverted) 85%, var(--color--brand-primary))';
+
+    /** Text colour of the notice in the page content. */
+    public const PAGE_COLOR = 'var(--color--font-secondary)';
+
     private static bool $queued = false;
 
     /** The notice: author, license with the additional terms, open source. */
@@ -41,19 +52,21 @@ final class Attribution
 
     /**
      * The notice with links to the license and the source as one block,
-     * smaller and dimmer than the help above it. `$linkIcon` is rendered
-     * icon markup and goes in as it is.
+     * smaller and dimmer than the text around it. `$linkIcon` is rendered
+     * icon markup and goes in as it is; `$inHelpbar` picks the text colour
+     * for the help bar or for the page content.
      */
-    public static function html(string $linkIcon = ''): string
+    public static function html(string $linkIcon = '', bool $inHelpbar = true): string
     {
         $icon = $linkIcon !== '' ? $linkIcon . ' ' : '';
         return sprintf(
-            '<div class="app-connect-attribution" style="font-size: 0.78em; line-height: 1.45; opacity: 0.65;">'
+            '<div class="app-connect-attribution" style="font-size: 0.78em; line-height: 1.45; color: %s;">'
             . '%s<br>'
             . '<a href="%s" target="_blank" rel="noopener noreferrer" style="color: inherit;">%s%s</a>'
             . ' · '
             . '<a href="%s" target="_blank" rel="noopener noreferrer" style="color: inherit;">%s%s</a>'
             . '</div>',
+            $inHelpbar ? self::HELPBAR_COLOR : self::PAGE_COLOR,
             htmlReady(self::text()),
             htmlReady(self::LICENSE_URL),
             $icon,

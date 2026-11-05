@@ -48,6 +48,20 @@ final class AttributionTest extends TestCase
         self::assertSame(2, substr_count($html, '<img alt=""> '));
     }
 
+    /** A fixed colour keeps the contrast measurable; opacity would also dim forced colours. */
+    public function testNoticeUsesAFixedColourPerPlace(): void
+    {
+        require_once __DIR__ . '/../Support/studip-view-functions.php';
+
+        $helpbar = Attribution::html();
+        $page = Attribution::html('', false);
+
+        self::assertStringNotContainsString('opacity', $helpbar . $page);
+        self::assertStringContainsString('color: ' . Attribution::HELPBAR_COLOR . ';', $helpbar);
+        self::assertStringContainsString('color: ' . Attribution::PAGE_COLOR . ';', $page);
+        self::assertStringContainsString('var(--color--font-inverted) 85%, var(--color--brand-primary)', Attribution::HELPBAR_COLOR);
+    }
+
     /** The pages people use show help and notice; the operator page does not need to. */
     public function testUserPagesAddHelpAndNoticeToTheHelpBar(): void
     {
@@ -67,6 +81,7 @@ final class AttributionTest extends TestCase
 
         self::assertStringContainsString("have_perm('autor')", $controller);
         self::assertStringContainsString(': Attribution::html(', $controller);
+        self::assertMatchesRegularExpression("/'alt' => ''\]\), false\);/", $controller);
         self::assertStringContainsString('<?= $attribution ?>', $view);
     }
 

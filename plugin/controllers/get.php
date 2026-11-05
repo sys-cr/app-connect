@@ -39,7 +39,7 @@ class GetController extends PluginController
         $this->attribution = is_object($GLOBALS['perm']) && $GLOBALS['perm']->have_perm('autor')
             ? null
             : Attribution::html((string) Icon::create('link-extern', Icon::ROLE_INFO)
-                ->asImg(16, ['style' => 'vertical-align: text-bottom;', 'alt' => '']));
+                ->asImg(16, ['style' => 'vertical-align: text-bottom;', 'alt' => '']), false);
 
         $base = parse_url(Runtime::baseUrl());
         // The host comes from ABSOLUTE_URI_STUDIP. Where a site has not set it,
