@@ -1,11 +1,46 @@
-Additional Terms under Section 7 of the GNU General Public License, version 3:
+Additional Terms under Section 7 of the GNU General Public License, version 3
 
-Pursuant to Section 7(b) of the GNU General Public License, version 3, this Program is subject to the following additional requirements:
+The copyright holder of this Program, Bodo Steffen, adds the following terms
+under Section 7 of the GNU General Public License, version 3 ("GPL"). They
+apply to the material of this Program and to modified versions of it.
 
-1.    Attribution and Source Notice: If the Program or any modified version thereof provides a graphical user interface (GUI), the interface must prominently display a visible notice identifying the original authors, the official source code repository, and the applicable license terms.
+1. Author attribution (Section 7(b)). The Appropriate Legal Notices displayed
+   by the Program, and by any work containing it or a modified version of it,
+   must preserve the author attribution "app-connect by Bodo Steffen" (for a
+   modified version: "based on app-connect by Bodo Steffen") and the notice
+   that the work is licensed under the GPL, version 3 or later, together with
+   these additional terms. You may change the wording, language, layout and
+   placement of these notices and add further authors, provided that the
+   attribution stays accurate and remains part of the Appropriate Legal
+   Notices. No particular screen, position or design is required.
 
-2.    Integrity of Notices: These notices must continue to be displayed in modified versions in an appropriate form; content (authors, repository, license) must not be removed. Adjustments to layout/placement are permitted as long as the notices remain clearly visible.
+2. Origin and modified versions (Section 7(c)). You may not misrepresent the
+   origin of this material. Modified versions must be marked in reasonable
+   ways as different from the original version, for example by a changed
+   name or by a statement in their Appropriate Legal Notices, and must not be
+   presented as the original version by its author.
 
-3.    Scope of Requirement: For the avoidance of doubt, these additional terms apply strictly to this Program and its components. They do not extend to the underlying Stud.IP core system or to any other separate, independent works or platforms with which this Program merely interacts or on which it runs.
+3. Names and marks (Sections 7(d) and 7(e)). The author's name may not be
+   used for publicity purposes for a modified version without prior written
+   permission. No rights are granted under trademark law for the names and
+   logos "app-connect" and "Stud.App", except for reasonable and customary
+   use in describing the origin of the Program and in the notices required
+   by these terms.
 
-All other rights to modify and distribute the software remain governed by the terms of the GNU General Public License, version 3.
+4. Source code. The source code of the original version is published at
+   https://github.com/sys-cr/app-connect. Keeping this reference in modified
+   versions is welcome but not required by these terms; recipients of a
+   modified version are to be told where to obtain its own Corresponding
+   Source as the GPL requires.
+
+5. Scope. These terms apply only to this Program and to the parts of works to
+   which they lawfully apply. They do not extend to the Stud.IP core system or
+   to separate and independent works or platforms with which the Program
+   interacts, on which it runs or in which it is embedded, solely by reason of
+   that interaction or embedding.
+
+6. Severability. If any of these terms goes beyond what Section 7 of the GPL
+   permits, only that term is void and may be removed as provided in
+   Section 7; the GPL and the remaining terms stay in effect.
+
+All other rights and obligations are governed by the GPL.

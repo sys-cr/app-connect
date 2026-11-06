@@ -35,14 +35,18 @@ final class AttributionTest extends TestCase
         self::assertSame(Attribution::LICENSE, $composer['license']);
     }
 
-    public function testNoticeNamesAuthorSourceAndLicense(): void
+    /** The notice holds what the GPL counts as Appropriate Legal Notices, plus the source link. */
+    public function testNoticeIsAppropriateLegalNotices(): void
     {
         require_once __DIR__ . '/../Support/studip-view-functions.php';
 
         $html = Attribution::html('<img alt="">');
 
-        self::assertStringContainsString('Bodo Steffen', $html);
+        self::assertStringContainsString('app-connect von Bodo Steffen', $html);
+        self::assertStringContainsString('© ' . Attribution::COPYRIGHT_YEAR, $html);
         self::assertStringContainsString('Abschnitt 7', $html);
+        self::assertStringContainsString('weitergeben und verändern', $html);
+        self::assertStringContainsString('Gewährleistung', $html);
         self::assertStringContainsString('href="https://github.com/sys-cr/app-connect"', $html);
         self::assertStringContainsString('href="https://www.gnu.org/licenses/gpl-3.0.html"', $html);
         self::assertSame(2, substr_count($html, '<img alt=""> '));
@@ -110,7 +114,19 @@ final class AttributionTest extends TestCase
     {
         $terms = (string) file_get_contents(self::PLUGIN_DIR . '/' . Attribution::TERMS_FILE);
 
-        self::assertStringContainsString('Section 7(b)', $terms);
-        self::assertStringContainsString('do not extend to the underlying Stud.IP core system', $terms);
+        self::assertStringContainsString('do not extend to the Stud.IP core system', $terms);
+    }
+
+    /** The terms stay within section 7: attribution in the legal notices, no required link. */
+    public function testAdditionalTermsKeepTheAttributionInTheLegalNotices(): void
+    {
+        $terms = (string) file_get_contents(self::PLUGIN_DIR . '/' . Attribution::TERMS_FILE);
+
+        self::assertStringContainsString('Author attribution (Section 7(b))', $terms);
+        self::assertStringContainsString('"app-connect by Bodo Steffen"', $terms);
+        self::assertStringContainsString('Appropriate Legal', $terms);
+        self::assertStringContainsString('welcome but not required', $terms);
+        self::assertStringContainsString('Severability', $terms);
+        self::assertStringContainsString('No particular screen, position or design is required.', $terms);
     }
 }

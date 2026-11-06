@@ -8,15 +8,19 @@ declare(strict_types=1);
 namespace AppConnect;
 
 /**
- * Author, source repository and license of the plugin. The additional terms
- * in SUPPLEMENTAL-TERMS.txt require the user interface to show all three;
- * the pages people use, "Stud.App Verbindung" and "App holen", carry them
- * at the end of the help bar, below the help texts. Forks may move the
- * notice but must keep it complete.
+ * The plugin's Appropriate Legal Notices in the sense of the GPL: copyright
+ * and author, the license with its additional terms, the right to convey,
+ * the absence of warranty and a link to the license text, plus a link to the
+ * source. The additional terms in SUPPLEMENTAL-TERMS.txt require these
+ * notices to keep the author attribution and the license notice; wording,
+ * place and design are free. The pages people use, "Stud.App Verbindung" and
+ * "App holen", carry them at the end of the help bar, below the help texts.
  */
 final class Attribution
 {
     public const AUTHOR = 'Bodo Steffen';
+
+    public const COPYRIGHT_YEAR = '2026';
 
     public const SOURCE_URL = 'https://github.com/sys-cr/app-connect';
 
@@ -41,12 +45,13 @@ final class Attribution
 
     private static bool $queued = false;
 
-    /** The notice: author, license with the additional terms, open source. */
+    /** The notice: author and copyright, license with the additional terms, conveying, no warranty. */
     public static function text(): string
     {
         return sprintf(
-            Translation::text('app-connect wurde von %s entwickelt und steht unter der GNU GPL 3.0 oder neuer mit Zusatzbedingungen nach Abschnitt 7. Der Quellcode ist öffentlich zugänglich.'),
-            self::AUTHOR
+            Translation::text('app-connect von %1$s (© %2$s) ist freie Software unter der GNU GPL 3.0 oder neuer mit Zusatzbedingungen nach Abschnitt 7. Sie dürfen sie unter diesen Bedingungen weitergeben und verändern; eine Gewährleistung gibt es nicht.'),
+            self::AUTHOR,
+            self::COPYRIGHT_YEAR
         );
     }
 

@@ -202,8 +202,8 @@ msgstr ""
 msgid "d.m.Y, H:i T"
 msgstr "Y-m-d, H:i T"
 
-msgid "app-connect wurde von %s entwickelt und steht unter der GNU GPL 3.0 oder neuer mit Zusatzbedingungen nach Abschnitt 7. Der Quellcode ist öffentlich zugänglich."
-msgstr "app-connect was developed by %s and is licensed under the GNU GPL 3.0 or later with additional terms under section 7. The source code is publicly available."
+msgid "app-connect von %1$s (© %2$s) ist freie Software unter der GNU GPL 3.0 oder neuer mit Zusatzbedingungen nach Abschnitt 7. Sie dürfen sie unter diesen Bedingungen weitergeben und verändern; eine Gewährleistung gibt es nicht."
+msgstr "app-connect by %1$s (© %2$s) is free software under the GNU GPL 3.0 or later with additional terms under section 7. You may redistribute and modify it under these terms; there is no warranty."
 
 msgid "Lizenz (GPLv3)"
 msgstr "License (GPLv3)"

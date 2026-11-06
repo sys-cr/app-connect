@@ -243,12 +243,15 @@ Rechtsgrundlage der App-Nutzung ist {{RECHTSGRUNDLAGE}}.
 ## Lizenzhinweis
 
 Die Hilfelasche („Hilfe“) von „Stud.App Verbindung“ und „App holen“ erklärt kurz die Seite
-und nennt am Ende, klein abgesetzt, Autor, Quellcode-Repository und Lizenz
-(GPL-3.0-or-later mit den Zusatzbedingungen in `SUPPLEMENTAL-TERMS.txt`). Die Lasche zeigt
-der Kern erst ab dem Status „autor“; wer „App holen“ ohne Anmeldung öffnet, sieht den Hinweis
-deshalb am Ende der Seite. Die Zusatzbedingungen verlangen diesen Hinweis; eine geänderte
-Fassung darf ihn verschieben, muss ihn aber sichtbar lassen. Das Plugin-Verzeichnis enthält
-`LICENSE` und `SUPPLEMENTAL-TERMS.txt`.
+und nennt am Ende, klein abgesetzt, die rechtlichen Hinweise: „app-connect von Bodo
+Steffen“, die Lizenz (GPL-3.0-or-later mit den Zusatzbedingungen in
+`SUPPLEMENTAL-TERMS.txt`), das Recht zur Weitergabe, den Ausschluss der Gewährleistung und
+Links zu Lizenz und Quellcode. Die Lasche zeigt der Kern erst ab dem Status „autor“; wer
+„App holen“ ohne Anmeldung öffnet, sieht den Hinweis deshalb am Ende der Seite. Die
+Zusatzbedingungen verlangen, dass diese Hinweise die Nennung und den Lizenzhinweis behalten;
+eine geänderte Fassung darf sie umformulieren und an anderer Stelle zeigen und ist als
+geändert zu kennzeichnen. Das Plugin-Verzeichnis enthält `LICENSE` und
+`SUPPLEMENTAL-TERMS.txt`.
 
 ---
 
@@ -461,9 +464,11 @@ of the app, until the key is reset.
 ### License notice
 
 The help bar ("Hilfe") of "Stud.App connection" and "Get the app" briefly explains the page
-and, small and set apart at the end, names the author, the source-code repository and the
-license (GPL-3.0-or-later with the additional terms in `SUPPLEMENTAL-TERMS.txt`). The core
-shows the help bar from the status "autor" on, so visitors who open "Get the app" without
-signing in see the notice at the end of the page. The additional terms require this notice;
-a modified version may move it but must keep it visible. The plugin directory contains
-`LICENSE` and `SUPPLEMENTAL-TERMS.txt`.
+and, small and set apart at the end, shows the legal notices: "app-connect by Bodo
+Steffen", the license (GPL-3.0-or-later with the additional terms in
+`SUPPLEMENTAL-TERMS.txt`), the right to convey, the absence of warranty and links to the
+license and the source. The core shows the help bar from the status "autor" on, so visitors
+who open "Get the app" without signing in see the notice at the end of the page. The
+additional terms require these notices to keep the attribution and the license notice; a
+modified version may reword them, show them elsewhere and must be marked as modified. The
+plugin directory contains `LICENSE` and `SUPPLEMENTAL-TERMS.txt`.

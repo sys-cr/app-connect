@@ -49,10 +49,13 @@ GNU GPL-3.0-or-later **mit Zusatzbedingungen nach Abschnitt 7** – siehe
 [`SUPPLEMENTAL-TERMS.txt`](SUPPLEMENTAL-TERMS.txt). Die Zusatzbedingungen gelten nur für
 dieses Plugin, nicht für das zugrunde liegende Stud.IP-Kernsystem.
 
-Die Zusatzbedingungen verlangen, dass die grafische Oberfläche sichtbar Autor,
-Quellcode-Repository und Lizenz nennt. app-connect zeigt sie in der Hilfelasche der
-Seiten, die Nutzende sehen: „Stud.App Verbindung“ im Profil und „App holen“. Das
-Plugin-Verzeichnis enthält eigene Kopien beider Texte (`plugin/LICENSE`,
+Die Zusatzbedingungen verlangen, dass die rechtlichen Hinweise der Oberfläche
+(„Appropriate Legal Notices“ der GPL) die Nennung „app-connect von Bodo Steffen“ und den
+Lizenzhinweis behalten, auch in geänderten oder eingebetteten Fassungen; Wortlaut, Ort und
+Gestaltung sind frei. Geänderte Fassungen sind als solche zu kennzeichnen. Der Link zum
+Quellcode ist erwünscht, aber keine Pflicht. app-connect zeigt die Hinweise in der
+Hilfelasche der Seiten, die Nutzende sehen: „Stud.App Verbindung“ im Profil und „App
+holen“. Das Plugin-Verzeichnis enthält eigene Kopien beider Texte (`plugin/LICENSE`,
 `plugin/SUPPLEMENTAL-TERMS.txt`), damit jede installierte Kopie sie mitbringt.
 
 Beiträge: [`CONTRIBUTING.md`](CONTRIBUTING.md). Sicherheitsmeldungen:
@@ -112,11 +115,14 @@ GNU GPL-3.0-or-later **with additional terms under section 7** – see
 [`SUPPLEMENTAL-TERMS.txt`](SUPPLEMENTAL-TERMS.txt). The additional terms apply to this
 plugin only, not to the Stud.IP core system it runs on.
 
-The additional terms require the graphical interface to visibly name the author, the
-source-code repository and the license. app-connect shows them in the help bar ("Hilfe")
-of the pages people use: "Stud.App connection" in the profile and "Get the app". The plugin
-directory carries its own copies of both texts (`plugin/LICENSE`,
-`plugin/SUPPLEMENTAL-TERMS.txt`), so every installed copy includes them.
+The additional terms require the interface's legal notices (the GPL's "Appropriate Legal
+Notices") to keep the attribution "app-connect by Bodo Steffen" and the license notice, also
+in modified or embedded versions; wording, place and design are free. Modified versions
+must be marked as such. A link to the source code is welcome but not required. app-connect
+shows the notices in the help bar ("Hilfe") of the pages people use: "Stud.App connection"
+in the profile and "Get the app". The plugin directory carries its own copies of both texts
+(`plugin/LICENSE`, `plugin/SUPPLEMENTAL-TERMS.txt`), so every installed copy includes
+them.
 
 Contributions: see [`CONTRIBUTING.md`](CONTRIBUTING.md). Security reports: see
 [`SECURITY.md`](SECURITY.md).

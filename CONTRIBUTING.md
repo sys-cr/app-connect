@@ -66,10 +66,10 @@ Contributor License Agreement (CLA).
 
 Beiträge werden unter GPL-3.0-or-later mit den Zusatzbedingungen nach Abschnitt 7 in
 [`SUPPLEMENTAL-TERMS.txt`](SUPPLEMENTAL-TERMS.txt) angenommen. Beiträge unter
-inkompatiblen Lizenzen können nicht angenommen werden. Der Lizenzhinweis (Autor,
-Quellcode-Repository, Lizenz) in der Hilfelasche und, für nicht angemeldete Besucher, am
-Ende von „App holen“ muss sichtbar bleiben; ein Beitrag darf ihn verschieben, aber nicht
-entfernen.
+inkompatiblen Lizenzen können nicht angenommen werden. Die rechtlichen Hinweise in der
+Hilfelasche und, für nicht angemeldete Besucher, am Ende von „App holen“ behalten die
+Nennung „app-connect von Bodo Steffen“ und den Lizenzhinweis; ein Beitrag darf sie
+umformulieren und verschieben, solange die Nennung zutrifft.
 
 Mit dem Einreichen stellst du deinen Beitrag zusätzlich unter GPL-2.0-or-later ohne die
 Zusatzbedingungen, damit er in das Stud.IP-Kernsystem (GPL-2.0-or-later) übernommen werden
@@ -148,9 +148,10 @@ contributor license agreement (CLA).
 
 Contributions are accepted under GPL-3.0-or-later with the additional terms under section
 7 in [`SUPPLEMENTAL-TERMS.txt`](SUPPLEMENTAL-TERMS.txt). Contributions under incompatible
-licenses cannot be accepted. The attribution notice (author, source repository, license)
-in the help bar and, for visitors who are not signed in, at the end of "Get the app" must
-stay visible; a contribution may move it but not remove it.
+licenses cannot be accepted. The legal notices in the help bar and, for visitors who are
+not signed in, at the end of "Get the app" keep the attribution "app-connect by Bodo
+Steffen" and the license notice; a contribution may reword and move them as long as the
+attribution stays accurate.
 
 By submitting a contribution you also license it under GPL-2.0-or-later, without the
 additional terms, for inclusion in the Stud.IP core system (licensed GPL-2.0-or-later).
