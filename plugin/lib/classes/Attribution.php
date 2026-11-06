@@ -52,7 +52,8 @@ final class Attribution
 
     /**
      * The notice with links to the license and the source as one block,
-     * smaller and dimmer than the text around it. `$linkIcon` is rendered
+     * dimmer than the text around it and set at 14 px, the smallest size
+     * the notice may take. `$linkIcon` is rendered
      * icon markup and goes in as it is; `$inHelpbar` picks the text colour
      * for the help bar or for the page content.
      */
@@ -60,11 +61,11 @@ final class Attribution
     {
         $icon = $linkIcon !== '' ? $linkIcon . ' ' : '';
         return sprintf(
-            '<div class="app-connect-attribution" style="font-size: 0.78em; line-height: 1.45; color: %s;">'
+            '<div class="app-connect-attribution" style="font-size: 14px; line-height: 1.75; color: %s;">'
             . '%s<br>'
-            . '<a href="%s" target="_blank" rel="noopener noreferrer" style="color: inherit;">%s%s</a>'
+            . '<a href="%s" target="_blank" rel="noopener noreferrer" style="color: inherit; white-space: nowrap;">%s%s</a>'
             . ' · '
-            . '<a href="%s" target="_blank" rel="noopener noreferrer" style="color: inherit;">%s%s</a>'
+            . '<a href="%s" target="_blank" rel="noopener noreferrer" style="color: inherit; white-space: nowrap;">%s%s</a>'
             . '</div>',
             $inHelpbar ? self::HELPBAR_COLOR : self::PAGE_COLOR,
             htmlReady(self::text()),

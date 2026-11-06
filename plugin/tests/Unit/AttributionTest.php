@@ -62,6 +62,20 @@ final class AttributionTest extends TestCase
         self::assertStringContainsString('var(--color--font-inverted) 85%, var(--color--brand-primary)', Attribution::HELPBAR_COLOR);
     }
 
+    /** The notice stays readable: 14 px in the help bar and in the page. */
+    public function testNoticeIsSetAtFourteenPixels(): void
+    {
+        require_once __DIR__ . '/../Support/studip-view-functions.php';
+
+        foreach ([Attribution::html(), Attribution::html('', false)] as $html) {
+            // 14 px at 1.75 keeps stacked links 24.5 px apart (WCAG 2.5.8).
+            self::assertStringContainsString('font-size: 14px; line-height: 1.75;', $html);
+            self::assertStringNotContainsString('em;', $html);
+            // Lines break at the separator, never inside a link.
+            self::assertSame(2, substr_count($html, 'white-space: nowrap;'));
+        }
+    }
+
     /** The pages people use show help and notice; the operator page does not need to. */
     public function testUserPagesAddHelpAndNoticeToTheHelpBar(): void
     {
