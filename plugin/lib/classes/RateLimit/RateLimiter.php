@@ -7,50 +7,59 @@ declare(strict_types=1);
 
 namespace AppConnect\RateLimit;
 
+use InvalidArgumentException;
+
 /**
- * Fixed-window limits for failed pairing attempts: per client address and for
- * the whole instance. Counters live in the cache, so a flushed cache only
- * resets them early.
+ * Fixed-window limits per client address and for the whole instance.
+ * Counters live in the cache, so a flushed cache only resets them early.
+ *
+ * The cache holds no client addresses: an address is replaced by a keyed
+ * HMAC with the installation's secret, shortened to 128 bits. Without the
+ * secret the value cannot be traced back to an address, not even by trying
+ * every IPv4 address.
  */
 final class RateLimiter
 {
-    public const PER_ADDRESS = 10;
-    public const PER_ADDRESS_WINDOW = 600;
-    public const GLOBAL = 100;
-    public const GLOBAL_WINDOW = 60;
+    private const PREFIX = 'app-connect/';
 
-    private const PREFIX = 'app-connect/pairing-failures/';
-
-    public function __construct(private readonly CounterStore $store, private readonly ?\Closure $clock = null)
-    {
+    public function __construct(
+        private readonly CounterStore $store,
+        private readonly Limits $limits,
+        private readonly string $secret,
+        private readonly ?\Closure $clock = null
+    ) {
+        if ($secret === '') {
+            throw new InvalidArgumentException('The rate limiter needs a secret');
+        }
     }
 
-    /** Whether redemptions from $address are currently refused. */
+    /** Whether requests from $address are currently refused. */
     public function isBlocked(string $address): bool
     {
-        return $this->store->read($this->addressKey($address)) >= self::PER_ADDRESS
-            || $this->store->read($this->globalKey()) >= self::GLOBAL;
+        return $this->store->read($this->addressKey($address)) >= $this->limits->perAddress
+            || $this->store->read($this->globalKey()) >= $this->limits->global;
     }
 
-    /** Counts one failed redemption. */
-    public function recordFailure(string $address): void
+    /** Counts one event from $address. */
+    public function record(string $address): void
     {
         $addressKey = $this->addressKey($address);
-        $this->store->write($addressKey, $this->store->read($addressKey) + 1, self::PER_ADDRESS_WINDOW);
+        $this->store->write($addressKey, $this->store->read($addressKey) + 1, $this->limits->perAddressWindow);
         $globalKey = $this->globalKey();
-        $this->store->write($globalKey, $this->store->read($globalKey) + 1, self::GLOBAL_WINDOW);
+        $this->store->write($globalKey, $this->store->read($globalKey) + 1, $this->limits->globalWindow);
     }
 
-    private function addressKey(string $address): string
+    /** The cache key of $address in the current window. */
+    public function addressKey(string $address): string
     {
-        // The address is hashed so the cache holds no IP addresses.
-        $window = intdiv($this->now(), self::PER_ADDRESS_WINDOW);
-        return self::PREFIX . hash('sha256', $address) . '/' . $window;
+        $window = intdiv($this->now(), $this->limits->perAddressWindow);
+        $digest = substr(hash_hmac('sha256', $address, $this->secret), 0, 32);
+        return self::PREFIX . $this->limits->name . '/' . $digest . '/' . $window;
     }
 
     private function globalKey(): string
     {
-        return self::PREFIX . 'all/' . intdiv($this->now(), self::GLOBAL_WINDOW);
+        return self::PREFIX . $this->limits->name . '/all/' . intdiv($this->now(), $this->limits->globalWindow);
     }
 
     private function now(): int

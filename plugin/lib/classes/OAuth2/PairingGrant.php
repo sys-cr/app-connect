@@ -96,7 +96,7 @@ final class PairingGrant extends AbstractGrant
             if ($userId === null || !$this->mayConnect($userId)) {
                 // A redeemed code of an account that may no longer connect stays used.
                 $db->commit();
-                $this->limiter->recordFailure($this->clientAddress);
+                $this->limiter->record($this->clientAddress);
                 throw OAuthServerException::invalidGrant();
             }
             $scopes = $this->scopeRepository->finalizeScopes(

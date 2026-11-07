@@ -12,6 +12,7 @@ use AppConnect\Devices\DeviceService;
 use AppConnect\Devices\TokenLedger;
 use AppConnect\Mail\ConnectedMail;
 use AppConnect\Pairing\PairingService;
+use AppConnect\RateLimit\Limits;
 use AppConnect\RateLimit\RateLimiter;
 use AppConnect\RateLimit\StudipCacheCounterStore;
 use AppConnect\Settings\Settings;
@@ -44,7 +45,7 @@ final class TokenServer
                 $settings,
                 new PairingService(),
                 $devices,
-                new RateLimiter(new StudipCacheCounterStore()),
+                new RateLimiter(new StudipCacheCounterStore(), Limits::pairingFailures(), $settings->rateLimitKey()),
                 $clientAddress,
                 static function (string $userId, DeviceRecord $device): void {
                     ConnectedMail::send($userId, $device);

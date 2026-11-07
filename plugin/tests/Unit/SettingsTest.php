@@ -43,4 +43,24 @@ final class SettingsTest extends TestCase
         self::assertFalse($settings->isEnabled());
         self::assertFalse($settings->isProfileEntryEnabled());
     }
+
+    public function testTheRateLimitKeyIsCreatedOnceAndKept(): void
+    {
+        $store = new InMemorySettingsStore();
+        $settings = new Settings($store);
+
+        $key = $settings->rateLimitKey();
+
+        self::assertMatchesRegularExpression('/^[0-9a-f]{64}$/', $key);
+        self::assertSame($key, $settings->rateLimitKey());
+        self::assertSame($key, (new Settings($store))->rateLimitKey());
+        self::assertNotSame($key, (new Settings(new InMemorySettingsStore()))->rateLimitKey());
+    }
+
+    public function testAMalformedRateLimitKeyIsReplaced(): void
+    {
+        $settings = new Settings(new InMemorySettingsStore([Settings::RATE_LIMIT_KEY => 'short']));
+
+        self::assertMatchesRegularExpression('/^[0-9a-f]{64}$/', $settings->rateLimitKey());
+    }
 }

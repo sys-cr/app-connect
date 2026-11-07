@@ -18,9 +18,12 @@ brauchen, kommt aus den eigenen Routen des Plugins.
   Adresse beim Einschalten der App-Verbindung und verwendet sie für den Link in der
   Verbindungsmail; Kern und Discovery verwenden die Adresse der Anfrage.
 - Hinter einem Reverse-Proxy oder Load-Balancer muss `REMOTE_ADDR` die echte
-  Client-Adresse sein (Apache `mod_remoteip`, nginx `real_ip`). Die Kopplung zählt
-  Fehlversuche je Adresse; kommen alle Anfragen von der Adresse des Proxys, sperren wenige
-  falsche Codes die Kopplung für alle.
+  Client-Adresse sein (Apache `mod_remoteip`, nginx `real_ip`, jeweils nur für die Adressen
+  eurer Proxys). Das Plugin liest `REMOTE_ADDR` wie der Kern; Stud.IP wertet
+  `X-Forwarded-For` nicht aus, und das Plugin tut es auch nicht, weil ein Client diesen
+  Header selbst setzen kann. Die Kopplung zählt Fehlversuche je Adresse. Kommen alle
+  Anfragen von der Adresse des Proxys, teilen sich alle Personen einen Zähler: Wenige
+  falsche Codes sperren dann die Kopplung für alle.
 - Der Cron-Worker von Stud.IP muss laufen: Der Aufräum-Job des Plugins löscht abgelaufene
   Daten.
 
@@ -194,8 +197,13 @@ Ereignisprotokolls.
 | Geräte | `app_connect_devices` | in der App gewählter Gerätename, Plattform, Art der Verbindung, IDs der OAuth2-Tokens (nicht die Tokens), Zeitpunkte |
 | Links für die Anmeldung im Web | `app_connect_web_login_tickets` | SHA-256-Hash, Person, zu öffnende Seite, Verweis auf Token und Gerät, Zeitpunkte |
 | Kalender-Schlüssel | Konfiguration der Person (Kern, `IcalExport`) | wie vom Kern verwaltet; das Plugin legt ihn an oder löscht ihn, ein Zähler der neuen Schlüssel liegt eine Stunde im Cache |
-| Einstellungen | `config` (Sektion „Stud.App“), `app_connect_settings` | eure Einstellungen, Client-ID, gespeicherte Adresse |
-| Fehlversuche beim Koppeln | Stud.IP-Cache | Zähler je gehashter Adresse, 10 Minuten |
+| Einstellungen | `config` (Sektion „Stud.App“), `app_connect_settings` | eure Einstellungen, Client-ID, gespeicherte Adresse, zufälliger Schlüssel für die Zähler der Grenzen |
+| Fehlversuche beim Koppeln | Stud.IP-Cache | Zähler je Adresse, 10 Minuten |
+
+Die Zähler im Cache enthalten keine IP-Adressen. Statt der Adresse steht dort ein HMAC-SHA256
+mit dem Schlüssel der Installation, gekürzt auf 128 Bit; ohne diesen Schlüssel lässt sich
+die Adresse auch durch Ausprobieren aller IPv4-Adressen nicht zurückgewinnen. Der Schlüssel
+entsteht bei der ersten Anfrage und liegt nur in `app_connect_settings`.
 
 ## Ereignisprotokoll
 
@@ -272,9 +280,12 @@ from the plugin's own routes.
   app connection on and uses it for the link in the connection mail; the core and the
   discovery use the request's address.
 - Behind a reverse proxy or load balancer, `REMOTE_ADDR` must be the real client address
-  (Apache `mod_remoteip`, nginx `real_ip`). The pairing limits count failed attempts per
-  address; if every request comes from the proxy's address, a few wrong codes block pairing
-  for everyone.
+  (Apache `mod_remoteip`, nginx `real_ip`, each trusting only the addresses of your
+  proxies). The plugin reads `REMOTE_ADDR` as the core does; Stud.IP does not evaluate
+  `X-Forwarded-For`, and neither does the plugin, because a client can set that header
+  itself. Pairing counts failed attempts per address. If every request comes from the
+  proxy's address, everyone shares one counter: a few wrong codes then block pairing for
+  everyone.
 - The Stud.IP cron worker must run: the plugin's cleanup job deletes expired data.
 
 ### Switching the app connection on
@@ -441,8 +452,13 @@ days; the other entries of the plugin follow your event log settings.
 | devices | `app_connect_devices` | device name chosen in the app, platform, how it was connected, ids of the OAuth2 tokens (not the tokens), times |
 | web login links | `app_connect_web_login_tickets` | SHA-256 hash, person, page to open, token/device reference, times |
 | calendar key | the person's configuration (core, `IcalExport`) | as the core keeps it; the plugin creates or deletes it, a count of new keys stays in the cache for an hour |
-| settings | `config` (section "Stud.App"), `app_connect_settings` | your settings, client id, recorded address |
-| failed pairing attempts | Stud.IP cache | counter per hashed address, 10 minutes |
+| settings | `config` (section "Stud.App"), `app_connect_settings` | your settings, client id, recorded address, random key for the limit counters |
+| failed pairing attempts | Stud.IP cache | counter per address, 10 minutes |
+
+The counters in the cache hold no IP addresses. In place of the address they hold an
+HMAC-SHA256 with the installation's key, shortened to 128 bits; without that key the address
+cannot be recovered, not even by trying every IPv4 address. The key is created on the first
+request and lives only in `app_connect_settings`.
 
 ### Event log
 

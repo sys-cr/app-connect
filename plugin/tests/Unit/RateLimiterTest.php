@@ -8,21 +8,27 @@ declare(strict_types=1);
 namespace AppConnect\Tests\Unit;
 
 use AppConnect\RateLimit\InMemoryCounterStore;
+use AppConnect\RateLimit\Limits;
 use AppConnect\RateLimit\RateLimiter;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 final class RateLimiterTest extends TestCase
 {
+    private const SECRET = '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef';
+
     public function testTenFailuresBlockOneAddressOnly(): void
     {
-        $limiter = new RateLimiter(new InMemoryCounterStore(), static fn (): int => 1_000_000);
-        for ($i = 0; $i < RateLimiter::PER_ADDRESS - 1; $i++) {
-            $limiter->recordFailure('192.0.2.1');
+        $limits = Limits::pairingFailures();
+        $limiter = new RateLimiter(new InMemoryCounterStore(), $limits, self::SECRET, static fn (): int => 1_000_000);
+        for ($i = 0; $i < $limits->perAddress - 1; $i++) {
+            $limiter->record('192.0.2.1');
         }
         self::assertFalse($limiter->isBlocked('192.0.2.1'));
 
-        $limiter->recordFailure('192.0.2.1');
+        $limiter->record('192.0.2.1');
 
+        self::assertSame(10, $limits->perAddress);
         self::assertTrue($limiter->isBlocked('192.0.2.1'));
         self::assertFalse($limiter->isBlocked('192.0.2.2'));
     }
@@ -30,26 +36,73 @@ final class RateLimiterTest extends TestCase
     public function testTheWindowEnds(): void
     {
         $now = 1_000_200;
-        $limiter = new RateLimiter(new InMemoryCounterStore(), static function () use (&$now): int {
+        $limits = Limits::pairingFailures();
+        $clock = static function () use (&$now): int {
             return $now;
-        });
-        for ($i = 0; $i < RateLimiter::PER_ADDRESS; $i++) {
-            $limiter->recordFailure('192.0.2.1');
+        };
+        $limiter = new RateLimiter(new InMemoryCounterStore(), $limits, self::SECRET, $clock);
+        for ($i = 0; $i < $limits->perAddress; $i++) {
+            $limiter->record('192.0.2.1');
         }
         self::assertTrue($limiter->isBlocked('192.0.2.1'));
 
-        $now += RateLimiter::PER_ADDRESS_WINDOW;
+        $now += $limits->perAddressWindow;
 
         self::assertFalse($limiter->isBlocked('192.0.2.1'));
     }
 
     public function testTheGlobalLimitBlocksEveryAddress(): void
     {
-        $limiter = new RateLimiter(new InMemoryCounterStore(), static fn (): int => 1_000_000);
-        for ($i = 0; $i < RateLimiter::GLOBAL; $i++) {
-            $limiter->recordFailure('198.51.100.' . ($i % 50));
+        $limits = Limits::pairingFailures();
+        $limiter = new RateLimiter(new InMemoryCounterStore(), $limits, self::SECRET, static fn (): int => 1_000_000);
+        for ($i = 0; $i < $limits->global; $i++) {
+            $limiter->record('198.51.100.' . ($i % 50));
         }
 
         self::assertTrue($limiter->isBlocked('203.0.113.9'));
+    }
+
+    public function testLimitSetsCountSeparately(): void
+    {
+        $store = new InMemoryCounterStore();
+        $pairing = new RateLimiter($store, Limits::pairingFailures(), self::SECRET, static fn (): int => 1_000_000);
+        $revocations = new RateLimiter($store, Limits::revocations(), self::SECRET, static fn (): int => 1_000_000);
+        for ($i = 0; $i < Limits::pairingFailures()->perAddress; $i++) {
+            $pairing->record('192.0.2.1');
+        }
+
+        self::assertTrue($pairing->isBlocked('192.0.2.1'));
+        self::assertFalse($revocations->isBlocked('192.0.2.1'));
+    }
+
+    public function testTheCacheKeyHoldsNoAddressAndNoPlainHash(): void
+    {
+        $limits = Limits::pairingFailures();
+        $limiter = new RateLimiter(new InMemoryCounterStore(), $limits, self::SECRET, self::zero(...));
+        $key = $limiter->addressKey('192.0.2.1');
+
+        self::assertStringNotContainsString('192.0.2.1', $key);
+        self::assertStringNotContainsString(substr(hash('sha256', '192.0.2.1'), 0, 32), $key);
+        self::assertMatchesRegularExpression('~^app-connect/pairing-failures/[0-9a-f]{32}/0$~', $key);
+    }
+
+    public function testAnotherSecretGivesAnotherKey(): void
+    {
+        $limits = Limits::pairingFailures();
+        $one = new RateLimiter(new InMemoryCounterStore(), $limits, self::SECRET, self::zero(...));
+        $other = new RateLimiter(new InMemoryCounterStore(), $limits, strrev(self::SECRET), self::zero(...));
+
+        self::assertNotSame($one->addressKey('192.0.2.1'), $other->addressKey('192.0.2.1'));
+    }
+
+    public function testASecretIsRequired(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        new RateLimiter(new InMemoryCounterStore(), Limits::pairingFailures(), '');
+    }
+
+    private static function zero(): int
+    {
+        return 0;
     }
 }

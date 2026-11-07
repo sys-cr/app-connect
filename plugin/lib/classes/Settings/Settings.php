@@ -31,6 +31,8 @@ final class Settings
     public const PRIVACY_SNIPPET = 'privacy_snippet';
     /** Base URL recorded when root switched the app connection on. */
     public const BASE_URL = 'base_url';
+    /** Secret of this installation that keys client addresses in the rate limit counters. */
+    public const RATE_LIMIT_KEY = 'rate_limit_key';
 
     /** The allowlist of setting keys. */
     public const KEYS = [
@@ -48,6 +50,7 @@ final class Settings
         self::FEATURES,
         self::PRIVACY_SNIPPET,
         self::BASE_URL,
+        self::RATE_LIMIT_KEY,
     ];
 
     public function __construct(private readonly SettingsStore $store)
@@ -96,6 +99,21 @@ final class Settings
     {
         $id = $this->store->get(self::OAUTH_CLIENT_ID);
         return is_scalar($id) && (string) $id !== '' ? (string) $id : null;
+    }
+
+    /**
+     * The secret that keys client addresses in the rate limit counters,
+     * created on first use. It never leaves the plugin table.
+     */
+    public function rateLimitKey(): string
+    {
+        $key = $this->store->get(self::RATE_LIMIT_KEY);
+        if (is_string($key) && preg_match('/^[0-9a-f]{64}$/', $key) === 1) {
+            return $key;
+        }
+        $key = bin2hex(random_bytes(32));
+        $this->store->set(self::RATE_LIMIT_KEY, $key);
+        return $key;
     }
 
     /** @return array<string, mixed> */
