@@ -21,9 +21,11 @@ brauchen, kommt aus den eigenen Routen des Plugins.
   Client-Adresse sein (Apache `mod_remoteip`, nginx `real_ip`, jeweils nur für die Adressen
   eurer Proxys). Das Plugin liest `REMOTE_ADDR` wie der Kern; Stud.IP wertet
   `X-Forwarded-For` nicht aus, und das Plugin tut es auch nicht, weil ein Client diesen
-  Header selbst setzen kann. Die Kopplung zählt Fehlversuche je Adresse. Kommen alle
-  Anfragen von der Adresse des Proxys, teilen sich alle Personen einen Zähler: Wenige
-  falsche Codes sperren dann die Kopplung für alle.
+  Header selbst setzen kann. Die Kopplung zählt Fehlversuche je Adresse, der
+  Widerrufs-Endpunkt Anfragen je Adresse. Kommen alle Anfragen von der Adresse des Proxys,
+  teilen sich alle Personen einen Zähler: Wenige falsche Codes sperren dann die Kopplung für
+  alle, und nach 30 Abmeldungen in 10 Minuten widerruft der Server keine weiteren Tokens
+  (die Apps melden sich trotzdem ab, das Token bleibt dann bis zu seinem Ablauf gültig).
 - Der Cron-Worker von Stud.IP muss laufen: Der Aufräum-Job des Plugins löscht abgelaufene
   Daten.
 
@@ -38,8 +40,8 @@ brauchen, kommt aus den eigenen Routen des Plugins.
      App-Installationen an oder verwendet den bisherigen wieder.
    - Diesen Client bitte nicht in der OAuth2-Verwaltung des Kerns bearbeiten; das Plugin
      verwaltet ihn.
-   - Das Plugin gibt sich außerdem für die Rolle „Nobody“ frei, weil Discovery und
-     Token-Endpunkt ohne Sitzung aufgerufen werden.
+   - Das Plugin gibt sich außerdem für die Rolle „Nobody“ frei, weil Discovery, Token- und
+     Widerrufs-Endpunkt ohne Sitzung aufgerufen werden.
 3. Optional, in derselben Sektion:
 
    | Eintrag | Bedeutung |
@@ -86,7 +88,8 @@ direkt über „Drittanwendungen“. Dort können sie
 
 Verbundene Apps stehen außerdem unter „Drittanwendungen“ (durch den Kern). Verwaltet und
 entfernt werden Geräte auf „Stud.App Verbindung“; ein Widerruf unter „Drittanwendungen“
-beendet das Gerät ebenfalls.
+beendet das Gerät ebenfalls. Meldet sich jemand in der App ab, widerruft die App ihre Tokens
+am Widerrufs-Endpunkt des Plugins; das Gerät gilt dann als entfernt.
 
 Jede neue Verbindung schickt eine Mail an das Konto mit Gerätename, Plattform, Zeitpunkt und
 einem Link zu „Stud.App Verbindung“. In der Sektion „Stud.App“ lassen sich der Eintrag
@@ -132,14 +135,15 @@ Einzelheiten: [`contract/ical-key.md`](../../contract/ical-key.md).
 ## API-Endpunkte des Plugins
 
 Alle Routen liegen unter `/jsonapi.php/v1/`. Fehler sind JSON:API-Fehlerdokumente mit einem
-Anwendungscode (`errors[0].code`); der Token-Endpunkt antwortet mit OAuth2-Fehlern
-(`invalid_grant`, `invalid_client`, …) nach RFC 6749. Jede Route antwortet
+Anwendungscode (`errors[0].code`); Token- und Widerrufs-Endpunkt antworten mit
+OAuth2-Fehlern (`invalid_grant`, `invalid_client`, …) nach RFC 6749. Jede Route antwortet
 `404 app-connect-disabled`, solange `APP_CONNECT_ENABLED` aus ist.
 
 | Route | Anmeldung | Funktion |
 |---|---|---|
 | `GET app-connect/discovery` | keine | Öffentliche Instanzdaten, mit denen die Apps starten: Name, Adressen, Client-ID und Endpunkte des OAuth2-Clients, eingeschaltete Funktionen und – falls gesetzt – Gestaltung, Links, Mensa-Quelle. Aus einer festen Feldliste; enthält nie Geheimnisse. `ETag`/`304`, 5 Minuten cachebar. Schema: [`contract/discovery.schema.json`](../../contract/discovery.schema.json) |
 | `POST app-connect/token` | keine (Client-ID der App) | Token-Endpunkt des App-Clients: `authorization_code` (Browser-Anmeldung mit PKCE), `refresh_token` (behält die Gerätebindung) und der Kopplungs-Grant (QR-Code, `urn:studip:app-connect:pairing`). Andere Clients werden abgewiesen. Fehlgeschlagene Kopplungen sind begrenzt (`429 slow_down`) |
+| `POST app-connect/revoke` | keine (Client-ID der App) | Widerruf nach RFC 7009 beim Abmelden in der App: `token` (Refresh- oder Access-Token) und `client_id`. Widerruft das Token, das andere Token seines Paars und das gebundene Gerät. Antwortet `200` auch für unbekannte, abgelaufene oder fremde Tokens, damit sich Tokens damit nicht prüfen lassen. Höchstens 30 Anfragen je Adresse in 10 Minuten und 300 je Minute insgesamt (`503`, `Retry-After`). In der Discovery als `oauth2.revocationEndpoint`. [`contract/token-revocation.md`](../../contract/token-revocation.md) |
 | `POST app-connect/devices` | App-Token | Registriert das Gerät nach einer Browser-Anmeldung und schickt die Verbindungsmail. `201`; `409 app-connect-already-registered`, wenn die Anmeldung schon gebunden ist; `401`/`403` für andere Tokens |
 | `GET app-connect/course-dates/places?filter[ids]=…` | ja | Wo bis zu 50 Termine stattfinden: gebuchte Räume mit Koordinaten (Raum, Gebäude oder Standort) und Raumfinder-Link, sonst die Freitext-Raumangabe. Termine, die die Person nicht sehen darf, fehlen. Funktion `eventPlaces`. [`contract/course-date-places.md`](../../contract/course-date-places.md) |
 | `GET app-connect/user-language` | ja | Die Sprache, in der die Person Stud.IP nutzt (Profil, sonst die Vorgabe der Instanz). Funktion `userLanguage`. [`contract/user-language.md`](../../contract/user-language.md) |
@@ -199,6 +203,7 @@ Ereignisprotokolls.
 | Kalender-Schlüssel | Konfiguration der Person (Kern, `IcalExport`) | wie vom Kern verwaltet; das Plugin legt ihn an oder löscht ihn, ein Zähler der neuen Schlüssel liegt eine Stunde im Cache |
 | Einstellungen | `config` (Sektion „Stud.App“), `app_connect_settings` | eure Einstellungen, Client-ID, gespeicherte Adresse, zufälliger Schlüssel für die Zähler der Grenzen |
 | Fehlversuche beim Koppeln | Stud.IP-Cache | Zähler je Adresse, 10 Minuten |
+| Widerrufe von Tokens | Stud.IP-Cache | Zähler je Adresse, 10 Minuten |
 
 Die Zähler im Cache enthalten keine IP-Adressen. Statt der Adresse steht dort ein HMAC-SHA256
 mit dem Schlüssel der Installation, gekürzt auf 128 Bit; ohne diesen Schlüssel lässt sich
@@ -283,9 +288,11 @@ from the plugin's own routes.
   (Apache `mod_remoteip`, nginx `real_ip`, each trusting only the addresses of your
   proxies). The plugin reads `REMOTE_ADDR` as the core does; Stud.IP does not evaluate
   `X-Forwarded-For`, and neither does the plugin, because a client can set that header
-  itself. Pairing counts failed attempts per address. If every request comes from the
-  proxy's address, everyone shares one counter: a few wrong codes then block pairing for
-  everyone.
+  itself. Pairing counts failed attempts per address, the revocation endpoint counts
+  requests per address. If every request comes from the proxy's address, everyone shares
+  one counter: a few wrong codes then block pairing for everyone, and after 30 sign-outs in
+  10 minutes the server revokes no further tokens (the apps still sign out; the token then
+  stays valid until it expires).
 - The Stud.IP cron worker must run: the plugin's cleanup job deletes expired data.
 
 ### Switching the app connection on
@@ -298,8 +305,8 @@ from the plugin's own routes.
      installations, or reuses the one it created before.
    - Please do not edit this client in the core OAuth2 administration; the plugin manages
      it.
-   - The plugin also allows the role "Nobody" to load it, because the discovery and the
-     token endpoint are called without a session.
+   - The plugin also allows the role "Nobody" to load it, because the discovery, the token
+     and the revocation endpoint are called without a session.
 3. Optional, in the same section:
 
    | Entry | Meaning |
@@ -345,7 +352,8 @@ right above "Drittanwendungen". There they
 
 Once connected, the app is also listed on "Drittanwendungen" (by the core). Devices are
 managed and removed on "Stud.App connection"; revoking the app on "Drittanwendungen" ends
-the device as well.
+the device as well. When someone signs out in the app, the app revokes its tokens at the
+plugin's revocation endpoint; the device then counts as removed.
 
 Every new connection sends a mail to the account with the device name, the platform, the
 time and a link to "Stud.App connection". In the configuration section "Stud.App" you can
@@ -390,14 +398,15 @@ Details: [`contract/ical-key.md`](../../contract/ical-key.md).
 ### API endpoints of the plugin
 
 All routes live below `/jsonapi.php/v1/`. Errors are JSON:API error documents with an
-application code (`errors[0].code`); the token endpoint answers OAuth2 errors
-(`invalid_grant`, `invalid_client`, …) as RFC 6749 describes. Every route answers
+application code (`errors[0].code`); the token and revocation endpoints answer OAuth2
+errors (`invalid_grant`, `invalid_client`, …) as RFC 6749 describes. Every route answers
 `404 app-connect-disabled` while `APP_CONNECT_ENABLED` is off.
 
 | Route | Sign-in | What it does |
 |---|---|---|
 | `GET app-connect/discovery` | none | Public instance data the apps start with: name, addresses, OAuth2 client id and endpoints, enabled features, and – if you set them – branding, links, mensa source. Built from a fixed list of fields; never contains secrets. `ETag`/`304`, cacheable for 5 minutes. Schema: [`contract/discovery.schema.json`](../../contract/discovery.schema.json) |
 | `POST app-connect/token` | none (app client id) | Token endpoint of the app client: `authorization_code` (browser sign-in with PKCE), `refresh_token` (keeps the device binding) and the pairing grant (QR code, `urn:studip:app-connect:pairing`). Other clients are refused. Failed pairing attempts are rate limited (`429 slow_down`) |
+| `POST app-connect/revoke` | none (app client id) | Revocation per RFC 7009 when someone signs out in the app: `token` (refresh or access token) and `client_id`. Revokes the token, the other token of its pair and the bound device. Answers `200` for unknown, expired or foreign tokens as well, so it cannot be used to test tokens. At most 30 requests per address in 10 minutes and 300 per minute overall (`503`, `Retry-After`). Announced in the discovery as `oauth2.revocationEndpoint`. [`contract/token-revocation.md`](../../contract/token-revocation.md) |
 | `POST app-connect/devices` | app token | Registers the device after a browser sign-in and sends the connection mail. `201`; `409 app-connect-already-registered` when the sign-in is bound already; `401`/`403` for other tokens |
 | `GET app-connect/course-dates/places?filter[ids]=…` | yes | Where up to 50 course dates take place: booked rooms with coordinates (room, building or site) and the room finder link, else the free-text room. Dates the person may not see are left out. Feature `eventPlaces`. [`contract/course-date-places.md`](../../contract/course-date-places.md) |
 | `GET app-connect/user-language` | yes | The language the person uses Stud.IP in (profile, else the site default). Feature `userLanguage`. [`contract/user-language.md`](../../contract/user-language.md) |
@@ -454,6 +463,7 @@ days; the other entries of the plugin follow your event log settings.
 | calendar key | the person's configuration (core, `IcalExport`) | as the core keeps it; the plugin creates or deletes it, a count of new keys stays in the cache for an hour |
 | settings | `config` (section "Stud.App"), `app_connect_settings` | your settings, client id, recorded address, random key for the limit counters |
 | failed pairing attempts | Stud.IP cache | counter per address, 10 minutes |
+| token revocations | Stud.IP cache | counter per address, 10 minutes |
 
 The counters in the cache hold no IP addresses. In place of the address they hold an
 HMAC-SHA256 with the installation's key, shortened to 128 bits; without that key the address

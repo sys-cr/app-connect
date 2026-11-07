@@ -103,6 +103,25 @@ final class DeviceService
         }
     }
 
+    /**
+     * Ends the lineage step a revocation request named: the device bound to
+     * it, if any, is removed as on the page "Stud.App Verbindung" (with the
+     * successors of a lineage refreshed at the core endpoint), and the pair
+     * itself is revoked either way. Revoking a pair that is revoked already
+     * changes nothing.
+     */
+    public function revokePair(string $accessTokenId, ?string $refreshTokenId): void
+    {
+        $row = DeviceRecord::findOneBySQL(
+            '`revoked_at` IS NULL AND (`access_token_id` = ? OR `refresh_token_id` = ?)',
+            [$accessTokenId, $refreshTokenId ?? '']
+        );
+        if ($row !== null) {
+            $this->revoke($row);
+        }
+        $this->ledger->revokeLineageStep($accessTokenId, $refreshTokenId);
+    }
+
     /** @return list<DeviceRecord> active devices, newest first */
     public function activeDevices(string $userId): array
     {

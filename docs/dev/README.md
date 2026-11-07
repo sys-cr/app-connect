@@ -21,13 +21,13 @@ Komponenten in `plugin/lib/classes/`:
 |---|---|
 | `Settings` | Betreiber-Einstellungen (Konfigurationssektion „Stud.App“) und die eigene Einstellungstabelle; Prüfung von Adressen, Farben, IDs |
 | `Discovery` | die öffentliche Discovery aus einer Feld-Allowlist, `ETag`/`304` |
-| `OAuth2` | der eine öffentliche App-Client (`ClientProvisioner`), der Token-Endpunkt (`TokenServer`), der Kopplungs-Grant und der Refresh-Grant, der die Gerätebindung mitführt |
+| `OAuth2` | der eine öffentliche App-Client (`ClientProvisioner`), der Token-Endpunkt (`TokenServer`), der Kopplungs-Grant und der Refresh-Grant, der die Gerätebindung mitführt; der Widerruf nach RFC 7009 (`TokenRevocation`, `TokenInspector` prüft Access-Tokens gegen den öffentlichen Schlüssel des Kerns, `RefreshTokenCipher` entschlüsselt Refresh-Tokens mit dem Schlüssel des Kerns) |
 | `Pairing`, `Connect` | Kopplungscodes (nur Hash, fünf Minuten, die erste Einlösung gewinnt) und der Verbindungslink des QR-Codes |
 | `Devices` | Gerätezeilen, gebunden an eine Token-Kette; Entfernen und Widerruf in den Token-Tabellen des Kerns (`TokenLedger`), Aufbewahrung |
 | `WebLogin` | einmalige Tickets für die Anmeldung im Web, Prüfung von `return_to`, die Anmeldung wie im Kern-Login |
 | `Calendar` | der Kalender der Person in den Ressourcen der Kern-Route `users/{id}/events` mit Kursfarben (`UserEvents`); Abo-Adresse des Kalender-Schlüssels (`IcalSubscription`), neue Schlüssel und ihre Grenze (`IcalKey`, `IcalKeyLimit`) |
 | `Places`, `Profile` | Orte von Terminen mit Koordinaten, die Profilsprache |
-| `RateLimit`, `Audit`, `Mail` | Grenzen für Fehlversuche, Aktionen des Ereignisprotokolls, die Verbindungsmail |
+| `RateLimit`, `Audit`, `Mail` | Grenzen je Adresse und für die Instanz (`Limits`; Adressen als HMAC mit dem Schlüssel der Installation), Aktionen des Ereignisprotokolls, die Verbindungsmail |
 | `Routes` | schlanke JSON:API-Controller der Routen unten; `AppToken` lässt nur das Token des App-Clients zu |
 | `Help` | kurze Hilfetexte für die Hilfelasche von `connect` und `get` |
 | `ContentBox` | Stil der h2-Überschriften in den Inhaltskästen, mit den Werten des Kerns |
@@ -111,6 +111,7 @@ auf `localhost` oder `127.0.0.1`.
 |---|---|---|
 | `GET /jsonapi.php/v1/app-connect/discovery` | keine | öffentliche Instanzdaten, `ETag`/`304`; `404 app-connect-disabled`, solange ausgeschaltet |
 | `POST /jsonapi.php/v1/app-connect/token` | keine (OAuth2-Client) | Token-Endpunkt des App-Clients: `authorization_code`, `refresh_token`, `urn:studip:app-connect:pairing` |
+| `POST /jsonapi.php/v1/app-connect/revoke` | keine (OAuth2-Client) | Widerruf nach RFC 7009 beim Abmelden ([`contract/token-revocation.md`](../../contract/token-revocation.md)); Discovery `oauth2.revocationEndpoint`; `200` (auch für unbekannte Tokens), `400`, `401`, `404`, `503` |
 | `POST /jsonapi.php/v1/app-connect/devices` | OAuth2-Token des App-Clients | Registrierung nach einer Browser-Anmeldung; `201`, `401`, `403`, `409`, `422` |
 | `GET /jsonapi.php/v1/app-connect/course-dates/places` | angemeldet | gebuchte Räume, Koordinaten und Raumfinder-Links von bis zu 50 Terminen ([`contract/course-date-places.md`](../../contract/course-date-places.md)); Discovery-Funktion `eventPlaces` |
 | `GET /jsonapi.php/v1/app-connect/user-language` | angemeldet | Profilsprache der Person, sonst die Vorgabe der Instanz ([`contract/user-language.md`](../../contract/user-language.md)); Discovery-Funktion `userLanguage` |
@@ -150,6 +151,10 @@ einen Widerruf im Kern: Der Refresh-Grant des Plugins lehnt das Refresh-Token da
 widerruft es und markiert das Gerät als entfernt. Der Token-Endpunkt des Kerns kennt diese
 Regel nicht; die Apps nutzen den Endpunkt des Plugins aus der Discovery.
 
+Der Widerrufs-Endpunkt (`app-connect/revoke`) beendet ein Paar wie das Entfernen auf
+„Stud.App Verbindung“: Ist ein Gerät an das Paar gebunden, wird es mit allen Nachfolgern
+entfernt; das genannte Paar wird in jedem Fall widerrufen.
+
 ---
 
 ## English
@@ -173,13 +178,13 @@ Components in `plugin/lib/classes/`:
 |---|---|
 | `Settings` | operator settings (configuration section "Stud.App") and the plugin's own settings table; validation of addresses, colours, ids |
 | `Discovery` | the public discovery payload from a field allowlist, `ETag`/`304` |
-| `OAuth2` | the one public app client (`ClientProvisioner`), the token endpoint (`TokenServer`), the pairing grant and the refresh grant that keeps the device binding |
+| `OAuth2` | the one public app client (`ClientProvisioner`), the token endpoint (`TokenServer`), the pairing grant and the refresh grant that keeps the device binding; revocation per RFC 7009 (`TokenRevocation`; `TokenInspector` checks access tokens against the core's public key, `RefreshTokenCipher` decrypts refresh tokens with the core's key) |
 | `Pairing`, `Connect` | pairing codes (hash only, five minutes, first redemption wins) and the connect link of the QR code |
 | `Devices` | device rows bound to a token lineage, removal and revocation in the core token tables (`TokenLedger`), retention |
 | `WebLogin` | one-time tickets for the web login, `return_to` checks, the sign-in like the core login |
 | `Calendar` | the person's calendar in the shapes of the core route `users/{id}/events`, with course colours (`UserEvents`); the subscription address of the calendar key (`IcalSubscription`), new keys and their limit (`IcalKey`, `IcalKeyLimit`) |
 | `Places`, `Profile` | places of course dates with coordinates, the profile language |
-| `RateLimit`, `Audit`, `Mail` | failure limits, event log actions, the connection mail |
+| `RateLimit`, `Audit`, `Mail` | limits per address and for the instance (`Limits`; addresses as an HMAC with the installation's key), event log actions, the connection mail |
 | `Routes` | thin JSON:API controllers of the routes below; `AppToken` admits only the app client's token |
 | `Help` | short help texts for the help bar of `connect` and `get` |
 | `ContentBox` | style of the h2 headings in the content boxes, with the core's values |
@@ -262,6 +267,7 @@ A local instance over plain `http` is accepted by the apps only in DEBUG builds 
 |---|---|---|
 | `GET /jsonapi.php/v1/app-connect/discovery` | none | public instance data, `ETag`/`304`; `404 app-connect-disabled` while switched off |
 | `POST /jsonapi.php/v1/app-connect/token` | none (OAuth2 client) | token endpoint of the app client: `authorization_code`, `refresh_token`, `urn:studip:app-connect:pairing` |
+| `POST /jsonapi.php/v1/app-connect/revoke` | none (OAuth2 client) | revocation per RFC 7009 on sign-out ([`contract/token-revocation.md`](../../contract/token-revocation.md)); discovery `oauth2.revocationEndpoint`; `200` (unknown tokens as well), `400`, `401`, `404`, `503` |
 | `POST /jsonapi.php/v1/app-connect/devices` | OAuth2 token of the app client | registration after a browser sign-in; `201`, `401`, `403`, `409`, `422` |
 | `GET /jsonapi.php/v1/app-connect/course-dates/places` | signed in | booked rooms, coordinates and room finder links of up to 50 course dates ([`contract/course-date-places.md`](../../contract/course-date-places.md)); discovery feature `eventPlaces` |
 | `GET /jsonapi.php/v1/app-connect/user-language` | signed in | profile language of the person, else the site's default ([`contract/user-language.md`](../../contract/user-language.md)); discovery feature `userLanguage` |
@@ -299,3 +305,7 @@ both, so a revoked access token with a valid refresh token means a revocation in
 the plugin's refresh grant then refuses the refresh token, revokes it and marks the device
 as removed. The core token endpoint does not know this rule; the apps use the plugin's
 endpoint from the discovery.
+
+The revocation endpoint (`app-connect/revoke`) ends a pair as removing it on "Stud.App
+connection" does: a device bound to the pair is removed with all successors; the named pair
+is revoked either way.

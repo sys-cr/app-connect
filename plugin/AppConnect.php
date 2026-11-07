@@ -17,6 +17,7 @@ use AppConnect\Routes\DiscoveryShow;
 use AppConnect\Routes\IcalKeyDelete;
 use AppConnect\Routes\IcalKeyShow;
 use AppConnect\Routes\TokenCreate;
+use AppConnect\Routes\TokenRevocationCreate;
 use AppConnect\Routes\UserEventsShow;
 use AppConnect\Routes\UserLanguageShow;
 use AppConnect\Routes\WebLoginCreate;
@@ -27,10 +28,10 @@ use Slim\Routing\RouteCollectorProxy;
 
 /**
  * Connects the mobile apps to this instance: the public discovery, the token
- * endpoint of the shared app client, device registration, the one-time web
- * login from the app, the page
- * "Stud.App Verbindung" under Profile → Settings and the operator settings in
- * the configuration section "Stud.App" (Admin → System → Konfiguration).
+ * and revocation endpoints of the shared app client, device registration,
+ * the one-time web login from the app, the page "Stud.App Verbindung" under
+ * Profile → Settings and the operator settings in the configuration section
+ * "Stud.App" (Admin → System → Konfiguration).
  */
 class AppConnect extends StudIPPlugin implements SystemPlugin, JsonApiPlugin, PrivacyPlugin
 {
@@ -109,6 +110,7 @@ class AppConnect extends StudIPPlugin implements SystemPlugin, JsonApiPlugin, Pr
     {
         $group->get('/app-connect/discovery', DiscoveryShow::class);
         $group->post('/app-connect/token', TokenCreate::class);
+        $group->post('/app-connect/revoke', TokenRevocationCreate::class);
     }
 
     public function registerSchemas(): array
@@ -167,8 +169,9 @@ class AppConnect extends StudIPPlugin implements SystemPlugin, JsonApiPlugin, Pr
     }
 
     /**
-     * The discovery and the token endpoint are called without a session, so
-     * the plugin must be loaded for the "Nobody" role as well.
+     * The discovery, the token and the revocation endpoint are called
+     * without a session, so the plugin must be loaded for the "Nobody" role
+     * as well.
      */
     private function allowRequestsWithoutSession(): void
     {

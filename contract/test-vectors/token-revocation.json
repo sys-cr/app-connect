@@ -1,0 +1,84 @@
+{
+  "description": "Requests to POST https://studip.example.org/jsonapi.php/v1/app-connect/revoke (application/x-www-form-urlencoded) with the app client id 7, and the answer the plugin gives. 'revokes' says what the request does: 'pair' revokes the named token and the other token of its pair and removes the bound device (a pair revoked already stays revoked), 'nothing' leaves every token alone. A 200 has an empty body. Values in angle brackets stand for tokens the core issued; 'not-a-token' and '<token of client 8>' are unknown to the app client.",
+  "endpoint": "https://studip.example.org/jsonapi.php/v1/app-connect/revoke",
+  "clientId": "7",
+  "cases": [
+    {
+      "name": "refresh token of the app, as the apps send it",
+      "body": "client_id=7&token=<refresh token>&token_type_hint=refresh_token",
+      "status": 200,
+      "revokes": "pair"
+    },
+    {
+      "name": "refresh token without a hint",
+      "body": "client_id=7&token=<refresh token>",
+      "status": 200,
+      "revokes": "pair"
+    },
+    {
+      "name": "access token with the wrong hint",
+      "body": "client_id=7&token=<access token>&token_type_hint=refresh_token",
+      "status": 200,
+      "revokes": "pair"
+    },
+    {
+      "name": "expired access token",
+      "body": "client_id=7&token=<expired access token>&token_type_hint=access_token",
+      "status": 200,
+      "revokes": "pair"
+    },
+    {
+      "name": "token revoked already (stays revoked, no error)",
+      "body": "client_id=7&token=<revoked refresh token>&token_type_hint=refresh_token",
+      "status": 200,
+      "revokes": "pair"
+    },
+    {
+      "name": "unknown or malformed token",
+      "body": "client_id=7&token=not-a-token&token_type_hint=refresh_token",
+      "status": 200,
+      "revokes": "nothing"
+    },
+    {
+      "name": "token of another OAuth2 client",
+      "body": "client_id=7&token=<token of client 8>",
+      "status": 200,
+      "revokes": "nothing"
+    },
+    {
+      "name": "unknown hint value",
+      "body": "client_id=7&token=<refresh token>&token_type_hint=device_code",
+      "status": 200,
+      "revokes": "pair"
+    },
+    {
+      "name": "token missing",
+      "body": "client_id=7&token_type_hint=refresh_token",
+      "status": 400,
+      "error": "invalid_request",
+      "revokes": "nothing"
+    },
+    {
+      "name": "client id missing",
+      "body": "token=<refresh token>&token_type_hint=refresh_token",
+      "status": 401,
+      "error": "invalid_client",
+      "revokes": "nothing"
+    },
+    {
+      "name": "another client id",
+      "body": "client_id=8&token=<refresh token>",
+      "status": 401,
+      "error": "invalid_client",
+      "revokes": "nothing"
+    },
+    {
+      "name": "rate limit reached (31st request from one address in 10 minutes)",
+      "body": "client_id=7&token=<refresh token>",
+      "status": 503,
+      "error": "temporarily_unavailable",
+      "retryAfter": 600,
+      "revokes": "nothing"
+    }
+  ]
+}

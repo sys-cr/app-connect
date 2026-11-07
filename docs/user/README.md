@@ -41,6 +41,8 @@ Verbindung (per QR-Code, per Browser-Anmeldung) und letzter Nutzung.
   beendet sie.
 - Die App steht auch unter „Drittanwendungen“. Wer sie dort widerruft, beendet das Gerät
   ebenfalls.
+- Meldest du dich in der App ab, beendet die App ihren Zugang auch bei Stud.IP; das Gerät
+  verschwindet aus der Liste.
 
 Jede neue Verbindung meldet eine Mail an dein Konto mit Gerätename, Plattform und Uhrzeit.
 Warst du es nicht, entferne das Gerät auf „Stud.App Verbindung“ und ändere dein Passwort.
@@ -124,6 +126,8 @@ connected (per QR-Code, per Browser-Anmeldung) and when it was used last.
   them.
 - The app is also listed under "Drittanwendungen". Revoking it there ends the device as
   well.
+- When you sign out in the app, the app also ends its access at Stud.IP; the device
+  disappears from the list.
 
 Every new connection sends a mail to your account with the device name, the platform and
 the time. If it was not you, remove the device on "Stud.App connection" and change your

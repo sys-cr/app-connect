@@ -37,6 +37,10 @@ final class DiscoveryBuilderTest extends TestCase
         self::assertSame('https://studip.example.org/jsonapi.php/v1', $payload['instance']['jsonApiUrl']);
         self::assertSame('7', $payload['oauth2']['clientId']);
         self::assertSame('https://studip.example.org/jsonapi.php/v1/app-connect/token', $payload['oauth2']['tokenEndpoint']);
+        self::assertSame(
+            'https://studip.example.org/jsonapi.php/v1/app-connect/revoke',
+            $payload['oauth2']['revocationEndpoint']
+        );
         self::assertSame('S256', $payload['oauth2']['pkce']);
         foreach (DiscoveryBuilder::BASE_FEATURES as $id) {
             self::assertSame(['version' => 1], $payload['features'][$id]);
@@ -65,7 +69,7 @@ final class DiscoveryBuilderTest extends TestCase
     public function testEveryEndpointIsOnTheInstanceHost(): void
     {
         $payload = $this->build([]);
-        foreach (['authorizationEndpoint', 'tokenEndpoint'] as $key) {
+        foreach (['authorizationEndpoint', 'tokenEndpoint', 'revocationEndpoint'] as $key) {
             self::assertSame('studip.example.org', parse_url($payload['oauth2'][$key], PHP_URL_HOST));
         }
         self::assertSame('studip.example.org', parse_url($payload['instance']['jsonApiUrl'], PHP_URL_HOST));

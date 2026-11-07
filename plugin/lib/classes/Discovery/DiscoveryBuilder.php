@@ -56,6 +56,7 @@ final class DiscoveryBuilder
                 'clientId' => (string) $settings->clientId(),
                 'authorizationEndpoint' => $base . '/dispatch.php/api/oauth2/authorize',
                 'tokenEndpoint' => $base . '/jsonapi.php/v1/app-connect/token',
+                'revocationEndpoint' => $base . '/jsonapi.php/v1/app-connect/revoke',
                 'redirectUri' => self::REDIRECT_URI,
                 'pkce' => 'S256',
                 'scopes' => self::SCOPES,

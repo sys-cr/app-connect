@@ -23,7 +23,7 @@ Veröffentlichung ist willkommen; den Zeitpunkt stimmen wir mit dir ab.
 ## Geltungsbereich
 
 - die Discovery-Route und ihre Feld-Allowlist
-- Anlage des OAuth2-Clients, der Token-Endpunkt und die Gerätebindung
+- Anlage des OAuth2-Clients, Token- und Widerrufs-Endpunkt und die Gerätebindung
 - Kopplungscodes und ihre Einlösung
 - die Web-Anmeldung aus der App und der Kalender-Schlüssel
 - die Profilseite und die öffentliche Landing-Page
@@ -61,7 +61,7 @@ vulnerability disclosure is welcome; we agree on a publication date with you.
 ### Scope
 
 - the discovery route and its field allowlist
-- OAuth2 client provisioning, the token endpoint and the device binding
+- OAuth2 client provisioning, the token and revocation endpoints and the device binding
 - pairing codes and their redemption
 - the web login from the app and the calendar key
 - the profile page and the public landing page
