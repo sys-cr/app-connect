@@ -15,7 +15,7 @@
     <?= MessageBox::info($_('Die Verbindung mit der App ist an dieser Hochschule nicht eingeschaltet.')) ?>
 <? else : ?>
 <section class="contentbox app-connect-get">
-    <header><h2><?= sprintf($_('Die App für %s'), htmlReady($instance_name)) ?></h2></header>
+    <header><h2 style="<?= \AppConnect\ContentBox::HEADING_STYLE ?>"><?= sprintf($_('Die App für %s'), htmlReady($instance_name)) ?></h2></header>
     <section>
         <p><?= $_('Ist die App schon installiert, öffnen Sie sie hier. Sonst installieren Sie sie und scannen den QR-Code danach in der App noch einmal. Oder Sie kommen auf diese Seite zurück und tippen auf „In der App öffnen“.') ?></p>
         <p>

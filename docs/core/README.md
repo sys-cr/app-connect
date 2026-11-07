@@ -62,6 +62,7 @@ Grund, der nur für ein Plugin gilt, und entfällt im Kern.
 | Rechte über OAuth2-Scopes | Vergleich mit der Client-ID | Der Kern kennt nur den Scope `api`; Plugins können keine Scopes anmelden. |
 | Routen mit `JsonApiController` und Schema, Fehler über `JsonApi\Errors` | `NonJsonApiController`, Fehler mit festem `code` | Die Apps brauchen stabile Fehlercodes (siehe `contract/`); Plugins können Schemas des Kerns nicht erweitern. |
 | Autoloader `StudipAutoloader` | eigener Autoloader in `bootstrap.php` | Migrationen und Cron-Runner laden die Klassen ohne Plugin-Instanz. |
+| Überschrift eines Inhaltskastens als h1, gestaltet über `section.contentbox header h1` | h2 mit denselben Werten als Inline-Style (`ContentBox`) | Die Seite behält den Seitentitel des Kerns als einziges h1; Plugins können das Stylesheet des Kerns nicht ändern. Im Kern gilt die Regel auch für h2. |
 | Plugins sind für „Nobody“ nicht freigegeben | das Plugin gibt sich für „Nobody“ frei | Discovery, Token-Endpunkt und „App holen“ werden ohne Sitzung aufgerufen. |
 | keine eigenen Sicherheits-Header | `X-Frame-Options` und `frame-ancestors` auf Kopplung, „App holen“ und Web-Anmeldung | Schutz vor Clickjacking auf Seiten, die Zugang gewähren. |
 | PHPUnit/Codeception im Kern-Testsystem | eigenständige PHPUnit-Suiten für die Logik | Ein Plugin hat kein Kern-Testsystem; beim Übergang wandern die Tests nach `tests/unit` und `tests/jsonapi`. |
@@ -231,6 +232,7 @@ that only applies to a plugin and disappears in the core.
 | Permissions through OAuth2 scopes | comparison with the client id | The core knows only the scope `api`; plugins cannot register scopes. |
 | Routes with `JsonApiController` and schema, errors via `JsonApi\Errors` | `NonJsonApiController`, errors with a fixed `code` | The apps need stable error codes (see `contract/`); plugins cannot extend core schemas. |
 | Autoloader `StudipAutoloader` | own autoloader in `bootstrap.php` | Migrations and the cron runner load the classes without a plugin instance. |
+| Content box heading as h1, styled by `section.contentbox header h1` | h2 with the same values as an inline style (`ContentBox`) | The page keeps the core's page title as its only h1; plugins cannot change the core's stylesheet. In the core the rule also covers h2. |
 | Plugins are not enabled for "Nobody" | the plugin enables itself for "Nobody" | Discovery, token endpoint and "Get the app" are called without a session. |
 | No security headers of its own | `X-Frame-Options` and `frame-ancestors` on pairing, "Get the app" and web sign-in | Protection against clickjacking on pages that grant access. |
 | PHPUnit/Codeception in the core test system | standalone PHPUnit suites for the logic | A plugin has no core test system; on the move the tests go to `tests/unit` and `tests/jsonapi`. |
