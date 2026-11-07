@@ -205,6 +205,9 @@ msgstr "Y-m-d, H:i T"
 msgid "app-connect wurde von %1$s (© %2$s) entwickelt. Das Plugin ist freie Software unter der GNU GPL 3.0 oder neuer mit Zusatzbedingungen nach Abschnitt 7."
 msgstr "app-connect was developed by %1$s (© %2$s). The plugin is free software under the GNU GPL 3.0 or later with additional terms under section 7."
 
+msgid "Sie dürfen es unter diesen Bedingungen weitergeben; eine Gewährleistung gibt es nicht."
+msgstr "You may convey it under these terms; there is no warranty."
+
 msgid "Lizenz (GPLv3)"
 msgstr "License (GPLv3)"
 

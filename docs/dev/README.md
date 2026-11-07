@@ -31,7 +31,7 @@ Komponenten in `plugin/lib/classes/`:
 | `Routes` | schlanke JSON:API-Controller der Routen unten; `AppToken` lässt nur das Token des App-Clients zu |
 | `Help` | kurze Hilfetexte für die Hilfelasche von `connect` und `get` |
 | `ContentBox` | Stil der h2-Überschriften in den Inhaltskästen, mit den Werten des Kerns |
-| `Attribution` | rechtlicher Hinweis (Nennung, Copyright, Lizenz mit Zusatzbedingungen) mit Link zur Lizenz; setzt ihn ans Ende der Hilfelasche von `connect` und `get` |
+| `Attribution` | rechtliche Hinweise im Sinne der GPL (Nennung, Copyright, Lizenz mit Zusatzbedingungen, Weitergabe, keine Gewährleistung) mit Link zur Lizenz; setzt sie ans Ende der Hilfelasche von `connect` und `get` |
 | `Runtime` | Verbindung zum laufenden Stud.IP (Einstellungen, Basis-Adresse, Instanzdaten) |
 
 Klassen ohne Abhängigkeit von Stud.IP (`Discovery\DiscoveryBuilder`,
@@ -183,7 +183,7 @@ Components in `plugin/lib/classes/`:
 | `Routes` | thin JSON:API controllers of the routes below; `AppToken` admits only the app client's token |
 | `Help` | short help texts for the help bar of `connect` and `get` |
 | `ContentBox` | style of the h2 headings in the content boxes, with the core's values |
-| `Attribution` | the legal notice (attribution, copyright, license with additional terms) with a link to the license; adds it to the end of the help bar of `connect` and `get` |
+| `Attribution` | the legal notices in the GPL's sense (attribution, copyright, license with additional terms, conveying, no warranty) with a link to the license; adds them to the end of the help bar of `connect` and `get` |
 | `Runtime` | wiring to the running Stud.IP (settings, base URL, instance data) |
 
 Classes without a Stud.IP dependency (`Discovery\DiscoveryBuilder`,

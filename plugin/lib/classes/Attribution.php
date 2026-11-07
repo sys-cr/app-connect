@@ -8,8 +8,9 @@ declare(strict_types=1);
 namespace AppConnect;
 
 /**
- * The plugin's legal notice: author and copyright, the license with its
- * additional terms and a link to the license text. The additional terms in
+ * The plugin's Appropriate Legal Notices in the sense of the GPL: author and
+ * copyright, the license with its additional terms, the right to convey, the
+ * absence of warranty and a link to the license text. The additional terms in
  * SUPPLEMENTAL-TERMS.txt require the notices to keep the author attribution
  * and the license notice; wording, place and design are free. The pages people use, "Stud.App Verbindung" and
  * "App holen", carry them at the end of the help bar, below the help texts.
@@ -51,6 +52,12 @@ final class Attribution
         );
     }
 
+    /** The line on conveying and warranty below the notice. */
+    public static function termsText(): string
+    {
+        return Translation::text('Sie dürfen es unter diesen Bedingungen weitergeben; eine Gewährleistung gibt es nicht.');
+    }
+
     /**
      * The notice with a link to the license as one block,
      * dimmer than the text around it and set at 14 px, the smallest size
@@ -64,10 +71,12 @@ final class Attribution
         return sprintf(
             '<div class="app-connect-attribution" style="font-size: 14px; line-height: 1.75; color: %s;">'
             . '%s<br>'
+            . '%s<br>'
             . '<a href="%s" target="_blank" rel="noopener noreferrer" style="color: inherit; white-space: nowrap;">%s%s</a>'
             . '</div>',
             $inHelpbar ? self::HELPBAR_COLOR : self::PAGE_COLOR,
             htmlReady(self::text()),
+            htmlReady(self::termsText()),
             htmlReady(self::LICENSE_URL),
             $icon,
             htmlReady(Translation::text('Lizenz (GPLv3)'))
