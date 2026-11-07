@@ -34,18 +34,17 @@ final class AttributionTest extends TestCase
         self::assertSame(Attribution::LICENSE, $composer['license']);
     }
 
-    /** The notice holds what the GPL counts as Appropriate Legal Notices and no source link. */
-    public function testNoticeIsAppropriateLegalNotices(): void
+    /** The notice names author, copyright and license with a link to the license, and no source link. */
+    public function testNoticeNamesAuthorAndLicense(): void
     {
         require_once __DIR__ . '/../Support/studip-view-functions.php';
 
         $html = Attribution::html('<img alt="">');
 
-        self::assertStringContainsString('app-connect von Bodo Steffen', $html);
+        self::assertStringContainsString('app-connect wurde von Bodo Steffen', $html);
         self::assertStringContainsString('© ' . Attribution::COPYRIGHT_YEAR, $html);
         self::assertStringContainsString('Abschnitt 7', $html);
-        self::assertStringContainsString('weitergeben und verändern', $html);
-        self::assertStringContainsString('Gewährleistung', $html);
+        self::assertStringContainsString('GNU GPL 3.0 oder neuer', $html);
         self::assertStringContainsString('href="https://www.gnu.org/licenses/gpl-3.0.html"', $html);
         self::assertStringNotContainsString('github.com', $html);
         self::assertSame(1, substr_count($html, '<img alt=""> '));

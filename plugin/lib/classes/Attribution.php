@@ -8,11 +8,10 @@ declare(strict_types=1);
 namespace AppConnect;
 
 /**
- * The plugin's Appropriate Legal Notices in the sense of the GPL: copyright
- * and author, the license with its additional terms, the right to convey,
- * the absence of warranty and a link to the license text. The additional terms in SUPPLEMENTAL-TERMS.txt require these
- * notices to keep the author attribution and the license notice; wording,
- * place and design are free. The pages people use, "Stud.App Verbindung" and
+ * The plugin's legal notice: author and copyright, the license with its
+ * additional terms and a link to the license text. The additional terms in
+ * SUPPLEMENTAL-TERMS.txt require the notices to keep the author attribution
+ * and the license notice; wording, place and design are free. The pages people use, "Stud.App Verbindung" and
  * "App holen", carry them at the end of the help bar, below the help texts.
  */
 final class Attribution
@@ -42,11 +41,11 @@ final class Attribution
 
     private static bool $queued = false;
 
-    /** The notice: author and copyright, license with the additional terms, conveying, no warranty. */
+    /** The notice: author and copyright, license with the additional terms. */
     public static function text(): string
     {
         return sprintf(
-            Translation::text('app-connect von %1$s (© %2$s) ist freie Software unter der GNU GPL 3.0 oder neuer mit Zusatzbedingungen nach Abschnitt 7. Sie dürfen sie unter diesen Bedingungen weitergeben und verändern; eine Gewährleistung gibt es nicht.'),
+            Translation::text('app-connect wurde von %1$s (© %2$s) entwickelt. Das Plugin ist freie Software unter der GNU GPL 3.0 oder neuer mit Zusatzbedingungen nach Abschnitt 7.'),
             self::AUTHOR,
             self::COPYRIGHT_YEAR
         );
