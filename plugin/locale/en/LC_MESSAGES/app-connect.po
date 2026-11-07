@@ -21,6 +21,9 @@ msgstr "The address must start with https://."
 msgid "Das ist keine gültige E-Mail-Adresse."
 msgstr "This is not a valid email address."
 
+msgid "Ohne Support-Adresse (APP_CONNECT_SUPPORT_EMAIL) gehen Meldungen von Inhalten aus der App an support@studapp2.de, den Support des Projekts Stud.App. Tragen Sie unter Admin → System → Konfiguration, Sektion „Stud.App“, die Support-Adresse Ihrer Hochschule ein, damit Meldungen dort ankommen."
+msgstr "Without a support address (APP_CONNECT_SUPPORT_EMAIL), content reports from the app go to support@studapp2.de, the support of the Stud.App project. Enter your university's support address under Admin → System → Konfiguration, section \"Stud.App\", so that reports reach you."
+
 msgid "Die Farbe muss die Form #RRGGBB haben."
 msgstr "The colour must have the form #RRGGBB."
 

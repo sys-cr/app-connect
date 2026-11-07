@@ -121,7 +121,7 @@ final class OperatorConfig
             self::FEATURE_USER_EVENTS => ['type' => 'boolean', 'value' => true, 'description' =>
                 'Liefert der App den Kalender der Person in einem Abruf, mit den Farben der Veranstaltungen wie im Web-Kalender. Ausgeschaltet setzt die App den Kalender aus den Routen des Kerns zusammen.'],
             self::SUPPORT_EMAIL => ['type' => 'string', 'value' => '', 'description' =>
-                'E-Mail-Adresse des Supports der Hochschule; die App bietet sie für Hilfe und zum Melden von Inhalten an. Leer: kein Support-Kontakt der Hochschule in der App.'],
+                'E-Mail-Adresse des Supports der Hochschule für Hilfe und Meldungen von Inhalten in der App. Bitte eintragen: Ohne Adresse gehen Meldungen an support@studapp2.de (Projekt Stud.App).'],
             self::LOGO_URL => ['type' => 'string', 'value' => '', 'description' =>
                 'Adresse des Hochschul-Logos für die App, beginnend mit https://.'],
             self::ACCENT_COLOR => ['type' => 'string', 'value' => '', 'description' =>

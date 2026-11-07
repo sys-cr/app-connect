@@ -56,6 +56,10 @@ class ConnectController extends PluginController
         $this->status_url = $this->url_for('connect/status');
         $this->index_url = $this->url_for('connect/index');
         $this->new_code = $this->new_code ?? null;
+        $supportEmail = $this->settings->arrayValue(Settings::INSTANCE)['supportEmail'] ?? null;
+        if ($GLOBALS['perm']->have_perm('root') && !is_string($supportEmail)) {
+            PageLayout::postInfo($this->_('Ohne Support-Adresse (APP_CONNECT_SUPPORT_EMAIL) gehen Meldungen von Inhalten aus der App an support@studapp2.de, den Support des Projekts Stud.App. Tragen Sie unter Admin → System → Konfiguration, Sektion „Stud.App“, die Support-Adresse Ihrer Hochschule ein, damit Meldungen dort ankommen.'));
+        }
     }
 
     public function create_code_action()

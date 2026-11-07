@@ -16,7 +16,8 @@ use PHPUnit\Framework\TestCase;
  * The migrations carry the values they create instead of reading them from
  * the classes. Together they must create exactly what the code expects: every
  * configuration entry of the section "Stud.App" and every event log action,
- * each once and with the same type, default and description.
+ * each once and with the same type, default and description (the last one a
+ * migration wrote).
  */
 final class MigrationsTest extends TestCase
 {
@@ -37,6 +38,12 @@ final class MigrationsTest extends TestCase
             foreach ($fields as $field => $definition) {
                 self::assertArrayNotHasKey($field, $created, "$field is created twice ($name)");
                 $created[$field] = $definition;
+            }
+            // A later migration may replace the description of an entry created before.
+            $descriptions = defined(get_class($migration) . '::DESCRIPTIONS') ? $migration::DESCRIPTIONS : [];
+            foreach ($descriptions as $field => $description) {
+                self::assertArrayHasKey($field, $created, "$field is described before it is created ($name)");
+                $created[$field]['description'] = $description;
             }
         }
 

@@ -53,7 +53,7 @@ brauchen, kommt aus den eigenen Routen des Plugins.
    | `APP_CONNECT_STORE_APP_STORE`, `APP_CONNECT_STORE_GOOGLE_PLAY` | Store-Links auf der Seite „App holen“ |
    | `APP_CONNECT_FEATURE_COURSE_CATALOGUE`, `…_BLUBBER`, `…_MENSA` | zusätzliche Funktionen der App |
    | `APP_CONNECT_ROOM_FINDER_PROPERTY` | Name der Raumeigenschaft mit dem Link zu eurem Raumfinder (z. B. `Lageplan`); die Apps zeigen ihn neben dem Raum eines Termins (nur https) |
-   | `APP_CONNECT_SUPPORT_EMAIL` | Support-Adresse eurer Einrichtung; die Apps bieten sie für Hilfe und zum Melden von Inhalten an (Barrieren in der App gehen an den Stud.App-Support) |
+   | `APP_CONNECT_SUPPORT_EMAIL` | Support-Adresse eurer Einrichtung; die Apps bieten sie für Hilfe und zum Melden von Inhalten an (Barrieren in der App gehen an den Stud.App-Support). **Bitte eintragen:** Ohne Adresse gehen Meldungen von Inhalten an support@studapp2.de, den Support des Projekts Stud.App, und nicht an eure Hochschule. Solange die Adresse fehlt, zeigen die Konfiguration nach dem Speichern und „Stud.App Verbindung“ für `root` einen Hinweis |
    | `APP_CONNECT_LOGO_URL`, `APP_CONNECT_ACCENT_COLOR` | Logo (https) und Akzentfarbe (`#RRGGBB`); die Apps leiten daraus ein kontrastsicheres Farbschema ab |
    | `APP_CONNECT_LINK_HOMEPAGE`, `…_CAMPUS_MANAGEMENT`, `…_LIBRARY`, `…_IT_HELP` | Links in der App (https) |
    | `APP_CONNECT_MENSA_OPENMENSA_IDS`, `APP_CONNECT_MENSA_URL` | Quelle der Mensa: OpenMensa-IDs (durch Komma getrennt, die erste ist die Vorgabe) oder ein Link zum Speiseplan; nötig für `APP_CONNECT_FEATURE_MENSA` |
@@ -346,7 +346,7 @@ from the plugin's own routes.
    | `APP_CONNECT_STORE_APP_STORE`, `APP_CONNECT_STORE_GOOGLE_PLAY` | store links on the page "Get the app" |
    | `APP_CONNECT_FEATURE_COURSE_CATALOGUE`, `…_BLUBBER`, `…_MENSA` | additional features of the app |
    | `APP_CONNECT_ROOM_FINDER_PROPERTY` | name of the room property that holds a link to your room finder (e.g. `Lageplan`); the apps show it next to the room of a course date (https only) |
-   | `APP_CONNECT_SUPPORT_EMAIL` | support address of your institution; the apps offer it for help and for reporting content (barriers in the app go to the Stud.App support) |
+   | `APP_CONNECT_SUPPORT_EMAIL` | support address of your institution; the apps offer it for help and for reporting content (barriers in the app go to the Stud.App support). **Please set it:** without an address, content reports go to support@studapp2.de, the support of the Stud.App project, and not to your university. While it is missing, the configuration after saving and "Stud.App connection" for `root` show a notice |
    | `APP_CONNECT_LOGO_URL`, `APP_CONNECT_ACCENT_COLOR` | logo (https) and accent colour (`#RRGGBB`); the apps derive a contrast-safe colour scheme from the accent |
    | `APP_CONNECT_LINK_HOMEPAGE`, `…_CAMPUS_MANAGEMENT`, `…_LIBRARY`, `…_IT_HELP` | links shown in the app (https) |
    | `APP_CONNECT_MENSA_OPENMENSA_IDS`, `APP_CONNECT_MENSA_URL` | mensa source: OpenMensa ids (comma separated, the first is the default) or a web menu link; needed for `APP_CONNECT_FEATURE_MENSA` |

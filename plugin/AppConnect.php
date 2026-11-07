@@ -149,6 +149,10 @@ class AppConnect extends StudIPPlugin implements SystemPlugin, JsonApiPlugin, Pr
         }
         EventLog::record(EventLog::SETTINGS_CHANGE, $field);
         $value = trim((string) ($change['new_value'] ?? ''));
+        if ($field === OperatorConfig::SUPPORT_EMAIL && !OperatorConfig::isEmail($value)) {
+            // The apps then send content reports to the project's own address.
+            PageLayout::postInfo($this->_('Ohne Support-Adresse (APP_CONNECT_SUPPORT_EMAIL) gehen Meldungen von Inhalten aus der App an support@studapp2.de, den Support des Projekts Stud.App. Tragen Sie unter Admin → System → Konfiguration, Sektion „Stud.App“, die Support-Adresse Ihrer Hochschule ein, damit Meldungen dort ankommen.'));
+        }
         if ($value === '') {
             return;
         }
