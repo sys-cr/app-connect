@@ -30,7 +30,7 @@ Komponenten in `plugin/lib/classes/`:
 | `RateLimit`, `Audit`, `Mail` | Grenzen für Fehlversuche, Aktionen des Ereignisprotokolls, die Verbindungsmail |
 | `Routes` | schlanke JSON:API-Controller der Routen unten; `AppToken` lässt nur das Token des App-Clients zu |
 | `Help` | kurze Hilfetexte für die Hilfelasche von `connect` und `get` |
-| `Attribution` | rechtliche Hinweise im Sinne der GPL (Nennung, Copyright, Lizenz mit Zusatzbedingungen, Weitergabe, keine Gewährleistung) und Quellcode-Link; setzt sie ans Ende der Hilfelasche von `connect` und `get` |
+| `Attribution` | rechtliche Hinweise im Sinne der GPL (Nennung, Copyright, Lizenz mit Zusatzbedingungen, Weitergabe, keine Gewährleistung) mit Link zur Lizenz; setzt sie ans Ende der Hilfelasche von `connect` und `get` |
 | `Runtime` | Verbindung zum laufenden Stud.IP (Einstellungen, Basis-Adresse, Instanzdaten) |
 
 Klassen ohne Abhängigkeit von Stud.IP (`Discovery\DiscoveryBuilder`,
@@ -181,7 +181,7 @@ Components in `plugin/lib/classes/`:
 | `RateLimit`, `Audit`, `Mail` | failure limits, event log actions, the connection mail |
 | `Routes` | thin JSON:API controllers of the routes below; `AppToken` admits only the app client's token |
 | `Help` | short help texts for the help bar of `connect` and `get` |
-| `Attribution` | the legal notices in the GPL's sense (attribution, copyright, license with additional terms, conveying, no warranty) and the source link; adds them to the end of the help bar of `connect` and `get` |
+| `Attribution` | the legal notices in the GPL's sense (attribution, copyright, license with additional terms, conveying, no warranty) with a link to the license; adds them to the end of the help bar of `connect` and `get` |
 | `Runtime` | wiring to the running Stud.IP (settings, base URL, instance data) |
 
 Classes without a Stud.IP dependency (`Discovery\DiscoveryBuilder`,

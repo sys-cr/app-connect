@@ -27,19 +27,14 @@ apply to the material of this Program and to modified versions of it.
    use in describing the origin of the Program and in the notices required
    by these terms.
 
-4. Source code. The source code of the original version is published at
-   https://github.com/sys-cr/app-connect. Keeping this reference in modified
-   versions is welcome but not required by these terms; recipients of a
-   modified version are to be told where to obtain its own Corresponding
-   Source as the GPL requires.
 
-5. Scope. These terms apply only to this Program and to the parts of works to
+4. Scope. These terms apply only to this Program and to the parts of works to
    which they lawfully apply. They do not extend to the Stud.IP core system or
    to separate and independent works or platforms with which the Program
    interacts, on which it runs or in which it is embedded, solely by reason of
    that interaction or embedding.
 
-6. Severability. If any of these terms goes beyond what Section 7 of the GPL
+5. Severability. If any of these terms goes beyond what Section 7 of the GPL
    permits, only that term is void and may be removed as provided in
    Section 7; the GPL and the remaining terms stay in effect.
 

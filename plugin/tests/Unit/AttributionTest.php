@@ -23,7 +23,6 @@ final class AttributionTest extends TestCase
     public function testValues(): void
     {
         self::assertSame('Bodo Steffen', Attribution::AUTHOR);
-        self::assertSame('https://github.com/sys-cr/app-connect', Attribution::SOURCE_URL);
         self::assertSame('GPL-3.0-or-later', Attribution::LICENSE);
         self::assertSame('SUPPLEMENTAL-TERMS.txt', Attribution::TERMS_FILE);
     }
@@ -35,7 +34,7 @@ final class AttributionTest extends TestCase
         self::assertSame(Attribution::LICENSE, $composer['license']);
     }
 
-    /** The notice holds what the GPL counts as Appropriate Legal Notices, plus the source link. */
+    /** The notice holds what the GPL counts as Appropriate Legal Notices and no source link. */
     public function testNoticeIsAppropriateLegalNotices(): void
     {
         require_once __DIR__ . '/../Support/studip-view-functions.php';
@@ -47,9 +46,9 @@ final class AttributionTest extends TestCase
         self::assertStringContainsString('Abschnitt 7', $html);
         self::assertStringContainsString('weitergeben und verändern', $html);
         self::assertStringContainsString('Gewährleistung', $html);
-        self::assertStringContainsString('href="https://github.com/sys-cr/app-connect"', $html);
         self::assertStringContainsString('href="https://www.gnu.org/licenses/gpl-3.0.html"', $html);
-        self::assertSame(2, substr_count($html, '<img alt=""> '));
+        self::assertStringNotContainsString('github.com', $html);
+        self::assertSame(1, substr_count($html, '<img alt=""> '));
     }
 
     /** A fixed colour keeps the contrast measurable; opacity would also dim forced colours. */
@@ -75,8 +74,8 @@ final class AttributionTest extends TestCase
             // 14 px at 1.75 keeps stacked links 24.5 px apart (WCAG 2.5.8).
             self::assertStringContainsString('font-size: 14px; line-height: 1.75;', $html);
             self::assertStringNotContainsString('em;', $html);
-            // Lines break at the separator, never inside a link.
-            self::assertSame(2, substr_count($html, 'white-space: nowrap;'));
+            // The link never breaks inside.
+            self::assertSame(1, substr_count($html, 'white-space: nowrap;'));
         }
     }
 
@@ -125,7 +124,7 @@ final class AttributionTest extends TestCase
         self::assertStringContainsString('Author attribution (Section 7(b))', $terms);
         self::assertStringContainsString('"app-connect by Bodo Steffen"', $terms);
         self::assertStringContainsString('Appropriate Legal', $terms);
-        self::assertStringContainsString('welcome but not required', $terms);
+        self::assertStringNotContainsString('github.com', $terms);
         self::assertStringContainsString('Severability', $terms);
         self::assertStringContainsString('No particular screen, position or design is required.', $terms);
     }

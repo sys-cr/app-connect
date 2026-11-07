@@ -208,8 +208,6 @@ msgstr "app-connect by %1$s (© %2$s) is free software under the GNU GPL 3.0 or 
 msgid "Lizenz (GPLv3)"
 msgstr "License (GPLv3)"
 
-msgid "Quellcode (GitHub)"
-msgstr "Source code (GitHub)"
 
 msgid "Über diese Seite kommen Sie zur Stud.App, der App für Stud.IP auf iPhone und Android-Geräten."
 msgstr "This page takes you to the Stud.App, the app for Stud.IP on iPhone and Android devices."

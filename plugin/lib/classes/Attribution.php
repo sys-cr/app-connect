@@ -10,8 +10,7 @@ namespace AppConnect;
 /**
  * The plugin's Appropriate Legal Notices in the sense of the GPL: copyright
  * and author, the license with its additional terms, the right to convey,
- * the absence of warranty and a link to the license text, plus a link to the
- * source. The additional terms in SUPPLEMENTAL-TERMS.txt require these
+ * the absence of warranty and a link to the license text. The additional terms in SUPPLEMENTAL-TERMS.txt require these
  * notices to keep the author attribution and the license notice; wording,
  * place and design are free. The pages people use, "Stud.App Verbindung" and
  * "App holen", carry them at the end of the help bar, below the help texts.
@@ -21,8 +20,6 @@ final class Attribution
     public const AUTHOR = 'Bodo Steffen';
 
     public const COPYRIGHT_YEAR = '2026';
-
-    public const SOURCE_URL = 'https://github.com/sys-cr/app-connect';
 
     /** SPDX identifier of the license. */
     public const LICENSE = 'GPL-3.0-or-later';
@@ -56,7 +53,7 @@ final class Attribution
     }
 
     /**
-     * The notice with links to the license and the source as one block,
+     * The notice with a link to the license as one block,
      * dimmer than the text around it and set at 14 px, the smallest size
      * the notice may take. `$linkIcon` is rendered
      * icon markup and goes in as it is; `$inHelpbar` picks the text colour
@@ -69,17 +66,12 @@ final class Attribution
             '<div class="app-connect-attribution" style="font-size: 14px; line-height: 1.75; color: %s;">'
             . '%s<br>'
             . '<a href="%s" target="_blank" rel="noopener noreferrer" style="color: inherit; white-space: nowrap;">%s%s</a>'
-            . ' · '
-            . '<a href="%s" target="_blank" rel="noopener noreferrer" style="color: inherit; white-space: nowrap;">%s%s</a>'
             . '</div>',
             $inHelpbar ? self::HELPBAR_COLOR : self::PAGE_COLOR,
             htmlReady(self::text()),
             htmlReady(self::LICENSE_URL),
             $icon,
-            htmlReady(Translation::text('Lizenz (GPLv3)')),
-            htmlReady(self::SOURCE_URL),
-            $icon,
-            htmlReady(Translation::text('Quellcode (GitHub)'))
+            htmlReady(Translation::text('Lizenz (GPLv3)'))
         );
     }
 
