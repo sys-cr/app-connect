@@ -27,7 +27,6 @@ apply to the material of this Program and to modified versions of it.
    use in describing the origin of the Program and in the notices required
    by these terms.
 
-
 4. Scope. These terms apply only to this Program and to the parts of works to
    which they lawfully apply. They do not extend to the Stud.IP core system or
    to separate and independent works or platforms with which the Program
