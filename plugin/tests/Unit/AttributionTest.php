@@ -63,17 +63,17 @@ final class AttributionTest extends TestCase
         self::assertStringNotContainsString('opacity', $helpbar . $page);
         self::assertStringContainsString('color: ' . Attribution::HELPBAR_COLOR . ';', $helpbar);
         self::assertStringContainsString('color: ' . Attribution::PAGE_COLOR . ';', $page);
-        self::assertStringContainsString('var(--color--font-inverted) 85%, var(--color--brand-primary)', Attribution::HELPBAR_COLOR);
+        self::assertStringContainsString('var(--color--font-inverted) 75%, var(--color--brand-primary)', Attribution::HELPBAR_COLOR);
     }
 
-    /** The notice stays readable: 14 px in the help bar and in the page. */
-    public function testNoticeIsSetAtFourteenPixels(): void
+    /** Smaller in the help bar, 14 px in the page; fixed sizes, not relative to the surroundings. */
+    public function testNoticeSizePerPlace(): void
     {
         require_once __DIR__ . '/../Support/studip-view-functions.php';
 
+        self::assertStringContainsString('font-size: 12px; line-height: 1.5;', Attribution::html());
+        self::assertStringContainsString('font-size: 14px; line-height: 1.75;', Attribution::html('', false));
         foreach ([Attribution::html(), Attribution::html('', false)] as $html) {
-            // 14 px at 1.75 keeps stacked links 24.5 px apart (WCAG 2.5.8).
-            self::assertStringContainsString('font-size: 14px; line-height: 1.75;', $html);
             self::assertStringNotContainsString('em;', $html);
             // The link never breaks inside.
             self::assertSame(1, substr_count($html, 'white-space: nowrap;'));

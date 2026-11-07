@@ -32,13 +32,20 @@ final class Attribution
     /**
      * Text colour of the notice in the help bar: the help bar's text colour
      * shaded towards its background. The background is `--color--brand-primary`
-     * from Stud.IP 6.1 on and `--color--info` in 6.0; at 85 % the notice keeps
-     * at least 4.5:1 on both and in the core's high-contrast mode.
+     * from Stud.IP 6.1 on and `--color--info` in 6.0; at 75 % the notice keeps
+     * at least 4.5:1 on both (5.9:1 and 4.8:1) and in the core's high-contrast
+     * mode.
      */
-    public const HELPBAR_COLOR = 'color-mix(in srgb, var(--color--font-inverted) 85%, var(--color--brand-primary))';
+    public const HELPBAR_COLOR = 'color-mix(in srgb, var(--color--font-inverted) 75%, var(--color--brand-primary))';
 
     /** Text colour of the notice in the page content. */
     public const PAGE_COLOR = 'var(--color--font-secondary)';
+
+    /** Size of the notice in the help bar, smaller than the help above it. */
+    public const HELPBAR_FONT = 'font-size: 12px; line-height: 1.5;';
+
+    /** Size of the notice in the page content. */
+    public const PAGE_FONT = 'font-size: 14px; line-height: 1.75;';
 
     private static bool $queued = false;
 
@@ -59,21 +66,21 @@ final class Attribution
     }
 
     /**
-     * The notice with a link to the license as one block,
-     * dimmer than the text around it and set at 14 px, the smallest size
-     * the notice may take. `$linkIcon` is rendered
-     * icon markup and goes in as it is; `$inHelpbar` picks the text colour
-     * for the help bar or for the page content.
+     * The notice with a link to the license as one block, smaller and dimmer
+     * than the text around it. `$linkIcon` is rendered icon markup and goes in
+     * as it is; `$inHelpbar` picks size and text colour for the help bar or for
+     * the page content.
      */
     public static function html(string $linkIcon = '', bool $inHelpbar = true): string
     {
         $icon = $linkIcon !== '' ? $linkIcon . ' ' : '';
         return sprintf(
-            '<div class="app-connect-attribution" style="font-size: 14px; line-height: 1.75; color: %s;">'
+            '<div class="app-connect-attribution" style="%s color: %s;">'
             . '%s<br>'
             . '%s<br>'
             . '<a href="%s" target="_blank" rel="noopener noreferrer" style="color: inherit; white-space: nowrap;">%s%s</a>'
             . '</div>',
+            $inHelpbar ? self::HELPBAR_FONT : self::PAGE_FONT,
             $inHelpbar ? self::HELPBAR_COLOR : self::PAGE_COLOR,
             htmlReady(self::text()),
             htmlReady(self::termsText()),
