@@ -76,7 +76,7 @@ On `503` the client must assume that the token still exists (RFC 7009
 ## Rate limit
 
 Every request with the app's `client_id` and a `token` counts, whether the
-token is known or not: 30 per client address in 10 minutes and 300 per minute
+token is known or not: 300 per client address in 10 minutes and 300 per minute
 for the whole instance. Opening a refresh token costs a key
 derivation, so the limit protects the server, not the tokens; the tokens are
 encrypted or signed and cannot be guessed. Addresses are counted as a keyed

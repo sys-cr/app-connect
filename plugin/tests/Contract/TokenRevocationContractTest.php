@@ -95,7 +95,10 @@ final class TokenRevocationContractTest extends TestCase
     public function testEveryRequestCountsTowardsTheLimit(): void
     {
         $limits = Limits::revocations();
-        $limiter = new RateLimiter(new InMemoryCounterStore(), $limits, self::SECRET, static fn (): int => 1_000_000);
+        $now = 1_000_000;
+        $limiter = new RateLimiter(new InMemoryCounterStore(), $limits, self::SECRET, function () use (&$now): int {
+            return $now;
+        });
         $revocation = new TokenRevocation(
             '7',
             $limiter,
@@ -109,6 +112,11 @@ final class TokenRevocationContractTest extends TestCase
             self::assertSame(200, $result['status']);
         }
 
+        self::assertSame(503, $revocation->handle(['client_id' => '7', 'token' => 'x'], self::ADDRESS)['status']);
+
+        // Once the overall window has passed, the address stays blocked for the
+        // rest of its own window while another address gets through.
+        $now += $limits->globalWindow;
         self::assertSame(503, $revocation->handle(['client_id' => '7', 'token' => 'x'], self::ADDRESS)['status']);
         self::assertSame(200, $revocation->handle(['client_id' => '7', 'token' => 'x'], '192.0.2.2')['status']);
     }

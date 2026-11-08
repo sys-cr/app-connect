@@ -26,12 +26,12 @@ final class Limits
     }
 
     /**
-     * Revocation requests: 30 per address in 10 minutes, 300 per minute
+     * Revocation requests: 300 per address in 10 minutes, 300 per minute
      * overall. Every request counts, because opening a refresh token costs
      * a key derivation whether or not the token turns out to be valid.
      */
     public static function revocations(): self
     {
-        return new self('revocations', 30, 600, 300, 60);
+        return new self('revocations', 300, 600, 300, 60);
     }
 }
