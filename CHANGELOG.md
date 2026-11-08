@@ -6,6 +6,26 @@ Alle nennenswerten Änderungen an diesem Projekt stehen in dieser Datei. Das For
 [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), die Versionen folgen
 [Semantic Versioning](https://semver.org/lang/de/).
 
+## [1.1.0] – 2026-11-08
+
+### Funktionen
+
+- Widerruf nach RFC 7009: `POST /jsonapi.php/v1/app-connect/revoke`, in der Discovery als
+  `oauth2.revocationEndpoint` angekündigt. Beim Abmelden in der App enden Tokens und Gerät
+  auch auf dem Server.
+
+### Änderungen
+
+- Die Zähler der Grenzen speichern Adressen nur noch als HMAC mit einem zufälligen
+  Schlüssel der Installation.
+- Ohne `APP_CONNECT_SUPPORT_EMAIL` weisen Konfiguration und „Stud.App Verbindung“ darauf
+  hin, dass Meldungen von Inhalten an support@studapp2.de gehen.
+
+### Dokumentation
+
+- Der Datenschutzbaustein nennt OpenMensa, Links, Web-Anmeldung, Ereignisprotokoll und den
+  Meldeweg; die Grenze bei `REMOTE_ADDR` hinter Proxys ist beschrieben.
+
 ## [1.0.0] – 2026-11-02
 
 Erste veröffentlichte Version.
@@ -88,6 +108,26 @@ Erste veröffentlichte Version.
 All notable changes to this project are documented in this file. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/).
+
+### [1.1.0] – 2026-11-08
+
+#### Features
+
+- Revocation under RFC 7009: `POST /jsonapi.php/v1/app-connect/revoke`, announced in the
+  discovery as `oauth2.revocationEndpoint`. Signing out in the app ends the tokens and the
+  device on the server as well.
+
+#### Changes
+
+- The rate limit counters store addresses only as an HMAC with a random secret of the
+  installation.
+- Without `APP_CONNECT_SUPPORT_EMAIL`, the configuration and "Stud.App Verbindung" point
+  out that content reports go to support@studapp2.de.
+
+#### Documentation
+
+- The privacy paragraph names OpenMensa, links, the web login, the event log and the
+  reporting path; the limit of `REMOTE_ADDR` behind proxies is described.
 
 ### [1.0.0] – 2026-11-02
 
