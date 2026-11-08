@@ -18,6 +18,9 @@ Funktionen erfahren sie über dieses Plugin.
   Profilsprache und eine einmalige Web-Anmeldung aus der App – als Plugin-Routen, ohne
   Änderung am Stud.IP-Kern.
 
+**Download:** Das installierbare Plugin-ZIP liegt bei jedem Release unter
+[Releases](https://github.com/sys-cr/app-connect/releases/latest), zusammen mit seiner SHA-256-Prüfsumme.
+
 Unterstützt: Stud.IP 6.0 und neuere 6.x-Versionen. Für Betreiber:
 [`docs/admin/README.md`](docs/admin/README.md) mit Einrichtung, allen API-Endpunkten,
 gespeicherten Daten und Aufbewahrung. Für Studierende, Lehrende und Mitarbeitende:
@@ -84,6 +87,9 @@ the OAuth2 client and the available features from this plugin.
   and course colours, the calendar key for subscribing, the places of course dates, the
   profile language, and a one-time web login from the app – as plugin routes, without
   changes to the Stud.IP core.
+
+**Download:** the installable plugin ZIP comes with every release under
+[Releases](https://github.com/sys-cr/app-connect/releases/latest), together with its SHA-256 checksum.
 
 Supported: Stud.IP 6.0 and later 6.x releases. Operators: see
 [`docs/admin/README.md`](docs/admin/README.md) for setup, all API endpoints, stored data

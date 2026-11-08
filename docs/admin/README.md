@@ -31,9 +31,11 @@ brauchen, kommt aus den eigenen Routen des Plugins.
 
 ## App-Verbindung einschalten
 
-1. Plugin installieren und aktivieren (Admin → System → Plugins). Die Migrationen des
-   Plugins laufen bei der Installation und bei jedem Update
-   (`cli/studip plugin:migrate app-connect`).
+1. Das Plugin-ZIP `app-connect-<Version>.zip` aus den
+   [Releases](https://github.com/sys-cr/app-connect/releases/latest) herunterladen, als `root` unter Admin → System →
+   Plugins hochladen und aktivieren. Wer aus dem Quellcode baut, erhält mit `make dist`
+   dasselbe ZIP unter `dist/`. Die Migrationen des Plugins laufen bei der Installation und
+   bei jedem Update (`cli/studip plugin:migrate app-connect`).
 2. Als `root` Admin → System → Konfiguration öffnen, Sektion **Stud.App**, und
    `APP_CONNECT_ENABLED` einschalten.
    - Das Plugin legt einen öffentlichen OAuth2-Client (PKCE, ohne Secret) für alle
@@ -325,8 +327,11 @@ from the plugin's own routes.
 
 ### Switching the app connection on
 
-1. Install and activate the plugin (Admin → System → Plugins). The plugin's migrations run
-   on installation and on every update (`cli/studip plugin:migrate app-connect`).
+1. Download the plugin ZIP `app-connect-<version>.zip` from the
+   [Releases](https://github.com/sys-cr/app-connect/releases/latest), then, as `root`, upload and activate it under Admin →
+   System → Plugins. If you build from source, `make dist` produces the same ZIP in
+   `dist/`. The plugin's migrations run on installation and on every update
+   (`cli/studip plugin:migrate app-connect`).
 2. As `root`, open Admin → System → Konfiguration and the section **Stud.App**, and set
    `APP_CONNECT_ENABLED` to on.
    - The plugin creates one public OAuth2 client (PKCE, no secret) for all app
