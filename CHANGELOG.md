@@ -6,6 +6,14 @@ Alle nennenswerten Änderungen an diesem Projekt stehen in dieser Datei. Das For
 [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), die Versionen folgen
 [Semantic Versioning](https://semver.org/lang/de/).
 
+## [1.1.1] – 2026-11-08
+
+### Änderungen
+
+- Der Widerruf lässt 300 statt 30 Anfragen je Adresse in 10 Minuten zu. Hinter einem
+  gemeinsamen Netz der Hochschule (NAT, Proxy) teilen sich viele Personen eine Adresse;
+  die Grenze für die ganze Instanz bleibt bei 300 je Minute.
+
 ## [1.1.0] – 2026-11-08
 
 ### Funktionen
@@ -108,6 +116,14 @@ Erste veröffentlichte Version.
 All notable changes to this project are documented in this file. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/).
+
+### [1.1.1] – 2026-11-08
+
+#### Changes
+
+- Revocation allows 300 instead of 30 requests per address in 10 minutes. Behind a shared
+  university network (NAT, proxy) many people share one address; the limit for the whole
+  instance stays at 300 per minute.
 
 ### [1.1.0] – 2026-11-08
 
