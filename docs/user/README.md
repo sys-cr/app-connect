@@ -39,7 +39,10 @@ Verbindung (per QR-Code, per Browser-Anmeldung) und letzter Nutzung.
   jederzeit neu verbinden.
 - Anmeldungen der App, die zu keinem Gerät gehören, stehen gesondert; **Alle beenden**
   beendet sie.
-- Die App steht auch unter „Drittanwendungen“. Wer sie dort widerruft, beendet das Gerät
+- Unter „Drittanwendungen“ steht die App nur, wenn du sie in der letzten Stunde benutzt
+  hast: Stud.IP zeigt dort nur Anwendungen mit einem gerade gültigen Zugriffstoken. Fehlt
+  sie dort, bleibt das Gerät trotzdem verbunden. Welche Geräte verbunden sind, zeigt die
+  Liste auf dieser Seite. Wer die App unter „Drittanwendungen“ widerruft, beendet das Gerät
   ebenfalls.
 - Meldest du dich in der App ab, beendet die App ihren Zugang auch bei Stud.IP; das Gerät
   verschwindet aus der Liste.
@@ -124,8 +127,10 @@ connected (per QR-Code, per Browser-Anmeldung) and when it was used last.
   again at any time.
 - Sign-ins of the app that belong to no device are listed separately; **End all** ends
   them.
-- The app is also listed under "Drittanwendungen". Revoking it there ends the device as
-  well.
+- "Drittanwendungen" lists the app only if you used it within the last hour: Stud.IP shows
+  only applications with an access token that is valid right now. If the app is missing
+  there, the device stays connected all the same. The list on this page shows which devices
+  are connected. Revoking the app on "Drittanwendungen" ends the device as well.
 - When you sign out in the app, the app also ends its access at Stud.IP; the device
   disappears from the list.
 

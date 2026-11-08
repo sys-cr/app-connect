@@ -120,6 +120,9 @@ Das Plugin bereitet den Übergang vor; was noch fehlt, kommt mit einer letzten 1
   - `IcalExport::makeKey()` mit `random_int`,
   - das gehärtete `Token`-Modell,
   - der Widerruf von Access- und Refresh-Token unter „Drittanwendungen“,
+  - „Drittanwendungen“ listet eine Anwendung, solange sie ein gültiges Refresh-Token hat;
+    heute zeigt `AccessToken::findValidTokens()` sie nur, solange ein Access-Token gilt, bei
+    der App also bis etwa eine Stunde nach der letzten Nutzung,
   - das Löschen abgelaufener OAuth2-Tokens.
 
 ### 3. Kernmigration
@@ -288,6 +291,9 @@ The plugin prepares the move; what is still missing comes with a last 1.x versio
   - `IcalExport::makeKey()` with `random_int`,
   - the hardened `Token` model,
   - revoking access and refresh token on "Drittanwendungen",
+  - "Drittanwendungen" lists an application as long as it holds a valid refresh token;
+    today `AccessToken::findValidTokens()` shows it only while an access token is valid,
+    for the app until about an hour after it was last used,
   - deleting expired OAuth2 tokens.
 
 #### 3. Core migration
