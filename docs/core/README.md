@@ -56,7 +56,7 @@ Grund, der nur für ein Plugin gilt, und entfällt im Kern.
 |---|---|---|
 | Token-Endpunkt `dispatch.php/api/oauth2/token` | eigener Endpunkt mit demselben Server | Plugins können dem OAuth2-Container des Kerns keine Grants hinzufügen; Kopplung und Gerätebindung brauchen eigene Grants. |
 | Widerruf über `AccessToken::revoke()` | Widerruf mit SQL in `Devices\TokenLedger` | Das `chdate` eines Tokens muss beim Widerruf erhalten bleiben, weil das Entfernen eines Geräts damit auch Nachfolger findet, die am Kern-Endpunkt ausgestellt wurden. |
-| Einmal-Tokens über das Modell `Token` | eigene Tabelle `app_connect_web_login_tickets` | `Token` speichert den Wert im Klartext, erzeugt ihn aus `uniqid()` und löst nicht atomar ein. |
+| Einmal-Tokens über das Modell `Token` | eigene Tabelle `app_connect_web_login_tickets` | `Token` speichert den Wert im Klartext und löst nicht atomar ein; den Wert erzeugt es bis 6.2 aus `uniqid()`, seit 6.3 über den `TokenService`. |
 | Kalender-Schlüssel aus `IcalExport::makeKey()` | eigener Generator | `makeKey()` nutzt `rand()` und 8 Zeichen; der Schlüssel ist die ganze Berechtigung des Abos und läuft nie ab. |
 | Anmeldung nur über `login.php` | `WebLogin\WebSignIn` führt dieselben Schritte aus (Person setzen, Sitzungs-ID erneuern, Prüfungen wie beim Login) | Der Kern hat keine Schnittstelle für eine Anmeldung ohne Passwort. |
 | Rechte über OAuth2-Scopes | Vergleich mit der Client-ID | Der Kern kennt nur den Scope `api`; Plugins können keine Scopes anmelden. |
@@ -104,6 +104,8 @@ Das Plugin bereitet den Übergang vor; was noch fehlt, kommt mit einer letzten 1
 - **Übersetzung.** Die Texte stehen mit deutschen msgids in der Textdomäne `app-connect`
   (`plugin/locale`). Beim Übergang wandern msgids und englische Übersetzungen unverändert
   in den Kernkatalog.
+- **Letzte 1.x-Version.** Kern erkennen und Versionsgrenze stehen noch nicht im Plugin; sie
+  kommen mit dieser Version, die vor Stud.IP 6.4 erscheint.
 
 ### 2. Kernbeitrag
 
@@ -124,6 +126,26 @@ Das Plugin bereitet den Übergang vor; was noch fehlt, kommt mit einer letzten 1
     heute zeigt `AccessToken::findValidTokens()` sie nur, solange ein Access-Token gilt, bei
     der App also bis etwa eine Stunde nach der letzten Nutzung,
   - das Löschen abgelaufener OAuth2-Tokens.
+- **Einmalwerte über den `TokenService`.** Ab 6.4 entstehen Kopplungscodes, Tickets der
+  Web-Anmeldung und Kalender-Schlüssel im Kern über `Studip\Services\TokenService` (seit 6.3):
+  Zufall aus `random_bytes`, gespeichert wird nur der SHA-256-Hash, verglichen wird mit
+  `hash_equals`. Die eigenen Generatoren des Plugins entfallen. Das Plugin selbst bleibt bei
+  ihnen, solange es Stud.IP 6.0 bis 6.2 unterstützt.
+- **Geräteliste wie die Personal Access Tokens.** Die Verwaltungsseite der Personal Access
+  Tokens (seit 6.3) zeigt Name, Erstellung, letzten Zugriff und Ablauf und lässt einzelne
+  Tokens löschen. Die Geräteliste kann im Kern dieselbe Darstellung nutzen.
+- **Keine Personal Access Tokens für die App.** Sie ersetzen die OAuth2-Anmeldung der App
+  nicht:
+  - Ein Personal Access Token gilt bis zu seinem Ablaufdatum oder unbegrenzt und geht bei
+    jeder Anfrage mit; OAuth2 mit kurzen Access-Tokens und rotierenden Refresh-Tokens bleibt
+    der Weg für mobile Apps (RFC 8252).
+  - Es gehört einer Person, nicht der App. Kopplung, Web-Anmeldung und Geräte setzen aber ein
+    Token des App-Clients voraus.
+  - Betreiber können die Tokens abschalten oder auf Rechtestufen beschränken
+    (`JSONAPI_PERSONAL_ACCESS_TOKENS_*`); die App fiele dann aus.
+
+  Mit den Apps vertragen sie sich: Die JSON:API prüft OAuth2 vor den Personal Access Tokens,
+  ein Token der App wird also auch im Header `Authorization: Bearer` als OAuth2 erkannt.
 
 ### 3. Kernmigration
 
@@ -229,7 +251,7 @@ that only applies to a plugin and disappears in the core.
 |---|---|---|
 | Token endpoint `dispatch.php/api/oauth2/token` | own endpoint with the same server | Plugins cannot add grants to the core OAuth2 container; pairing and device binding need grants of their own. |
 | Revoking via `AccessToken::revoke()` | revoking with SQL in `Devices\TokenLedger` | A token's `chdate` must survive revocation, because removing a device uses it to find successors issued at the core endpoint as well. |
-| One-time tokens via the `Token` model | own table `app_connect_web_login_tickets` | `Token` stores the value in clear text, derives it from `uniqid()` and does not redeem atomically. |
+| One-time tokens via the `Token` model | own table `app_connect_web_login_tickets` | `Token` stores the value in clear text and does not redeem atomically; it derives the value from `uniqid()` up to 6.2 and through the `TokenService` from 6.3 on. |
 | Calendar keys from `IcalExport::makeKey()` | own generator | `makeKey()` uses `rand()` and 8 characters; the key is the whole authorisation of the feed and never expires. |
 | Sign-in only through `login.php` | `WebLogin\WebSignIn` performs the same steps (set the person, renew the session id, the checks of the login) | The core has no interface for a sign-in without a password. |
 | Permissions through OAuth2 scopes | comparison with the client id | The core knows only the scope `api`; plugins cannot register scopes. |
@@ -275,6 +297,8 @@ The plugin prepares the move; what is still missing comes with a last 1.x versio
 - **Translation.** The texts have German msgids in the text domain `app-connect`
   (`plugin/locale`). On the move, msgids and English translations go unchanged into the
   core catalogue.
+- **Last 1.x version.** Core detection and the version limit are not in the plugin yet; they
+  come with this version, released before Stud.IP 6.4.
 
 #### 2. Core contribution
 
@@ -295,6 +319,25 @@ The plugin prepares the move; what is still missing comes with a last 1.x versio
     today `AccessToken::findValidTokens()` shows it only while an access token is valid,
     for the app until about an hour after it was last used,
   - deleting expired OAuth2 tokens.
+- **One-time values through the `TokenService`.** From 6.4 on, pairing codes, web login
+  tickets and calendar keys are made in the core through `Studip\Services\TokenService`
+  (since 6.3): randomness from `random_bytes`, only the SHA-256 hash is stored, comparison
+  with `hash_equals`. The plugin's own generators disappear. The plugin itself keeps them as
+  long as it supports Stud.IP 6.0 to 6.2.
+- **Device list like the personal access tokens.** The management page of the personal
+  access tokens (since 6.3) shows name, creation, last access and expiry and deletes single
+  tokens. In the core, the device list can use the same presentation.
+- **No personal access tokens for the app.** They do not replace the app's OAuth2 sign-in:
+  - A personal access token is valid until its expiry date or indefinitely and goes along
+    with every request; OAuth2 with short access tokens and rotating refresh tokens remains
+    the way for mobile apps (RFC 8252).
+  - It belongs to a person, not to the app. Pairing, web login and devices, however, require
+    a token of the app client.
+  - Operators can switch the tokens off or limit them to permission levels
+    (`JSONAPI_PERSONAL_ACCESS_TOKENS_*`); the app would then fail.
+
+  They do get along with the apps: the JSON:API checks OAuth2 before personal access tokens,
+  so an app token is recognised as OAuth2 even in the `Authorization: Bearer` header.
 
 #### 3. Core migration
 
