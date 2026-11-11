@@ -9,7 +9,7 @@ brauchen, kommt aus den eigenen Routen des Plugins.
 
 ## Voraussetzungen
 
-- Stud.IP 6.0 oder eine neuere 6.x-Version, PHP 8.1 oder neuer. Das Plugin-ZIP braucht zur
+- Stud.IP 6.0 bis 6.3, PHP 8.1 oder neuer. Das Plugin-ZIP braucht zur
   Laufzeit keine Composer-Pakete.
 - HTTPS für die ganze Instanz.
 - `$ABSOLUTE_URI_STUDIP` in `config/config_local.inc.php` gesetzt. Ohne diesen Wert leitet
@@ -306,7 +306,7 @@ from the plugin's own routes.
 
 ### Requirements
 
-- Stud.IP 6.0 or a later 6.x release, PHP 8.1 or later. The plugin ZIP needs no Composer
+- Stud.IP 6.0 to 6.3, PHP 8.1 or later. The plugin ZIP needs no Composer
   packages at runtime.
 - HTTPS for the whole instance.
 - `$ABSOLUTE_URI_STUDIP` set in `config/config_local.inc.php`. Without it Stud.IP derives

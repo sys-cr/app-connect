@@ -10,6 +10,8 @@ Alle nennenswerten Änderungen an diesem Projekt stehen in dieser Datei. Das For
 
 ### Änderungen
 
+- Das Manifest nennt Stud.IP 6.3 als höchste Version. Das Plugin läuft mit Stud.IP 6.0
+  bis 6.3; der Kern vergleicht nur Haupt- und Nebenversion, sodass jedes 6.3.x passt.
 - Der Widerruf lässt 300 statt 30 Anfragen je Adresse in 10 Minuten zu. Hinter einem
   gemeinsamen Netz der Hochschule (NAT, Proxy) teilen sich viele Personen eine Adresse;
   die Grenze für die ganze Instanz bleibt bei 300 je Minute.
@@ -121,6 +123,8 @@ All notable changes to this project are documented in this file. The format foll
 
 #### Changes
 
+- The manifest names Stud.IP 6.3 as the highest version. The plugin runs on Stud.IP 6.0
+  to 6.3; the core compares only major and minor version, so every 6.3.x fits.
 - Revocation allows 300 instead of 30 requests per address in 10 minutes. Behind a shared
   university network (NAT, proxy) many people share one address; the limit for the whole
   instance stays at 300 per minute.
