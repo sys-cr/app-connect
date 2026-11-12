@@ -41,6 +41,12 @@ final class DiscoveryBuilder
         'icalKey' => ['version' => 1, 'route' => 'app-connect/me/ical-key'],
     ];
 
+    /**
+     * Route below `jsonapi.php/v1/` that serves the plugin's copy of the
+     * institution logo; `branding.logoUrl` points there.
+     */
+    public const LOGO_ROUTE = 'app-connect/logo';
+
     private const LINK_TYPES = ['campusManagement', 'homepage', 'mensa', 'library', 'itHelp', 'privacyPolicy', 'other'];
 
     /**
@@ -69,7 +75,7 @@ final class DiscoveryBuilder
             $payload['pairing'] = ['version' => 1];
         }
         $optional = [
-            'branding' => $this->brandingBlock($settings),
+            'branding' => $this->brandingBlock($settings, $instance),
             'links' => $links,
             'sync' => $this->syncBlock($settings),
             'pollIntervals' => $this->pollIntervalsBlock($settings),
@@ -136,8 +142,15 @@ final class DiscoveryBuilder
         return $features;
     }
 
-    /** @return array<string, mixed> */
-    private function brandingBlock(Settings $settings): array
+    /**
+     * The logo is never the configured address: the apps load it only from
+     * the instance's host, so the block names the plugin's own route, with
+     * the content version for cache busting, and only while a checked copy
+     * exists.
+     *
+     * @return array<string, mixed>
+     */
+    private function brandingBlock(Settings $settings, InstanceInfo $instance): array
     {
         $configured = $settings->arrayValue(Settings::BRANDING);
         $block = [];
@@ -149,8 +162,8 @@ final class DiscoveryBuilder
             && count(array_filter($gradient, [self::class, 'isHexColor'])) === count($gradient)) {
             $block['gradient'] = array_values($gradient);
         }
-        if (self::isHttpsUrl($configured['logoUrl'] ?? null)) {
-            $block['logoUrl'] = $configured['logoUrl'];
+        if ($instance->logoVersion !== null && preg_match('/^[0-9a-f]{8,64}$/', $instance->logoVersion) === 1) {
+            $block['logoUrl'] = $instance->baseUrl . '/jsonapi.php/v1/' . self::LOGO_ROUTE . '?v=' . $instance->logoVersion;
         }
         return $block;
     }

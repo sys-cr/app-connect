@@ -43,7 +43,7 @@ brauchen, kommt aus den eigenen Routen des Plugins.
    - Diesen Client bitte nicht in der OAuth2-Verwaltung des Kerns bearbeiten; das Plugin
      verwaltet ihn.
    - Das Plugin gibt sich außerdem für die Rolle „Nobody“ frei, weil Discovery, Token- und
-     Widerrufs-Endpunkt ohne Sitzung aufgerufen werden.
+     Widerrufs-Endpunkt und das Logo ohne Sitzung aufgerufen werden.
 3. Optional, in derselben Sektion:
 
    | Eintrag | Bedeutung |
@@ -56,7 +56,8 @@ brauchen, kommt aus den eigenen Routen des Plugins.
    | `APP_CONNECT_FEATURE_COURSE_CATALOGUE`, `…_BLUBBER`, `…_MENSA` | zusätzliche Funktionen der App |
    | `APP_CONNECT_ROOM_FINDER_PROPERTY` | Name der Raumeigenschaft mit dem Link zu eurem Raumfinder (z. B. `Lageplan`); die Apps zeigen ihn neben dem Raum eines Termins (nur https) |
    | `APP_CONNECT_SUPPORT_EMAIL` | Support-Adresse eurer Einrichtung; die Apps bieten sie für Hilfe und zum Melden von Inhalten an (Barrieren in der App gehen an den Stud.App-Support). **Bitte eintragen:** Ohne Adresse gehen Meldungen von Inhalten an support@studapp2.de, den Support des Projekts Stud.App, und nicht an eure Hochschule. Solange die Adresse fehlt, zeigen die Konfiguration nach dem Speichern und „Stud.App Verbindung“ für `root` einen Hinweis |
-   | `APP_CONNECT_LOGO_URL`, `APP_CONNECT_ACCENT_COLOR` | Logo (https) und Akzentfarbe (`#RRGGBB`); die Apps leiten daraus ein kontrastsicheres Farbschema ab |
+   | `APP_CONNECT_LOGO_URL` | Adresse des Logos (https); das Plugin ruft das Bild ab und liefert es den Apps von diesem Server aus, siehe [Logo](#logo) |
+   | `APP_CONNECT_ACCENT_COLOR` | Akzentfarbe (`#RRGGBB`); die Apps leiten daraus ein kontrastsicheres Farbschema ab |
    | `APP_CONNECT_LINK_HOMEPAGE`, `…_CAMPUS_MANAGEMENT`, `…_LIBRARY`, `…_IT_HELP` | Links in der App (https) |
    | `APP_CONNECT_MENSA_OPENMENSA_IDS`, `APP_CONNECT_MENSA_URL` | Quelle der Mensa: OpenMensa-IDs (durch Komma getrennt, die erste ist die Vorgabe) oder ein Link zum Speiseplan; nötig für `APP_CONNECT_FEATURE_MENSA` |
    | `APP_CONNECT_FEATURE_MESSAGES`, `APP_CONNECT_FEATURE_EVENT_PLACES` | Nachrichten und Orte von Terminen in der App (ab Werk an) |
@@ -75,6 +76,33 @@ Ausschalten widerruft den Client: Angemeldete Apps verlieren sofort den Zugang. 
 Einschalten verwendet denselben Client wieder. Dasselbe gilt, wenn ihr das Plugin in der
 Plugin-Verwaltung deaktiviert oder deinstalliert: Der Client wird widerrufen. Aktiviert ihr
 es wieder, während `APP_CONNECT_ENABLED` an ist, gilt der Client wieder.
+
+## Logo
+
+Die Apps laden das Logo nur vom Server eurer Stud.IP-Instanz: Ein Bild von einem anderen
+Server verriete diesem, wann jemand die App öffnet. Das Plugin ruft deshalb die Adresse aus
+`APP_CONNECT_LOGO_URL` selbst ab, prüft das Bild, speichert eine Kopie und liefert sie unter
+`jsonapi.php/v1/app-connect/logo` aus. Die Discovery nennt diese Adresse als
+`branding.logoUrl`, mit einer Version (`?v=…`), die sich mit jedem neuen Bild ändert. Das
+gilt auch, wenn das Logo schon auf dem Stud.IP-Server liegt.
+
+- Abgerufen wird gleich nach dem Speichern der Adresse und danach täglich durch den
+  Cronjob „app-connect: Aufräumen“. Für root zeigt „Stud.App Verbindung“ das gespeicherte
+  Logo, den Zeitpunkt des Abrufs oder den Grund der Ablehnung und die Schaltfläche „Logo neu
+  laden“.
+- Angenommen werden PNG, JPEG und WebP bis 512 KB mit 32 bis 2048 Pixeln je Seite. Die Art
+  erkennt das Plugin an den Bytes, nicht am `Content-Type`. SVG wird abgelehnt: Die Apps
+  zeigen nur Rastergrafiken, und ein SVG kann Skripte enthalten.
+- Nur `https://` ohne Zugangsdaten, 5 Sekunden je Anfrage, höchstens drei Weiterleitungen,
+  jede wieder auf `https://`. Adressen, deren Server in ein internes Netz zeigt (Loopback,
+  private Netze, Link-Local, reservierte Bereiche), ruft das Plugin nicht ab; ausgenommen
+  ist der Server eurer Instanz selbst. Ist `HTTP_PROXY` gesetzt, geht der Abruf wie die
+  Anfragen des Kerns über den Proxy (außer für Server in `HTTP_PROXY_IGNORE`).
+- Scheitert ein späterer Abruf derselben Adresse, liefert das Plugin weiter das zuletzt
+  geladene Bild aus und zeigt den Fehler. Eine neue Adresse ersetzt das alte Bild; gelingt
+  ihr Abruf nicht, bekommen die Apps kein Logo, bis er gelingt.
+- Ohne gültiges Bild fehlt `branding.logoUrl` in der Discovery, und die Apps zeigen ein
+  allgemeines Symbol. Leert ihr `APP_CONNECT_LOGO_URL`, löscht das Plugin die Kopie.
 
 ## Geräte verbinden
 
@@ -144,6 +172,7 @@ OAuth2-Fehlern (`invalid_grant`, `invalid_client`, …) nach RFC 6749. Jede Rout
 | Route | Anmeldung | Funktion |
 |---|---|---|
 | `GET app-connect/discovery` | keine | Öffentliche Instanzdaten, mit denen die Apps starten: Name, Adressen, Client-ID und Endpunkte des OAuth2-Clients, eingeschaltete Funktionen und – falls gesetzt – Gestaltung, Links, Mensa-Quelle. Aus einer festen Feldliste; enthält nie Geheimnisse. `ETag`/`304`, 5 Minuten cachebar. Schema: [`contract/discovery.schema.json`](../../contract/discovery.schema.json) |
+| `GET app-connect/logo` | keine | Die Kopie des Logos (siehe [Logo](#logo)) mit dem geprüften `Content-Type`, `ETag`/`304`, einen Tag cachebar; `404 app-connect-no-logo` ohne gültige Kopie. In der Discovery als `branding.logoUrl` |
 | `POST app-connect/token` | keine (Client-ID der App) | Token-Endpunkt des App-Clients: `authorization_code` (Browser-Anmeldung mit PKCE), `refresh_token` (behält die Gerätebindung) und der Kopplungs-Grant (QR-Code, `urn:studip:app-connect:pairing`). Andere Clients werden abgewiesen. Fehlgeschlagene Kopplungen sind begrenzt (`429 slow_down`) |
 | `POST app-connect/revoke` | keine (Client-ID der App) | Widerruf nach RFC 7009 beim Abmelden in der App: `token` (Refresh- oder Access-Token) und `client_id`. Widerruft das Token, das andere Token seines Paars und das gebundene Gerät. Antwortet `200` auch für unbekannte, abgelaufene oder fremde Tokens, damit sich Tokens damit nicht prüfen lassen. Höchstens 300 Anfragen je Adresse in 10 Minuten und 300 je Minute insgesamt (`503`, `Retry-After`). In der Discovery als `oauth2.revocationEndpoint`. [`contract/token-revocation.md`](../../contract/token-revocation.md) |
 | `POST app-connect/devices` | App-Token | Registriert das Gerät nach einer Browser-Anmeldung und schickt die Verbindungsmail. `201`; `409 app-connect-already-registered`, wenn die Anmeldung schon gebunden ist; `401`/`403` für andere Tokens |
@@ -157,7 +186,7 @@ Seiten des Plugins (`plugins.php/appconnect/…`):
 
 | Seite | Anmeldung | Funktion |
 |---|---|---|
-| `connect` | ab `autor` | „Stud.App Verbindung“: QR-Code, Geräteliste, Geräte entfernen |
+| `connect` | ab `autor` | „Stud.App Verbindung“: QR-Code, Geräteliste, Geräte entfernen; für root zusätzlich der Zustand des Logos und „Logo neu laden“ |
 | `get` | keine | „App holen“: Store-Links und „In der App öffnen“; der Kopplungscode bleibt im URL-Fragment |
 | `web/enter`, `web/redeem`, `web/confirm` | keine | Anmeldung im Web aus der App |
 
@@ -189,6 +218,8 @@ Ein Cronjob „app-connect: Aufräumen“ (vom Plugin angelegt und eingeschaltet
 - Gerätezeilen einen Monat nach Ablauf des Refresh-Tokens des Geräts – entfernte Geräte
   ebenso wie Geräte, die nicht mehr genutzt wurden.
 
+Derselbe Job ruft das Logo neu ab (siehe [Logo](#logo)).
+
 Wird ein Konto gelöscht, verschwinden seine Geräte, Codes und Links sofort. Die
 Personendaten von Stud.IP (Benutzerverwaltung → Aktionen → „Anzeige Personendaten“ bzw.
 „Export Personendaten als CSV“) enthalten Geräte, Kopplungscodes und Links einer Person;
@@ -203,6 +234,7 @@ Ereignisprotokolls.
 | Geräte | `app_connect_devices` | in der App gewählter Gerätename, Plattform, Art der Verbindung, IDs der OAuth2-Tokens (nicht die Tokens), Zeitpunkte |
 | Links für die Anmeldung im Web | `app_connect_web_login_tickets` | SHA-256-Hash, Person, zu öffnende Seite, Verweis auf Token und Gerät, Zeitpunkte |
 | Kalender-Schlüssel | Konfiguration der Person (Kern, `IcalExport`) | wie vom Kern verwaltet; das Plugin legt ihn an oder löscht ihn, ein Zähler der neuen Schlüssel liegt eine Stunde im Cache |
+| Logo | `app_connect_logo` | eine Zeile: Adresse, Bild (PNG, JPEG oder WebP, höchstens 512 KB), SHA-256, Zeitpunkte von Abruf und letztem Versuch, Grund einer Ablehnung; keine Personendaten. Gelöscht, wenn `APP_CONNECT_LOGO_URL` geleert oder das Plugin deinstalliert wird |
 | Einstellungen | `config` (Sektion „Stud.App“), `app_connect_settings` | eure Einstellungen, Client-ID, gespeicherte Adresse, zufälliger Schlüssel für die Zähler der Grenzen |
 | Fehlversuche beim Koppeln | Stud.IP-Cache | Zähler je Adresse, 10 Minuten |
 | Widerrufe von Tokens | Stud.IP-Cache | Zähler je Adresse, 10 Minuten |
@@ -243,7 +275,7 @@ angezeigten Inhalte werden auf Ihrem Gerät zwischengespeichert. Der Herausgeber
 erhält nur Nachrichten, die Sie ihm selbst schicken (siehe „Inhalte melden“).
 
 Für die Einrichtung ruft die App ohne Anmeldung öffentliche Angaben unserer Instanz ab
-(Name, Adressen, Farben, Links, verfügbare Funktionen). Dabei verarbeiten wir wie bei jedem
+(Name, Adressen, Farben, Logo, Links, verfügbare Funktionen). Dabei verarbeiten wir wie bei jedem
 Seitenaufruf Ihre IP-Adresse in den Server-Protokollen ({{SPEICHERDAUER-SERVERLOG}}).
 
 Links der App (z. B. zur Bibliothek oder zur Website der Hochschule) öffnet die App in Ihrem
@@ -338,8 +370,8 @@ from the plugin's own routes.
      installations, or reuses the one it created before.
    - Please do not edit this client in the core OAuth2 administration; the plugin manages
      it.
-   - The plugin also allows the role "Nobody" to load it, because the discovery, the token
-     and the revocation endpoint are called without a session.
+   - The plugin also allows the role "Nobody" to load it, because the discovery, the logo,
+     the token and the revocation endpoint are called without a session.
 3. Optional, in the same section:
 
    | Entry | Meaning |
@@ -352,7 +384,8 @@ from the plugin's own routes.
    | `APP_CONNECT_FEATURE_COURSE_CATALOGUE`, `…_BLUBBER`, `…_MENSA` | additional features of the app |
    | `APP_CONNECT_ROOM_FINDER_PROPERTY` | name of the room property that holds a link to your room finder (e.g. `Lageplan`); the apps show it next to the room of a course date (https only) |
    | `APP_CONNECT_SUPPORT_EMAIL` | support address of your institution; the apps offer it for help and for reporting content (barriers in the app go to the Stud.App support). **Please set it:** without an address, content reports go to support@studapp2.de, the support of the Stud.App project, and not to your university. While it is missing, the configuration after saving and "Stud.App connection" for `root` show a notice |
-   | `APP_CONNECT_LOGO_URL`, `APP_CONNECT_ACCENT_COLOR` | logo (https) and accent colour (`#RRGGBB`); the apps derive a contrast-safe colour scheme from the accent |
+   | `APP_CONNECT_LOGO_URL` | address of the logo (https); the plugin fetches the picture and serves it to the apps from this server, see [Logo](#logo-1) |
+   | `APP_CONNECT_ACCENT_COLOR` | accent colour (`#RRGGBB`); the apps derive a contrast-safe colour scheme from it |
    | `APP_CONNECT_LINK_HOMEPAGE`, `…_CAMPUS_MANAGEMENT`, `…_LIBRARY`, `…_IT_HELP` | links shown in the app (https) |
    | `APP_CONNECT_MENSA_OPENMENSA_IDS`, `APP_CONNECT_MENSA_URL` | mensa source: OpenMensa ids (comma separated, the first is the default) or a web menu link; needed for `APP_CONNECT_FEATURE_MENSA` |
    | `APP_CONNECT_FEATURE_MESSAGES`, `APP_CONNECT_FEATURE_EVENT_PLACES` | messages and places of course dates in the app (on by default) |
@@ -370,6 +403,32 @@ Switching off revokes the client: signed-in apps lose access immediately. Switch
 again reuses the same client. The same happens when you disable or uninstall the plugin in
 the plugin administration: the client is revoked. Enabling it again while
 `APP_CONNECT_ENABLED` is on lifts the revocation.
+
+### Logo
+
+The apps load the logo only from your Stud.IP instance's own server: a picture from another
+server would tell that server when someone opens the app. The plugin therefore fetches the
+address in `APP_CONNECT_LOGO_URL` itself, checks the picture, keeps a copy and serves it at
+`jsonapi.php/v1/app-connect/logo`. The discovery names that address as `branding.logoUrl`,
+with a version (`?v=…`) that changes with every new picture. This also applies when the logo
+already lives on the Stud.IP server.
+
+- The plugin fetches the logo right after the address is saved and then daily in the cronjob
+  "app-connect: cleanup". For root, "Stud.App connection" shows the stored logo, when it was
+  fetched or why it was refused, and the button "Logo neu laden" (fetch the logo again).
+- PNG, JPEG and WebP up to 512 KB with 32 to 2048 pixels per side are accepted. The plugin
+  recognises the type by the bytes, not by the `Content-Type`. SVG is refused: the apps show
+  raster pictures only, and an SVG can contain scripts.
+- Only `https://` without credentials, 5 seconds per request, at most three redirects, each
+  to `https://` again. Addresses whose server points into an internal network (loopback,
+  private networks, link-local, reserved ranges) are not fetched; your instance's own server
+  is the exception. With `HTTP_PROXY` set, the fetch goes through the proxy like the core's
+  own requests (except for servers in `HTTP_PROXY_IGNORE`).
+- If a later fetch of the same address fails, the plugin keeps serving the last good picture
+  and shows the error. A new address replaces the old picture; if it cannot be fetched, the
+  apps get no logo until it can.
+- Without a valid picture, `branding.logoUrl` is left out of the discovery and the apps show
+  a generic symbol. Emptying `APP_CONNECT_LOGO_URL` deletes the copy.
 
 ### Connecting devices
 
@@ -438,6 +497,7 @@ errors (`invalid_grant`, `invalid_client`, …) as RFC 6749 describes. Every rou
 | Route | Sign-in | What it does |
 |---|---|---|
 | `GET app-connect/discovery` | none | Public instance data the apps start with: name, addresses, OAuth2 client id and endpoints, enabled features, and – if you set them – branding, links, mensa source. Built from a fixed list of fields; never contains secrets. `ETag`/`304`, cacheable for 5 minutes. Schema: [`contract/discovery.schema.json`](../../contract/discovery.schema.json) |
+| `GET app-connect/logo` | none | The copy of the logo (see [Logo](#logo-1)) with the checked `Content-Type`, `ETag`/`304`, cacheable for a day; `404 app-connect-no-logo` without a valid copy. Announced in the discovery as `branding.logoUrl` |
 | `POST app-connect/token` | none (app client id) | Token endpoint of the app client: `authorization_code` (browser sign-in with PKCE), `refresh_token` (keeps the device binding) and the pairing grant (QR code, `urn:studip:app-connect:pairing`). Other clients are refused. Failed pairing attempts are rate limited (`429 slow_down`) |
 | `POST app-connect/revoke` | none (app client id) | Revocation per RFC 7009 when someone signs out in the app: `token` (refresh or access token) and `client_id`. Revokes the token, the other token of its pair and the bound device. Answers `200` for unknown, expired or foreign tokens as well, so it cannot be used to test tokens. At most 300 requests per address in 10 minutes and 300 per minute overall (`503`, `Retry-After`). Announced in the discovery as `oauth2.revocationEndpoint`. [`contract/token-revocation.md`](../../contract/token-revocation.md) |
 | `POST app-connect/devices` | app token | Registers the device after a browser sign-in and sends the connection mail. `201`; `409 app-connect-already-registered` when the sign-in is bound already; `401`/`403` for other tokens |
@@ -451,7 +511,7 @@ Pages of the plugin (`plugins.php/appconnect/…`):
 
 | Page | Sign-in | What it does |
 |---|---|---|
-| `connect` | `autor` and up | "Stud.App connection": QR code, device list, removing devices |
+| `connect` | `autor` and up | "Stud.App connection": QR code, device list, removing devices; for root also the state of the logo and "Logo neu laden" |
 | `get` | none | "Get the app": store links and "Open in the app"; the pairing code stays in the URL fragment |
 | `web/enter`, `web/redeem`, `web/confirm` | none | web login from the app |
 
@@ -481,6 +541,8 @@ on by the plugin, daily at 03:17; Admin → System → Cronjobs) deletes
 - device rows a month after the device's refresh token expired – removed devices as well
   as devices that were not used again.
 
+The same job fetches the logo again (see [Logo](#logo-1)).
+
 When an account is deleted, its devices, codes and web login links are removed at once.
 The Stud.IP personal data view and export (user administration → actions → "Anzeige
 Personendaten" / "Export Personendaten als CSV") contain a person's devices, pairing
@@ -494,6 +556,7 @@ days; the other entries of the plugin follow your event log settings.
 | devices | `app_connect_devices` | device name chosen in the app, platform, how it was connected, ids of the OAuth2 tokens (not the tokens), times |
 | web login links | `app_connect_web_login_tickets` | SHA-256 hash, person, page to open, token/device reference, times |
 | calendar key | the person's configuration (core, `IcalExport`) | as the core keeps it; the plugin creates or deletes it, a count of new keys stays in the cache for an hour |
+| logo | `app_connect_logo` | one row: address, picture (PNG, JPEG or WebP, at most 512 KB), SHA-256, times of the fetch and the last attempt, reason of a refusal; no personal data. Deleted when `APP_CONNECT_LOGO_URL` is emptied or the plugin is uninstalled |
 | settings | `config` (section "Stud.App"), `app_connect_settings` | your settings, client id, recorded address, random key for the limit counters |
 | failed pairing attempts | Stud.IP cache | counter per address, 10 minutes |
 | token revocations | Stud.IP cache | counter per address, 10 minutes |
@@ -534,7 +597,7 @@ e-mail after every new connection. Content shown in the app is cached on your de
 app's publisher receives only messages you send them yourself (see "Reporting content").
 
 To set itself up, the app fetches public information about our instance without signing in
-(name, addresses, colours, links, available features). As with every page request, we
+(name, addresses, colours, logo, links, available features). As with every page request, we
 process your IP address in the server logs ({{SERVER-LOG-RETENTION}}).
 
 Links in the app (for example to the library or the university website) open in your

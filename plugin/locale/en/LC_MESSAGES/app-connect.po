@@ -236,5 +236,65 @@ msgstr "“Devices connected with the app” lists every device that has access 
 msgid "app-connect: Aufräumen"
 msgstr "app-connect: cleanup"
 
-msgid "Löscht abgelaufene Kopplungscodes, Web-Anmeldelinks und Gerätezeilen der App-Anbindung nach Ablauf ihrer Aufbewahrungsfrist."
-msgstr "Deletes expired pairing codes, web sign-in links and device rows of the app connection once their retention period has passed."
+msgid "Löscht abgelaufene Kopplungscodes, Web-Anmeldelinks und Gerätezeilen der App-Anbindung nach Ablauf ihrer Aufbewahrungsfrist und lädt das Logo der Hochschule neu."
+msgstr "Deletes expired pairing codes, web sign-in links and device rows of the app connection once their retention period has passed, and fetches the institution logo again."
+
+msgid "Logo für die App"
+msgstr "Logo for the app"
+
+msgid "Es ist kein Logo eingetragen. Die Apps zeigen dann ein allgemeines Symbol. Tragen Sie die Adresse unter Admin → System → Konfiguration, Sektion „Stud.App“, bei APP_CONNECT_LOGO_URL ein: PNG, JPEG oder WebP, höchstens 512 KB."
+msgstr "No logo is set. The apps then show a generic symbol. Enter the address under Admin → System → Konfiguration, section “Stud.App”, in APP_CONNECT_LOGO_URL: PNG, JPEG or WebP, at most 512 KB."
+
+msgid "Das Plugin ruft das Logo von dieser Adresse ab und liefert es den Apps von diesem Server aus:"
+msgstr "The plugin fetches the logo from this address and serves it to the apps from this server:"
+
+msgid "Das Logo wurde noch nicht abgerufen."
+msgstr "The logo has not been fetched yet."
+
+msgid "Logo der Hochschule"
+msgstr "Logo of the institution"
+
+msgid "Abgerufen am %s (%s, %u × %u Pixel). Die Apps erhalten es von diesem Server."
+msgstr "Fetched on %s (%s, %u × %u pixels). The apps receive it from this server."
+
+msgid "Der letzte Abruf am %s ist fehlgeschlagen: %s Die Apps erhalten weiter die Fassung oben."
+msgstr "The last fetch on %s failed: %s The apps keep receiving the version above."
+
+msgid "Die Apps erhalten kein Logo. Der Abruf am %s ist fehlgeschlagen: %s"
+msgstr "The apps receive no logo. The fetch on %s failed: %s"
+
+msgid "Logo neu laden"
+msgstr "Fetch logo again"
+
+msgid "Die Adresse muss mit https:// beginnen und darf keine Zugangsdaten enthalten."
+msgstr "The address must start with https:// and must not contain credentials."
+
+msgid "Die Adresse zeigt in ein internes Netz; abgerufen werden nur öffentliche Adressen und dieser Server."
+msgstr "The address points into an internal network; only public addresses and this server are fetched."
+
+msgid "Die Adresse leitet zu oft oder auf eine Adresse ohne https weiter."
+msgstr "The address redirects too often or to an address without https."
+
+msgid "Das Bild ist zu groß; erlaubt sind höchstens 512 KB."
+msgstr "The picture is too large; at most 512 KB are allowed."
+
+msgid "Das Bild ist kein PNG, JPEG oder WebP. SVG wird nicht unterstützt."
+msgstr "The picture is not a PNG, JPEG or WebP. SVG is not supported."
+
+msgid "Das Bild muss je Seite zwischen 32 und 2048 Pixel groß sein."
+msgstr "Each side of the picture must be between 32 and 2048 pixels."
+
+msgid "Das Bild lässt sich nicht lesen."
+msgstr "The picture cannot be read."
+
+msgid "Das Logo ist nicht erreichbar: keine Antwort in 5 Sekunden, ein Fehler beim Zertifikat oder eine Antwort ohne Status 200."
+msgstr "The logo is not reachable: no answer within 5 seconds, a certificate error or an answer without status 200."
+
+msgid "Das Logo wurde geladen. Die Apps erhalten es von diesem Server."
+msgstr "The logo was fetched. The apps receive it from this server."
+
+msgid "Das Logo konnte nicht neu geladen werden: %s Die Apps erhalten weiter die Fassung vom %s."
+msgstr "The logo could not be fetched again: %s The apps keep receiving the version of %s."
+
+msgid "Das Logo (APP_CONNECT_LOGO_URL) wird nicht verwendet: %s"
+msgstr "The logo (APP_CONNECT_LOGO_URL) is not used: %s"

@@ -10,9 +10,9 @@
 | `plugin/AppConnect.php` | Plugin-Klasse (`SystemPlugin`, `JsonApiPlugin`): Routen und Navigationseinträge (Admin, Profil-Einstellungen) |
 | `plugin/lib/classes/` | Namensraum `AppConnect\`, siehe Komponenten unten |
 | `plugin/controllers/`, `plugin/views/` | Profilseite (`connect`), öffentliche Landing-Page (`get`), Anmeldung im Web aus der App (`web`: `enter`, `redeem`, `confirm`); die Betreiber-Einstellungen sind Konfigurationseinträge der Sektion „Stud.App“ (`Settings\OperatorConfig`, Migration `004`) |
-| `plugin/migrations/` | Datenbank-Migrationen (`NNN_name.php`); `003` registriert den Aufräum-Cronjob, `010` und `011` setzen die Aufbewahrung der Ereignisprotokoll-Einträge zu Web-Anmeldung und Kalender-Schlüssel |
-| `plugin/cronjobs/` | `AppConnectCleanupJob` (tägliches Aufräumen); lädt `bootstrap.php` selbst, weil der Cron-Runner das Plugin nicht lädt |
-| `plugin/tests/` | PHPUnit: `Unit` (Logik ohne Stud.IP) und `Contract` (Schema, gemeinsame Test-Vektoren) |
+| `plugin/migrations/` | Datenbank-Migrationen (`NNN_name.php`); `003` registriert den Aufräum-Cronjob, `010` und `011` setzen die Aufbewahrung der Ereignisprotokoll-Einträge zu Web-Anmeldung und Kalender-Schlüssel, `015` legt die Tabelle der Logo-Kopie an |
+| `plugin/cronjobs/` | `AppConnectCleanupJob` (tägliches Aufräumen, Logo neu abrufen); lädt `bootstrap.php` selbst, weil der Cron-Runner das Plugin nicht lädt |
+| `plugin/tests/` | PHPUnit: `Unit` (Logik ohne Stud.IP) und `Contract` (Schema, gemeinsame Test-Vektoren); `Fixtures/logo` mit kleinen Bildern, `Support/FakeHttpFetcher` beantwortet Abrufe ohne Netz |
 | `plugin/LICENSE`, `plugin/SUPPLEMENTAL-TERMS.txt` | Kopien von `LICENSES/GPL-3.0-or-later.txt` und `SUPPLEMENTAL-TERMS.txt`, damit das Plugin-Verzeichnis beide mitbringt; `AttributionTest` hält sie gleich |
 
 Komponenten in `plugin/lib/classes/`:
@@ -21,6 +21,7 @@ Komponenten in `plugin/lib/classes/`:
 |---|---|
 | `Settings` | Betreiber-Einstellungen (Konfigurationssektion „Stud.App“) und die eigene Einstellungstabelle; Prüfung von Adressen, Farben, IDs |
 | `Discovery` | die öffentliche Discovery aus einer Feld-Allowlist, `ETag`/`304` |
+| `Logo` | das Logo der Hochschule auf dem eigenen Server: Abruf mit SSRF-Schutz (`LogoFetch`, `AddressGuard`, `CurlHttpFetcher` mit festgelegter Adresse), Prüfung an den Bytes (`LogoImage`: PNG, JPEG, WebP, 512 KB, 32 bis 2048 Pixel), Kopie in `app_connect_logo` (`DatabaseLogoStore`), letzte gute Kopie bei Fehlern (`LogoService`), Antwort der Route (`LogoResponse`) |
 | `OAuth2` | der eine öffentliche App-Client (`ClientProvisioner`), der Token-Endpunkt (`TokenServer`), der Kopplungs-Grant und der Refresh-Grant, der die Gerätebindung mitführt; der Widerruf nach RFC 7009 (`TokenRevocation`, `TokenInspector` prüft Access-Tokens gegen den öffentlichen Schlüssel des Kerns, `RefreshTokenCipher` entschlüsselt Refresh-Tokens mit dem Schlüssel des Kerns) |
 | `Pairing`, `Connect` | Kopplungscodes (nur Hash, fünf Minuten, die erste Einlösung gewinnt) und der Verbindungslink des QR-Codes |
 | `Devices` | Gerätezeilen, gebunden an eine Token-Kette; Entfernen und Widerruf in den Token-Tabellen des Kerns (`TokenLedger`), Aufbewahrung |
@@ -37,9 +38,11 @@ Komponenten in `plugin/lib/classes/`:
 Klassen ohne Abhängigkeit von Stud.IP (`Discovery\DiscoveryBuilder`,
 `Discovery\DiscoveryResponse`, `Connect\*`, `Settings\Settings`, `Calendar\UserEvents`,
 `Calendar\IcalSubscription`, `Calendar\IcalKey`, `Calendar\IcalKeyLimit`,
-`WebLogin\WebLoginService`, `RateLimit\RateLimiter`) sind mit
+`WebLogin\WebLoginService`, `RateLimit\RateLimiter`, `Logo\LogoImage`, `Logo\LogoFetch`,
+`Logo\AddressGuard`, `Logo\LogoService`, `Logo\LogoResponse`) sind mit
 PHPUnit abgedeckt; die schlanke Stud.IP-Schicht (`Runtime`, `Routes\*`,
-`OAuth2\ClientProvisioner`, `Devices\TokenLedger`, die Controller) wird gegen ein laufendes
+`OAuth2\ClientProvisioner`, `Devices\TokenLedger`, `Logo\CurlHttpFetcher`,
+`Logo\DatabaseLogoStore`, die Controller) wird gegen ein laufendes
 Stud.IP getestet.
 
 ## Tests
@@ -110,6 +113,7 @@ auf `localhost` oder `127.0.0.1`.
 | Route | Anmeldung | Zweck |
 |---|---|---|
 | `GET /jsonapi.php/v1/app-connect/discovery` | keine | öffentliche Instanzdaten, `ETag`/`304`; `404 app-connect-disabled`, solange ausgeschaltet |
+| `GET /jsonapi.php/v1/app-connect/logo` | keine | die geprüfte Kopie des Logos (`Content-Type` aus den Bytes, `nosniff`, `Content-Security-Policy: default-src 'none'`, einen Tag cachebar, `ETag` = SHA-256, `304`); Discovery `branding.logoUrl` mit `?v=` (die ersten 16 Zeichen des SHA-256); `404 app-connect-no-logo` ohne gültige Kopie |
 | `POST /jsonapi.php/v1/app-connect/token` | keine (OAuth2-Client) | Token-Endpunkt des App-Clients: `authorization_code`, `refresh_token`, `urn:studip:app-connect:pairing` |
 | `POST /jsonapi.php/v1/app-connect/revoke` | keine (OAuth2-Client) | Widerruf nach RFC 7009 beim Abmelden ([`contract/token-revocation.md`](../../contract/token-revocation.md)); Discovery `oauth2.revocationEndpoint`; `200` (auch für unbekannte Tokens), `400`, `401`, `404`, `503` |
 | `POST /jsonapi.php/v1/app-connect/devices` | OAuth2-Token des App-Clients | Registrierung nach einer Browser-Anmeldung; `201`, `401`, `403`, `409`, `422` |
@@ -167,9 +171,9 @@ entfernt; das genannte Paar wird in jedem Fall widerrufen.
 | `plugin/AppConnect.php` | plugin class (`SystemPlugin`, `JsonApiPlugin`): routes and the navigation entries (admin, profile settings) |
 | `plugin/lib/classes/` | namespace `AppConnect\`, see the components below |
 | `plugin/controllers/`, `plugin/views/` | profile page (`connect`), public landing page (`get`), web login from the app (`web`: `enter`, `redeem`, `confirm`); the operator settings are configuration entries of the section "Stud.App" (`Settings\OperatorConfig`, migration `004`) |
-| `plugin/migrations/` | database migrations (`NNN_name.php`); `003` registers the cleanup cronjob, `010` and `011` set the retention of the event log entries about the web login and the calendar key |
-| `plugin/cronjobs/` | `AppConnectCleanupJob` (daily retention cleanup); loads `bootstrap.php` itself because the cron runner does not load the plugin |
-| `plugin/tests/` | PHPUnit: `Unit` (logic without Stud.IP) and `Contract` (schema, shared test vectors) |
+| `plugin/migrations/` | database migrations (`NNN_name.php`); `003` registers the cleanup cronjob, `010` and `011` set the retention of the event log entries about the web login and the calendar key, `015` creates the table of the logo copy |
+| `plugin/cronjobs/` | `AppConnectCleanupJob` (daily retention cleanup, fetching the logo again); loads `bootstrap.php` itself because the cron runner does not load the plugin |
+| `plugin/tests/` | PHPUnit: `Unit` (logic without Stud.IP) and `Contract` (schema, shared test vectors); `Fixtures/logo` holds tiny pictures, `Support/FakeHttpFetcher` answers fetches without network |
 | `plugin/LICENSE`, `plugin/SUPPLEMENTAL-TERMS.txt` | copies of `LICENSES/GPL-3.0-or-later.txt` and `SUPPLEMENTAL-TERMS.txt`, so the plugin directory ships both; `AttributionTest` keeps them identical |
 
 Components in `plugin/lib/classes/`:
@@ -178,6 +182,7 @@ Components in `plugin/lib/classes/`:
 |---|---|
 | `Settings` | operator settings (configuration section "Stud.App") and the plugin's own settings table; validation of addresses, colours, ids |
 | `Discovery` | the public discovery payload from a field allowlist, `ETag`/`304` |
+| `Logo` | the institution logo on the instance's own server: fetch with SSRF protection (`LogoFetch`, `AddressGuard`, `CurlHttpFetcher` pinned to the checked address), checks on the bytes (`LogoImage`: PNG, JPEG, WebP, 512 KB, 32 to 2048 pixels), the copy in `app_connect_logo` (`DatabaseLogoStore`), the last good copy on failure (`LogoService`), the route's answer (`LogoResponse`) |
 | `OAuth2` | the one public app client (`ClientProvisioner`), the token endpoint (`TokenServer`), the pairing grant and the refresh grant that keeps the device binding; revocation per RFC 7009 (`TokenRevocation`; `TokenInspector` checks access tokens against the core's public key, `RefreshTokenCipher` decrypts refresh tokens with the core's key) |
 | `Pairing`, `Connect` | pairing codes (hash only, five minutes, first redemption wins) and the connect link of the QR code |
 | `Devices` | device rows bound to a token lineage, removal and revocation in the core token tables (`TokenLedger`), retention |
@@ -194,9 +199,11 @@ Components in `plugin/lib/classes/`:
 Classes without a Stud.IP dependency (`Discovery\DiscoveryBuilder`,
 `Discovery\DiscoveryResponse`, `Connect\*`, `Settings\Settings`, `Calendar\UserEvents`,
 `Calendar\IcalSubscription`, `Calendar\IcalKey`, `Calendar\IcalKeyLimit`,
-`WebLogin\WebLoginService`, `RateLimit\RateLimiter`) are
+`WebLogin\WebLoginService`, `RateLimit\RateLimiter`, `Logo\LogoImage`, `Logo\LogoFetch`,
+`Logo\AddressGuard`, `Logo\LogoService`, `Logo\LogoResponse`) are
 covered by PHPUnit; the thin Stud.IP layer (`Runtime`, `Routes\*`,
-`OAuth2\ClientProvisioner`, `Devices\TokenLedger`, the controllers) is tested against a
+`OAuth2\ClientProvisioner`, `Devices\TokenLedger`, `Logo\CurlHttpFetcher`,
+`Logo\DatabaseLogoStore`, the controllers) is tested against a
 running Stud.IP.
 
 ### Tests
@@ -266,6 +273,7 @@ A local instance over plain `http` is accepted by the apps only in DEBUG builds 
 | Route | Authentication | Purpose |
 |---|---|---|
 | `GET /jsonapi.php/v1/app-connect/discovery` | none | public instance data, `ETag`/`304`; `404 app-connect-disabled` while switched off |
+| `GET /jsonapi.php/v1/app-connect/logo` | none | the checked copy of the logo (`Content-Type` from the bytes, `nosniff`, `Content-Security-Policy: default-src 'none'`, cacheable for a day, `ETag` = SHA-256, `304`); discovery `branding.logoUrl` with `?v=` (the first 16 characters of the SHA-256); `404 app-connect-no-logo` without a valid copy |
 | `POST /jsonapi.php/v1/app-connect/token` | none (OAuth2 client) | token endpoint of the app client: `authorization_code`, `refresh_token`, `urn:studip:app-connect:pairing` |
 | `POST /jsonapi.php/v1/app-connect/revoke` | none (OAuth2 client) | revocation per RFC 7009 on sign-out ([`contract/token-revocation.md`](../../contract/token-revocation.md)); discovery `oauth2.revocationEndpoint`; `200` (unknown tokens as well), `400`, `401`, `404`, `503` |
 | `POST /jsonapi.php/v1/app-connect/devices` | OAuth2 token of the app client | registration after a browser sign-in; `201`, `401`, `403`, `409`, `422` |

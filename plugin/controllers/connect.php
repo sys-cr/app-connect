@@ -9,7 +9,9 @@ use AppConnect\Attribution;
 use AppConnect\Connect\ConnectLink;
 use AppConnect\Devices\DeviceService;
 use AppConnect\Devices\TokenLedger;
+use AppConnect\Discovery\DiscoveryBuilder;
 use AppConnect\Help;
+use AppConnect\Logo\LogoStatusText;
 use AppConnect\Pairing\PairingService;
 use AppConnect\Runtime;
 use AppConnect\Settings\Settings;
@@ -18,7 +20,8 @@ use AppConnect\Settings\Settings;
  * Profile → Settings → "Stud.App Verbindung", above "Drittanwendungen":
  * create a pairing code shown as QR code, watch the connection happen, list and
  * remove connected devices. Acts only for the signed-in person; a `username`
- * parameter is ignored.
+ * parameter is ignored. For root the page also shows the state of the
+ * institution logo the plugin serves to the apps.
  */
 class ConnectController extends PluginController
 {
@@ -60,6 +63,28 @@ class ConnectController extends PluginController
         if ($GLOBALS['perm']->have_perm('root') && !is_string($supportEmail)) {
             PageLayout::postInfo($this->_('Ohne Support-Adresse (APP_CONNECT_SUPPORT_EMAIL) gehen Meldungen von Inhalten aus der App an support@studapp2.de, den Support des Projekts Stud.App. Tragen Sie unter Admin → System → Konfiguration, Sektion „Stud.App“, die Support-Adresse Ihrer Hochschule ein, damit Meldungen dort ankommen.'));
         }
+        $this->logo = null;
+        if ($GLOBALS['perm']->have_perm('root')) {
+            $url = Runtime::configuredLogoUrl();
+            $status = Runtime::logo()->status($url);
+            $this->logo = [
+                'configured' => $url,
+                'status' => $status,
+                'problem' => $status?->problem !== null ? LogoStatusText::reason($status->problem) : null,
+                'preview' => $status?->image !== null
+                    ? Runtime::baseUrl() . '/jsonapi.php/v1/' . DiscoveryBuilder::LOGO_ROUTE . '?v=' . $status->image->version()
+                    : null,
+            ];
+        }
+    }
+
+    /** Fetches the configured logo again (root only). */
+    public function reload_logo_action()
+    {
+        CSRFProtection::verifyUnsafeRequest();
+        $GLOBALS['perm']->check('root');
+        LogoStatusText::post(Runtime::logo()->refresh(Runtime::configuredLogoUrl()));
+        $this->redirect('connect/index');
     }
 
     public function create_code_action()

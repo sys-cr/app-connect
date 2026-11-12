@@ -8,6 +8,9 @@ Funktionen erfahren sie über dieses Plugin.
 
 - **Discovery** – `GET /jsonapi.php/v1/app-connect/discovery` liefert die öffentlichen
   Instanzdaten, die die Apps brauchen, aus einer festen Feld-Allowlist.
+- **Logo vom eigenen Server** – das Plugin ruft das Logo der Hochschule ab, prüft es und
+  liefert es unter `GET /jsonapi.php/v1/app-connect/logo` aus, weil die Apps Bilder nur vom
+  Server der Instanz laden.
 - **Ein OAuth2-Client** – das Plugin legt einen öffentlichen PKCE-Client für alle
   App-Installationen der Instanz an und verwaltet ihn.
 - **Verbinden aus dem Profil** – angemeldete Personen zeigen einen QR-Code mit
@@ -78,6 +81,9 @@ the OAuth2 client and the available features from this plugin.
 
 - **Discovery** – `GET /jsonapi.php/v1/app-connect/discovery` returns the public instance
   data the apps need, from a fixed field allowlist.
+- **Logo from the instance's own server** – the plugin fetches the institution logo, checks
+  it and serves it at `GET /jsonapi.php/v1/app-connect/logo`, because the apps load
+  pictures only from the instance's server.
 - **One OAuth2 client** – the plugin creates and manages one public PKCE client for all
   app installations of the instance.
 - **Connect from the profile** – signed-in users show a QR code with a short-lived pairing

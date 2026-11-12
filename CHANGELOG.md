@@ -6,6 +6,23 @@ Alle nennenswerten Änderungen an diesem Projekt stehen in dieser Datei. Das For
 [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), die Versionen folgen
 [Semantic Versioning](https://semver.org/lang/de/).
 
+## [Unreleased]
+
+### Funktionen
+
+- Das Plugin liefert das Logo der Hochschule selbst aus: `GET /jsonapi.php/v1/app-connect/logo`
+  ohne Anmeldung, mit `ETag`/`304` und einen Tag cachebar. Die Apps laden das Logo nur vom
+  Server der Instanz; ein Logo auf einem anderen Server erschien bisher nicht. Das Plugin
+  ruft die Adresse aus `APP_CONNECT_LOGO_URL` nach dem Speichern und täglich im Cronjob ab
+  und speichert eine geprüfte Kopie in der neuen Tabelle `app_connect_logo`: nur https,
+  keine internen Netze, höchstens drei Weiterleitungen, PNG, JPEG oder WebP bis 512 KB mit
+  32 bis 2048 Pixeln je Seite; SVG wird abgelehnt. Scheitert ein späterer Abruf, bleibt die
+  letzte gute Kopie.
+- `branding.logoUrl` in der Discovery zeigt auf diese Route, mit einer Version für den
+  Cache, und fehlt ohne gültige Kopie.
+- Für root zeigt „Stud.App Verbindung“ das gespeicherte Logo, den Zeitpunkt des Abrufs oder
+  den Grund der Ablehnung und „Logo neu laden“.
+
 ## [1.1.1] – 2026-11-08
 
 ### Änderungen
@@ -116,6 +133,22 @@ Erste veröffentlichte Version.
 All notable changes to this project are documented in this file. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/).
+
+### [Unreleased]
+
+#### Features
+
+- The plugin serves the institution logo itself: `GET /jsonapi.php/v1/app-connect/logo`
+  without sign-in, with `ETag`/`304` and cacheable for a day. The apps load the logo only
+  from the instance's server; a logo on another server did not show so far. The plugin
+  fetches the address in `APP_CONNECT_LOGO_URL` after it is saved and daily in the cronjob
+  and keeps a checked copy in the new table `app_connect_logo`: https only, no internal
+  networks, at most three redirects, PNG, JPEG or WebP up to 512 KB with 32 to 2048 pixels
+  per side; SVG is refused. If a later fetch fails, the last good copy stays.
+- `branding.logoUrl` in the discovery points to this route, with a version for caches, and
+  is left out without a valid copy.
+- For root, "Stud.App connection" shows the stored logo, when it was fetched or why it was
+  refused, and "Logo neu laden" (fetch the logo again).
 
 ### [1.1.1] – 2026-11-08
 

@@ -10,6 +10,7 @@
  * @var string $status_url
  * @var string $index_url
  * @var array{landing_url: string, expires_at: int}|null $new_code
+ * @var array{configured: ?string, status: ?\AppConnect\Logo\StoredLogo, problem: ?string, preview: ?string}|null $logo
  */
 ?>
 <? if ($pairing_enabled) : ?>
@@ -100,6 +101,53 @@
         <? endif ?>
     </section>
 </section>
+
+<? if ($logo) : ?>
+<section class="contentbox">
+    <header><h2 style="<?= \AppConnect\ContentBox::HEADING_STYLE ?>"><?= $_('Logo für die App') ?></h2></header>
+    <section>
+        <? if ($logo['configured'] === null) : ?>
+            <?= MessageBox::info(htmlReady($_('Es ist kein Logo eingetragen. Die Apps zeigen dann ein allgemeines Symbol. Tragen Sie die Adresse unter Admin → System → Konfiguration, Sektion „Stud.App“, bei APP_CONNECT_LOGO_URL ein: PNG, JPEG oder WebP, höchstens 512 KB.'))) ?>
+        <? else : ?>
+            <p>
+                <?= $_('Das Plugin ruft das Logo von dieser Adresse ab und liefert es den Apps von diesem Server aus:') ?>
+                <?= htmlReady($logo['configured']) ?>
+            </p>
+            <? if ($logo['status'] === null) : ?>
+                <?= MessageBox::info(htmlReady($_('Das Logo wurde noch nicht abgerufen.'))) ?>
+            <? elseif ($logo['status']->image !== null) : ?>
+                <p>
+                    <img src="<?= htmlReady($logo['preview']) ?>" alt="<?= htmlReady($_('Logo der Hochschule')) ?>" height="64">
+                </p>
+                <?= MessageBox::success(htmlReady(sprintf(
+                    $_('Abgerufen am %s (%s, %u × %u Pixel). Die Apps erhalten es von diesem Server.'),
+                    date('d.m.Y H:i', (int) $logo['status']->fetchedAt),
+                    ['image/png' => 'PNG', 'image/jpeg' => 'JPEG', 'image/webp' => 'WebP'][$logo['status']->image->mimeType] ?? '',
+                    $logo['status']->image->width,
+                    $logo['status']->image->height
+                ))) ?>
+                <? if ($logo['problem'] !== null) : ?>
+                    <?= MessageBox::warning(htmlReady(sprintf(
+                        $_('Der letzte Abruf am %s ist fehlgeschlagen: %s Die Apps erhalten weiter die Fassung oben.'),
+                        date('d.m.Y H:i', $logo['status']->checkedAt),
+                        $logo['problem']
+                    ))) ?>
+                <? endif ?>
+            <? else : ?>
+                <?= MessageBox::error(htmlReady(sprintf(
+                    $_('Die Apps erhalten kein Logo. Der Abruf am %s ist fehlgeschlagen: %s'),
+                    date('d.m.Y H:i', $logo['status']->checkedAt),
+                    (string) $logo['problem']
+                ))) ?>
+            <? endif ?>
+            <form method="post" action="<?= $controller->link_for('connect/reload_logo') ?>">
+                <?= CSRFProtection::tokenTag() ?>
+                <?= Studip\Button::create($_('Logo neu laden'), 'reload_logo') ?>
+            </form>
+        <? endif ?>
+    </section>
+</section>
+<? endif ?>
 
 <? if ($new_code) : ?>
 <script>
