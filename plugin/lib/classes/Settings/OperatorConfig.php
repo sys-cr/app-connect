@@ -32,6 +32,7 @@ final class OperatorConfig
     public const FEATURE_EVENT_PLACES = 'APP_CONNECT_FEATURE_EVENT_PLACES';
     public const FEATURE_COURSEWARE = 'APP_CONNECT_FEATURE_COURSEWARE';
     public const FEATURE_WEB_LOGIN = 'APP_CONNECT_FEATURE_WEB_LOGIN';
+    public const WEB_LOGIN_PRIVILEGED = 'APP_CONNECT_WEB_LOGIN_PRIVILEGED';
     public const FEATURE_ICAL_KEY = 'APP_CONNECT_FEATURE_ICAL_KEY';
     public const FEATURE_USER_EVENTS = 'APP_CONNECT_FEATURE_USER_EVENTS';
     public const SUPPORT_EMAIL = 'APP_CONNECT_SUPPORT_EMAIL';
@@ -116,6 +117,8 @@ final class OperatorConfig
                 'Zeigt in der App die Courseware der Veranstaltungen zum Lesen. Wirkt nur, wenn das Modul Courseware aktiv ist.'],
             self::FEATURE_WEB_LOGIN => ['type' => 'boolean', 'value' => true, 'description' =>
                 'Öffnet Stud.IP-Seiten aus der App ohne erneute Anmeldung im Browser (einmaliger Link, 60 Sekunden gültig). Ein zweiter Faktor des Identity Providers wird dabei nicht abgefragt.'],
+            self::WEB_LOGIN_PRIVILEGED => ['type' => 'boolean', 'value' => false, 'description' =>
+                'Erlaubt die Anmeldung im Web aus der App auch für Konten mit den Rollen admin und root. Aus (Vorgabe): Diese Konten melden sich im Browser wie gewohnt an.'],
             self::FEATURE_ICAL_KEY => ['type' => 'boolean', 'value' => true, 'description' =>
                 'Kalender aus der App abonnieren: die App holt den iCal-Schlüssel der Person und übergibt die webcal-Adresse an den Systemkalender. Wer den Schlüssel kennt, kann den Kalender lesen. Ausgeschaltet bleibt der Weg über die Kalender-Seite im Browser.'],
             self::FEATURE_USER_EVENTS => ['type' => 'boolean', 'value' => true, 'description' =>

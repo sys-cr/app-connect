@@ -82,7 +82,8 @@ now`; only the request that changed the row continues. It then requires:
 
 - the account exists and may sign in now (not locked, not expired, no pending
   e-mail activation, the admin/root IP range check, no maintenance mode unless
-  root) – the checks of the core password login;
+  root) – the checks of the core password login; admin and root only while the
+  operator switch `APP_CONNECT_WEB_LOGIN_PRIVILEGED` is on (off by default);
 - app connection and web login still switched on;
 - the app sign-in behind the ticket is still there: the device row active and
   its access token not revoked; without a device row the access token the

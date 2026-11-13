@@ -67,6 +67,7 @@ brauchen, kommt aus den eigenen Routen des Plugins.
    | `APP_CONNECT_FEATURE_MESSAGES`, `APP_CONNECT_FEATURE_EVENT_PLACES` | Nachrichten und Orte von Terminen in der App (ab Werk an) |
    | `APP_CONNECT_FEATURE_COURSEWARE` | Courseware in der App lesen (ab Werk an; nur solange das Kernmodul Courseware aktiv ist) |
    | `APP_CONNECT_FEATURE_WEB_LOGIN` | Stud.IP-Seiten aus der App ohne erneute Anmeldung öffnen (ab Werk an, siehe [Anmeldung im Web aus der App](#anmeldung-im-web-aus-der-app)) |
+   | `APP_CONNECT_WEB_LOGIN_PRIVILEGED` | Anmeldung im Web aus der App auch für admin und root (ab Werk aus) |
    | `APP_CONNECT_FEATURE_ICAL_KEY` | Kalender aus der App abonnieren (ab Werk an, siehe [Kalender-Schlüssel](#kalender-schlüssel)) |
    | `APP_CONNECT_FEATURE_USER_EVENTS` | Kalender der Person in einem Abruf mit den Farben der Veranstaltungen (ab Werk an); aus setzt die App ihn aus den Routen des Kerns zusammen |
 
@@ -164,8 +165,11 @@ Link aus einem fremden Konto einen Browser unbemerkt in dieses Konto anmeldet.
 
 Ein zweiter Faktor eures Identity Providers (Shibboleth, OIDC) wird dabei nicht abgefragt,
 die Zwei-Faktor-Authentisierung von Stud.IP schon. Schaltet `APP_CONNECT_FEATURE_WEB_LOGIN`
-aus, wenn jede Web-Sitzung über euren Identity Provider laufen muss. Einzelheiten:
-[`contract/web-login.md`](../../contract/web-login.md).
+aus, wenn jede Web-Sitzung über euren Identity Provider laufen muss. Konten mit den Rollen
+admin und root nutzen die Anmeldung im Web aus der App nur, wenn ihr
+`APP_CONNECT_WEB_LOGIN_PRIVILEGED` einschaltet; ab Werk melden sie sich im Browser wie
+gewohnt an. Prüft die Anmeldung im Web aus der App gegen die Anmelderichtlinie eurer
+Hochschule. Einzelheiten: [`contract/web-login.md`](../../contract/web-login.md).
 
 ## Kalender-Schlüssel
 
@@ -416,6 +420,7 @@ from the plugin's own routes.
    | `APP_CONNECT_FEATURE_MESSAGES`, `APP_CONNECT_FEATURE_EVENT_PLACES` | messages and places of course dates in the app (on by default) |
    | `APP_CONNECT_FEATURE_COURSEWARE` | reading Courseware in the app (on by default; only while the core module Courseware is active) |
    | `APP_CONNECT_FEATURE_WEB_LOGIN` | web pages opened from the app without signing in again (on by default, see [Web login from the app](#web-login-from-the-app)) |
+   | `APP_CONNECT_WEB_LOGIN_PRIVILEGED` | web login from the app also for admin and root (off by default) |
    | `APP_CONNECT_FEATURE_ICAL_KEY` | subscribing to the calendar from the app (on by default, see [Calendar key](#calendar-key)) |
    | `APP_CONNECT_FEATURE_USER_EVENTS` | the person's calendar in one call with the course colours (on by default); when off, the app builds it from the core routes |
 
@@ -509,8 +514,10 @@ signing a browser into that account unnoticed.
 
 A second factor of your identity provider (Shibboleth, OIDC) is not asked for; Stud.IP's
 own two-factor authentication still is. Switch `APP_CONNECT_FEATURE_WEB_LOGIN` off if every
-web session must pass your identity provider. Details:
-[`contract/web-login.md`](../../contract/web-login.md).
+web session must pass your identity provider. Accounts with the roles admin and root use
+the web login from the app only if you switch `APP_CONNECT_WEB_LOGIN_PRIVILEGED` on; by
+default they sign in on the web as usual. Check the web login from the app against your
+university's sign-in policy. Details: [`contract/web-login.md`](../../contract/web-login.md).
 
 ### Calendar key
 

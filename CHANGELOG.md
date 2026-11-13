@@ -54,6 +54,12 @@ Alle nennenswerten Änderungen an diesem Projekt stehen in dieser Datei. Das For
   Verbindungen nach dem Wiedereinschalten wieder gültig. Deaktivieren des Plugins pausiert
   weiterhin nur (#9).
 
+### Änderungen
+
+- Konten mit den Rollen admin und root nutzen die Anmeldung im Web aus der App nur noch,
+  wenn der neue Schalter `APP_CONNECT_WEB_LOGIN_PRIVILEGED` an ist; ab Werk ist er aus
+  (Migration 016) (#8).
+
 ## [1.1.1] – 2026-11-08
 
 ### Änderungen
@@ -212,6 +218,11 @@ All notable changes to this project are documented in this file. The format foll
 - Switching `APP_CONNECT_ENABLED` off ends every connection for good: all devices count as
   removed and all tokens of the app are revoked. So far, old connections became valid again
   after switching on. Disabling the plugin still only pauses (#9).
+
+#### Changes
+
+- Accounts with the roles admin and root use the web login from the app only when the new
+  switch `APP_CONNECT_WEB_LOGIN_PRIVILEGED` is on; it is off by default (migration 016) (#8).
 
 ### [1.1.1] – 2026-11-08
 

@@ -10,6 +10,7 @@ namespace AppConnect\WebLogin;
 use AppConnect\Devices\DeviceRecord;
 use AppConnect\Devices\TokenLedger;
 use AppConnect\Runtime;
+use AppConnect\Settings\OperatorConfig;
 
 /**
  * The Stud.IP side of a redeemed ticket: whether the person may sign in on
@@ -29,6 +30,12 @@ final class WebSignIn
         if ($user->id === 'nobody' || (string) $user->username === '' || $user->locked || $user->isExpired()) {
             return false;
         }
+        if (!self::roleMayUseWebLogin(
+            (string) $user->perms,
+            (bool) \Config::get()->getValue(OperatorConfig::WEB_LOGIN_PRIVILEGED)
+        )) {
+            return false;
+        }
         if ((string) $user->validation_key !== '') {
             return false;
         }
@@ -38,6 +45,16 @@ final class WebSignIn
             return false;
         }
         return !\Config::get()->getValue('MAINTENANCE_MODE_ENABLE') || $user->perms === 'root';
+    }
+
+    /**
+     * admin and root sign in on the web as usual unless the operator lets
+     * them use the web login from the app (APP_CONNECT_WEB_LOGIN_PRIVILEGED):
+     * a second factor of the identity provider is not asked for here.
+     */
+    public static function roleMayUseWebLogin(string $perms, bool $privilegedAllowed): bool
+    {
+        return $privilegedAllowed || !in_array($perms, ['admin', 'root'], true);
     }
 
     /**
