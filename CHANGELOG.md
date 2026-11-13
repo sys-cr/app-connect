@@ -41,6 +41,12 @@ Alle nennenswerten Änderungen an diesem Projekt stehen in dieser Datei. Das For
 - Die Admin-Doku sagt, dass die Funktionsschalter steuern, was die App anbietet, und keine
   Berechtigungen sind; serverseitig gesperrt werden nur die Routen des Plugins (#10).
 
+### Änderungen
+
+- Liegt Stud.IP unter einem Unterpfad (etwa `/studip`), lässt sich die App-Verbindung nicht
+  mehr einschalten, und das Plugin sagt warum. Die Apps erreichen solche Instanzen nicht;
+  Admin-Doku und Vertrag nennen die Voraussetzung (#6).
+
 ## [1.1.1] – 2026-11-08
 
 ### Änderungen
@@ -187,6 +193,12 @@ All notable changes to this project are documented in this file. The format foll
 
 - The admin docs say that the feature switches control what the app offers and are not
   permissions; only the plugin's own routes are blocked on the server (#10).
+
+#### Changes
+
+- If Stud.IP is installed below a path (such as `/studip`), the app connection can no longer
+  be switched on, and the plugin says why. The apps cannot reach such instances; admin docs
+  and contract name the requirement (#6).
 
 ### [1.1.1] – 2026-11-08
 

@@ -60,4 +60,15 @@ final class ConnectLinkContractTest extends TestCase
         self::assertSame('studip.example.org', $landing->host);
         self::assertSame($code, $landing->code);
     }
+
+    /** The links carry the host only, so only root installations can be connected. */
+    public function testOnlyRootInstallationsCanBeConnected(): void
+    {
+        foreach (['https://studip.example.org', 'https://studip.example.org/', 'https://studip.example.org:8443'] as $url) {
+            self::assertTrue(ConnectLink::isRootInstallation($url), $url);
+        }
+        foreach (['https://example.org/studip', 'https://example.org/studip/', 'https://example.org/a/b'] as $url) {
+            self::assertFalse(ConnectLink::isRootInstallation($url), $url);
+        }
+    }
 }

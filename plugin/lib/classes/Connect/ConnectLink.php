@@ -19,6 +19,17 @@ final class ConnectLink
     public const LANDING_PATH = '/plugins.php/appconnect/get';
     private const LOOPBACK = ['localhost', '127.0.0.1'];
 
+    /**
+     * Whether the instance is installed at the root of its host. The links
+     * carry the host only, so the apps cannot reach an instance below a
+     * path such as /studip (contract/connect-link.md).
+     */
+    public static function isRootInstallation(string $baseUrl): bool
+    {
+        $path = parse_url($baseUrl, PHP_URL_PATH);
+        return trim(is_string($path) ? $path : '', '/') === '';
+    }
+
     /** URL of the landing page, the code in the fragment. */
     public static function landingUrl(string $baseUrl, ?string $code): string
     {

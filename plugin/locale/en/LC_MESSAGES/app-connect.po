@@ -346,3 +346,6 @@ msgstr "Deletes expired pairing codes, web sign-in links and device rows of the 
 
 msgid "„Zuletzt aktiv“ ist der Tag, an dem die App ihre Anmeldung zuletzt erneuert hat. Während Sie die App nutzen, geschieht das etwa einmal pro Stunde."
 msgstr "“Zuletzt aktiv” (last active) is the day the app last renewed its sign-in. While you use the app, that happens about once an hour."
+
+msgid "Die App-Verbindung bleibt aus: Stud.IP liegt unter einem Unterpfad (ABSOLUTE_URI_STUDIP). Die Apps unterstützen bisher nur Installationen im Wurzelpfad eines Servers, etwa https://studip.example.org/."
+msgstr "The app connection stays off: Stud.IP is installed below a path (ABSOLUTE_URI_STUDIP). The apps support only installations at the root path of a server so far, such as https://studip.example.org/."
