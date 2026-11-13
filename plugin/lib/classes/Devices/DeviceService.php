@@ -122,6 +122,20 @@ final class DeviceService
         $this->ledger->revokeLineageStep($accessTokenId, $refreshTokenId);
     }
 
+    /**
+     * Ends every connection of the app client: all devices of all people
+     * count as removed and all their tokens are revoked. Returns the number
+     * of devices that were still connected.
+     */
+    public function endAll(): int
+    {
+        $db = \DBManager::get();
+        $count = (int) $db->fetchColumn('SELECT COUNT(*) FROM `app_connect_devices` WHERE `revoked_at` IS NULL');
+        $db->execute('UPDATE `app_connect_devices` SET `revoked_at` = ? WHERE `revoked_at` IS NULL', [time()]);
+        $this->ledger->revokeClient($this->clientId);
+        return $count;
+    }
+
     /** @return list<DeviceRecord> active devices, newest first */
     public function activeDevices(string $userId): array
     {

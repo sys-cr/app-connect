@@ -10,6 +10,8 @@ require_once __DIR__ . '/bootstrap.php';
 use AppConnect\Audit\EventLog;
 use AppConnect\Connect\ConnectLink;
 use AppConnect\Devices\DeviceRetention;
+use AppConnect\Devices\DeviceService;
+use AppConnect\Devices\TokenLedger;
 use AppConnect\Logo\LogoStatusText;
 use AppConnect\OAuth2\ClientProvisioner;
 use AppConnect\Privacy\UserDataExport;
@@ -155,6 +157,17 @@ class AppConnect extends StudIPPlugin implements SystemPlugin, JsonApiPlugin, Pr
                 $this->allowRequestsWithoutSession();
             } else {
                 $provisioner->revoke();
+                // Switching off ends every connection for good: switching on
+                // again must not bring old tokens back. Disabling the plugin
+                // only pauses (onDisable).
+                $clientId = Runtime::settings()->clientId();
+                if ($clientId !== null) {
+                    $count = (new DeviceService(new TokenLedger(), $clientId))->endAll();
+                    EventLog::record(EventLog::DISABLE, 'connections ended: ' . $count);
+                    if ($count > 0) {
+                        PageLayout::postInfo(htmlReady($this->_('Alle Verbindungen der App sind beendet. Nach dem Einschalten muss jede Person die App neu verbinden.')));
+                    }
+                }
             }
             return;
         }

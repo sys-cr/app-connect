@@ -349,3 +349,6 @@ msgstr "“Zuletzt aktiv” (last active) is the day the app last renewed its si
 
 msgid "Die App-Verbindung bleibt aus: Stud.IP liegt unter einem Unterpfad (ABSOLUTE_URI_STUDIP). Die Apps unterstützen bisher nur Installationen im Wurzelpfad eines Servers, etwa https://studip.example.org/."
 msgstr "The app connection stays off: Stud.IP is installed below a path (ABSOLUTE_URI_STUDIP). The apps support only installations at the root path of a server so far, such as https://studip.example.org/."
+
+msgid "Alle Verbindungen der App sind beendet. Nach dem Einschalten muss jede Person die App neu verbinden."
+msgstr "All connections of the app have ended. After switching on again, everyone has to connect the app again."

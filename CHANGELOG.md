@@ -47,6 +47,13 @@ Alle nennenswerten Änderungen an diesem Projekt stehen in dieser Datei. Das For
   mehr einschalten, und das Plugin sagt warum. Die Apps erreichen solche Instanzen nicht;
   Admin-Doku und Vertrag nennen die Voraussetzung (#6).
 
+### Änderungen
+
+- Ausschalten von `APP_CONNECT_ENABLED` beendet alle Verbindungen endgültig: Alle Geräte
+  gelten als entfernt, alle Tokens der App werden widerrufen. Bisher wurden alte
+  Verbindungen nach dem Wiedereinschalten wieder gültig. Deaktivieren des Plugins pausiert
+  weiterhin nur (#9).
+
 ## [1.1.1] – 2026-11-08
 
 ### Änderungen
@@ -199,6 +206,12 @@ All notable changes to this project are documented in this file. The format foll
 - If Stud.IP is installed below a path (such as `/studip`), the app connection can no longer
   be switched on, and the plugin says why. The apps cannot reach such instances; admin docs
   and contract name the requirement (#6).
+
+#### Changes
+
+- Switching `APP_CONNECT_ENABLED` off ends every connection for good: all devices count as
+  removed and all tokens of the app are revoked. So far, old connections became valid again
+  after switching on. Disabling the plugin still only pauses (#9).
 
 ### [1.1.1] – 2026-11-08
 

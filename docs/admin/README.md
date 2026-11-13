@@ -84,10 +84,15 @@ brauchen, kommt aus den eigenen Routen des Plugins.
    Nachrichten oder Blubber, regelt ihr das über die Rechte, Module und Einstellungen des
    Kerns.
 
-Ausschalten widerruft den Client: Angemeldete Apps verlieren sofort den Zugang. Erneutes
-Einschalten verwendet denselben Client wieder. Dasselbe gilt, wenn ihr das Plugin in der
-Plugin-Verwaltung deaktiviert oder deinstalliert: Der Client wird widerrufen. Aktiviert ihr
-es wieder, während `APP_CONNECT_ENABLED` an ist, gilt der Client wieder.
+Ausschalten von `APP_CONNECT_ENABLED` beendet alle Verbindungen endgültig: Der Client wird
+widerrufen, alle Geräte gelten als entfernt, alle Tokens der App werden widerrufen. Erneutes
+Einschalten verwendet denselben Client wieder, aber jede Person muss die App neu verbinden.
+
+Deaktiviert ihr das Plugin in der Plugin-Verwaltung, pausiert die Verbindung nur: Der
+Client wird widerrufen, und die Apps verlieren sofort den Zugang. Aktiviert ihr das Plugin
+wieder, während `APP_CONNECT_ENABLED` an ist, gilt der Client wieder, und noch gültige
+Verbindungen funktionieren weiter. Wollt ihr alle Verbindungen beenden, schaltet ihr
+`APP_CONNECT_ENABLED` aus.
 
 ## Logo
 
@@ -426,10 +431,14 @@ from the plugin's own routes.
    course dates. To really forbid an access, for example to messages or Blubber, use the
    core's permissions, modules and settings.
 
-Switching off revokes the client: signed-in apps lose access immediately. Switching on
-again reuses the same client. The same happens when you disable or uninstall the plugin in
-the plugin administration: the client is revoked. Enabling it again while
-`APP_CONNECT_ENABLED` is on lifts the revocation.
+Switching `APP_CONNECT_ENABLED` off ends every connection for good: the client is revoked,
+every device counts as removed and every token of the app is revoked. Switching on again
+reuses the same client, but everyone has to connect the app again.
+
+Disabling the plugin in the plugin administration only pauses the connection: the client is
+revoked and the apps lose access at once. Enabling the plugin again while
+`APP_CONNECT_ENABLED` is on lifts the revocation, and connections that are still valid work
+again. To end all connections, switch `APP_CONNECT_ENABLED` off.
 
 ### Logo
 
