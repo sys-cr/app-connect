@@ -6,16 +6,6 @@ Alle nennenswerten Änderungen an diesem Projekt stehen in dieser Datei. Das For
 [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), die Versionen folgen
 [Semantic Versioning](https://semver.org/lang/de/).
 
-## [Unreleased]
-
-### Funktionen
-
-- Stud.IP unter einem Unterpfad (etwa `https://example.org/studip/`) lässt sich verbinden.
-  QR-Code und Verbindungslink tragen den Basispfad mit (`path` im Verbindungslink,
-  Vertrag Abschnitt 3); die Apps erkennen eine Instanz an Server und Pfad. Abgelehnt wird
-  nur noch ein Pfad, der sich nicht in den Link übernehmen lässt. Ältere Apps ignorieren
-  den Pfad und melden „keine Stud.App-Verbindung“ (#6).
-
 ## [1.2.0] – 2026-11-13
 
 Version 1.2.0 setzt die Befunde eines externen Audits von Version 1.1.1 um.
@@ -61,6 +51,12 @@ Version 1.2.0 setzt die Befunde eines externen Audits von Version 1.1.1 um.
     Cache, und fehlt ohne gültiges Bild.
   - Für root zeigt „Stud.App Verbindung“ das Logo, den Zeitpunkt des Abrufs oder den Grund
     der Ablehnung sowie „Logo neu laden“.
+- Stud.IP unter einem Unterpfad (etwa `https://example.org/studip/`) lässt sich verbinden.
+  QR-Code und Verbindungslink tragen den Basispfad mit (`path` im Verbindungslink,
+  Vertrag Abschnitt 3); die Apps erkennen eine Instanz an Server und Pfad. Abgelehnt wird
+  nur ein Pfad, der sich nicht in den Link übernehmen lässt. Dafür braucht es App-Versionen,
+  die den Basispfad kennen; ältere ignorieren ihn und melden „keine
+  Stud.App-Verbindung“ (#6).
 
 ### Änderungen
 
@@ -69,9 +65,6 @@ Version 1.2.0 setzt die Befunde eines externen Audits von Version 1.1.1 um.
   Meldung, Hilfetext und Nutzer-Doku nennen das (#7).
 - Die Spalte „Zuletzt verwendet“ heißt „Zuletzt aktiv“ und zeigt den Tag der letzten
   Token-Erneuerung; der Hilfetext erklärt das (#11).
-- Liegt Stud.IP unter einem Unterpfad (etwa `/studip`), lässt sich die App-Verbindung nicht
-  einschalten, und das Plugin sagt warum. Die Apps erreichen solche Instanzen nicht;
-  Admin-Doku und Vertrag nennen die Voraussetzung (#6).
 
 ### Dokumentation
 
@@ -205,15 +198,6 @@ All notable changes to this project are documented in this file. The format foll
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/).
 
-### [Unreleased]
-
-#### Features
-
-- Stud.IP below a path (such as `https://example.org/studip/`) can be connected. QR code
-  and connect link carry the base path (`path` in the connect link, contract section 3);
-  the apps identify an instance by host and path. Only a path that cannot go into the link
-  is still refused. Older apps ignore the path and report "no Stud.App connection" (#6).
-
 ### [1.2.0] – 2026-11-13
 
 Version 1.2.0 addresses the findings of an external audit of version 1.1.1.
@@ -254,6 +238,11 @@ Version 1.2.0 addresses the findings of an external audit of version 1.1.1.
     is left out without a valid picture.
   - For root, "Stud.App Verbindung" shows the logo, when it was fetched or why it was
     refused, and "Logo neu laden" (fetch the logo again).
+- Stud.IP below a path (such as `https://example.org/studip/`) can be connected. QR code
+  and connect link carry the base path (`path` in the connect link, contract section 3);
+  the apps identify an instance by host and path. Only a path that cannot go into the link
+  is refused. This needs app versions that know the base path; older ones ignore it and
+  report "no Stud.App connection" (#6).
 
 #### Changes
 
@@ -262,9 +251,6 @@ Version 1.2.0 addresses the findings of an external audit of version 1.1.1.
   Confirmation, message, help text and user docs say so (#7).
 - The column "Zuletzt verwendet" is now "Zuletzt aktiv" (last active) and shows the day of
   the last token refresh; the help text explains this (#11).
-- If Stud.IP is installed below a path (such as `/studip`), the app connection cannot be
-  switched on, and the plugin says why. The apps cannot reach such instances; admin docs
-  and contract name the requirement (#6).
 
 #### Documentation
 
