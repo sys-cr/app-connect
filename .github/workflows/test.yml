@@ -52,3 +52,29 @@ jobs:
           tools: composer
           coverage: none
       - run: make test-integration
+
+  # Stud.IP in Docker with the plugin (tests/e2e/run.sh). The core image is
+  # built from the pinned core sources and kept in the cache, keyed by run.sh,
+  # which pins them.
+  e2e:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        studip: ['6.0', '6.3']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: curl
+          tools: composer
+          coverage: none
+      - uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/studip-images
+          key: studip-image-${{ matrix.studip }}-${{ hashFiles('tests/e2e/run.sh') }}
+      - run: make test-e2e STUDIP=${{ matrix.studip }}
+        env:
+          E2E_IMAGE_CACHE: ${{ runner.temp }}/studip-images
