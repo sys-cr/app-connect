@@ -25,6 +25,11 @@ Alle nennenswerten Änderungen an diesem Projekt stehen in dieser Datei. Das For
 - Statt einer Adresse kann root dort eine Bilddatei hochladen (PNG, JPEG oder WebP, gleiche
   Prüfungen). Sie hat Vorrang vor `APP_CONNECT_LOGO_URL`, bis sie entfernt wird.
 
+### Änderungen
+
+- Die Spalte „Zuletzt verwendet“ auf „Stud.App Verbindung“ heißt jetzt „Zuletzt aktiv“. Sie
+  zeigt den Tag der letzten Token-Erneuerung; der Hilfetext erklärt das (#11).
+
 ## [1.1.1] – 2026-11-08
 
 ### Änderungen
@@ -155,6 +160,11 @@ All notable changes to this project are documented in this file. The format foll
   refused, and "Logo neu laden" (fetch the logo again).
 - Instead of an address, root can upload a picture there (PNG, JPEG or WebP, same checks). It
   takes precedence over `APP_CONNECT_LOGO_URL` until it is removed.
+
+#### Changes
+
+- The column "Zuletzt verwendet" on "Stud.App Verbindung" is now called "Zuletzt aktiv" (last
+  active). It shows the day of the last token refresh; the help text explains this (#11).
 
 ### [1.1.1] – 2026-11-08
 

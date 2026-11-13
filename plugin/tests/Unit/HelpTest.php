@@ -15,7 +15,7 @@ final class HelpTest extends TestCase
     public function testEveryPageHasHelp(): void
     {
         self::assertCount(2, Help::texts(Help::GET));
-        self::assertCount(3, Help::texts(Help::CONNECT));
+        self::assertCount(4, Help::texts(Help::CONNECT));
     }
 
     /** Without pairing the connect page does not talk about QR codes. */
