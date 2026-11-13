@@ -32,7 +32,10 @@ final class DeviceService
         ?string $refreshTokenId
     ): DeviceRecord {
         foreach ($this->activeRows($userId, $device->deviceId) as $previous) {
-            $this->revoke($previous);
+            // Same lock order as a refresh: device row first.
+            if ($this->ledger->lockDeviceRow((int) $previous->id, $userId)) {
+                $this->revoke($previous);
+            }
         }
         $now = time();
         $row = new DeviceRecord();
@@ -68,12 +71,35 @@ final class DeviceService
         return $this->connect($userId, $device, self::VIA_BROWSER, $accessTokenId, $refreshTokenId);
     }
 
-    /** Moves the binding of the device holding $oldRefreshTokenId to the new pair. */
-    public function rebind(string $oldRefreshTokenId, string $accessTokenId, ?string $refreshTokenId): void
+    /**
+     * Locks the lineage step of a refresh, inside the refresh's transaction:
+     * first the device row bound to $refreshTokenId (if any), then the
+     * refresh token row. Removal and revocation lock in the same order, so a
+     * refresh either finishes before them or sees their result. Returns the
+     * id of the bound device row, null when the token belongs to no device.
+     *
+     * @throws LineageEnded when the refresh token was revoked meanwhile
+     */
+    public function lockLineage(string $refreshTokenId): ?int
     {
-        $row = DeviceRecord::findOneBySQL('`refresh_token_id` = ? AND `revoked_at` IS NULL', [$oldRefreshTokenId]);
+        $rowId = $this->ledger->lockDeviceRowByRefreshToken($refreshTokenId);
+        if ($this->ledger->lockRefreshTokenIsRevoked($refreshTokenId)) {
+            throw new LineageEnded();
+        }
+        return $rowId;
+    }
+
+    /**
+     * Moves the binding of the locked device row $rowId to the new pair.
+     *
+     * @throws LineageEnded when the row is no longer active, so the new pair
+     *                      must not be handed out
+     */
+    public function rebind(int $rowId, string $accessTokenId, ?string $refreshTokenId): void
+    {
+        $row = DeviceRecord::findOneBySQL('`id` = ? AND `revoked_at` IS NULL', [$rowId]);
         if ($row === null) {
-            return;
+            throw new LineageEnded();
         }
         $row->access_token_id = $accessTokenId;
         $row->refresh_token_id = $refreshTokenId;
@@ -109,14 +135,14 @@ final class DeviceService
      */
     public function revokePair(string $accessTokenId, ?string $refreshTokenId): void
     {
-        $row = DeviceRecord::findOneBySQL(
-            '`revoked_at` IS NULL AND (`access_token_id` = ? OR `refresh_token_id` = ?)',
-            [$accessTokenId, $refreshTokenId ?? '']
-        );
-        if ($row !== null) {
-            $this->revoke($row);
-        }
-        $this->ledger->revokeLineageStep($accessTokenId, $refreshTokenId);
+        $this->locked(function () use ($accessTokenId, $refreshTokenId): void {
+            $rowId = $this->ledger->lockDeviceRowByPair($accessTokenId, $refreshTokenId);
+            $row = $rowId !== null ? DeviceRecord::find($rowId) : null;
+            if ($row !== null) {
+                $this->revoke($row);
+            }
+            $this->ledger->revokeLineageStep($accessTokenId, $refreshTokenId);
+        });
     }
 
     /** @return list<DeviceRecord> active devices, newest first */
@@ -128,12 +154,17 @@ final class DeviceService
     /** Removes one of the user's own devices. False when it is not theirs or already removed. */
     public function remove(string $userId, int $rowId): bool
     {
-        $row = DeviceRecord::findOneBySQL('`id` = ? AND `user_id` = ? AND `revoked_at` IS NULL', [$rowId, $userId]);
-        if ($row === null) {
-            return false;
-        }
-        $this->revoke($row);
-        return true;
+        return $this->locked(function () use ($userId, $rowId): bool {
+            if (!$this->ledger->lockDeviceRow($rowId, $userId)) {
+                return false;
+            }
+            $row = DeviceRecord::find($rowId);
+            if ($row === null) {
+                return false;
+            }
+            $this->revoke($row);
+            return true;
+        });
     }
 
     /**
@@ -172,7 +203,7 @@ final class DeviceService
     {
         $accessTokenId = (string) $row->access_token_id;
         $refreshTokenId = $row->refresh_token_id !== null ? (string) $row->refresh_token_id : null;
-        if ($refreshTokenId !== null && $this->ledger->isRefreshTokenRevoked($refreshTokenId)) {
+        if ($refreshTokenId !== null && $this->ledger->lockRefreshTokenIsRevoked($refreshTokenId)) {
             foreach ($this->unassignedTokens((string) $row->user_id) as $unbound) {
                 $this->ledger->revokeLineageStep($unbound);
             }
@@ -180,6 +211,31 @@ final class DeviceService
         $this->ledger->revokeLineageStep($accessTokenId, $refreshTokenId);
         $row->revoked_at = time();
         $row->store();
+    }
+
+    /**
+     * Runs $work in a transaction, or in the caller's if one is open
+     * already (pairing connects inside its own).
+     *
+     * @template T
+     * @param \Closure(): T $work
+     * @return T
+     */
+    private function locked(\Closure $work): mixed
+    {
+        $db = \DBManager::get();
+        if ($db->inTransaction()) {
+            return $work();
+        }
+        $db->beginTransaction();
+        try {
+            $result = $work();
+            $db->commit();
+            return $result;
+        } catch (\Throwable $exception) {
+            $db->rollBack();
+            throw $exception;
+        }
     }
 
     /** @return list<DeviceRecord> */

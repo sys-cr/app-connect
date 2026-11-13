@@ -10,6 +10,9 @@ Alle nennenswerten Änderungen an diesem Projekt stehen in dieser Datei. Das For
 
 ### Sicherheit
 
+- Erneuern, Entfernen und Widerrufen sperren Gerätezeile und Refresh-Token in fester
+  Reihenfolge. Zwei gleichzeitige Erneuerungen oder eine Erneuerung während des Entfernens
+  konnten bisher eine gültige Token-Familie ohne Gerät hinterlassen (GHSA-mpgv-rh37-3q3h).
 - Der Token-Endpunkt des Kerns lehnt die Erneuerung von Tokens des App-Clients ab; die Apps
   erneuern ohnehin über das Plugin. Eine dort erneuerte Kette konnte „Gerät entfernen“
   entgehen. Ist eine Kette trotzdem gebrochen, beendet das Entfernen alle gültigen
@@ -135,6 +138,9 @@ All notable changes to this project are documented in this file. The format foll
 
 #### Security
 
+- Refresh, removal and revocation lock the device row and the refresh token in a fixed
+  order. Two simultaneous refreshes or a refresh during removal could leave a valid token
+  family without a device (GHSA-mpgv-rh37-3q3h).
 - The core's token endpoint refuses to refresh tokens of the app client; the apps refresh
   through the plugin anyway. A chain refreshed there could escape "remove device". If a
   chain is broken all the same, removal ends every valid sign-in of the person without a

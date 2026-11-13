@@ -24,6 +24,51 @@ final class TokenLedger
         return $id === false || $id === null ? null : (string) $id;
     }
 
+    /**
+     * Locks the active device row bound to $refreshTokenId and returns its
+     * id; null when no active row is bound to it.
+     */
+    public function lockDeviceRowByRefreshToken(string $refreshTokenId): ?int
+    {
+        $id = \DBManager::get()->fetchColumn(
+            'SELECT `id` FROM `app_connect_devices` WHERE `refresh_token_id` = ? AND `revoked_at` IS NULL FOR UPDATE',
+            [$refreshTokenId]
+        );
+        return $id === false || $id === null ? null : (int) $id;
+    }
+
+    /** Locks the active device row bound to the pair and returns its id; null when there is none. */
+    public function lockDeviceRowByPair(string $accessTokenId, ?string $refreshTokenId): ?int
+    {
+        $id = \DBManager::get()->fetchColumn(
+            'SELECT `id` FROM `app_connect_devices`
+              WHERE `revoked_at` IS NULL AND (`access_token_id` = ? OR `refresh_token_id` = ?) FOR UPDATE',
+            [$accessTokenId, $refreshTokenId ?? '']
+        );
+        return $id === false || $id === null ? null : (int) $id;
+    }
+
+    /** Locks the device row $rowId of $userId; false when it is not active or not theirs. */
+    public function lockDeviceRow(int $rowId, string $userId): bool
+    {
+        $id = \DBManager::get()->fetchColumn(
+            'SELECT `id` FROM `app_connect_devices`
+              WHERE `id` = ? AND `user_id` = ? AND `revoked_at` IS NULL FOR UPDATE',
+            [$rowId, $userId]
+        );
+        return $id !== false && $id !== null;
+    }
+
+    /** Locks the refresh token row and tells whether it is revoked (or missing). */
+    public function lockRefreshTokenIsRevoked(string $refreshTokenId): bool
+    {
+        $revoked = \DBManager::get()->fetchColumn(
+            'SELECT `revoked` FROM `oauth2_refresh_tokens` WHERE `id` = ? FOR UPDATE',
+            [$refreshTokenId]
+        );
+        return $revoked === false || (int) $revoked === 1;
+    }
+
     public function isRefreshTokenRevoked(string $refreshTokenId): bool
     {
         $revoked = \DBManager::get()->fetchColumn(

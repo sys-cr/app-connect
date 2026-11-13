@@ -144,6 +144,13 @@ Controller des Kerns geladen). Ist eine Kette trotzdem gebrochen (gebundenes Ref
 widerrufen, Gerät noch aktiv), beendet das Entfernen zusätzlich alle gültigen Anmeldungen
 der Person, die keinem aktiven Gerät gehören: lieber mehr als weniger.
 
+Erneuern, Entfernen und Widerrufen sperren in derselben Reihenfolge: zuerst die Gerätezeile
+(`SELECT … FOR UPDATE`), dann die Zeile des Refresh-Tokens. Der Refresh prüft nach dem
+Sperren den Widerruf erneut; findet er die Gerätezeile beim Umbinden nicht mehr aktiv,
+rollt er zurück und gibt keine Tokens aus (`LineageEnded`). So entsteht weder durch zwei
+gleichzeitige Erneuerungen noch durch Erneuern während des Entfernens eine gültige
+Token-Familie ohne Gerät.
+
 Die Kernseite „Drittanwendungen“ widerruft nur das Access-Token. Eine normale Erneuerung
 widerruft beide; ein widerrufenes Access-Token mit gültigem Refresh-Token bedeutet also
 einen Widerruf im Kern: Der Refresh-Grant des Plugins lehnt das Refresh-Token dann ab,
@@ -298,6 +305,12 @@ client (`CoreRefreshGuard`, loaded as a system plugin before the core's controll
 chain is broken all the same (bound refresh token revoked, device still active), removal
 also ends every valid sign-in of the person that belongs to no active device: more rather
 than fewer.
+
+Refresh, removal and revocation lock in the same order: the device row first (`SELECT …
+FOR UPDATE`), then the refresh token row. The refresh checks the revocation again after
+locking; if the device row is no longer active when it rebinds, it rolls back and hands out
+no tokens (`LineageEnded`). Neither two simultaneous refreshes nor a refresh during removal
+can leave a valid token family without a device.
 
 The core page "Drittanwendungen" revokes only the access token. A normal refresh revokes
 both, so a revoked access token with a valid refresh token means a revocation in the core:

@@ -9,6 +9,7 @@ namespace AppConnect\OAuth2;
 
 use AppConnect\Account\AccountGate;
 use AppConnect\Devices\DeviceService;
+use AppConnect\Devices\LineageEnded;
 use DateInterval;
 use League\OAuth2\Server\Entities\AccessTokenEntityInterface;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
@@ -34,7 +35,8 @@ use Throwable;
  */
 final class LineageRefreshTokenGrant extends RefreshTokenGrant
 {
-    private ?string $oldRefreshTokenId = null;
+    /** The device row locked for this refresh, null when the token belongs to no device. */
+    private ?int $boundRowId = null;
     private ?string $newAccessTokenId = null;
     private ?string $newRefreshTokenId = null;
     private ?string $revokedInCore = null;
@@ -55,11 +57,14 @@ final class LineageRefreshTokenGrant extends RefreshTokenGrant
         $db->beginTransaction();
         try {
             $response = parent::respondToAccessTokenRequest($request, $responseType, $accessTokenTTL);
-            if ($this->oldRefreshTokenId !== null && $this->newAccessTokenId !== null) {
-                $this->devices->rebind($this->oldRefreshTokenId, $this->newAccessTokenId, $this->newRefreshTokenId);
+            if ($this->boundRowId !== null && $this->newAccessTokenId !== null) {
+                $this->devices->rebind($this->boundRowId, $this->newAccessTokenId, $this->newRefreshTokenId);
             }
             $db->commit();
             return $response;
+        } catch (LineageEnded) {
+            $db->rollBack();
+            throw OAuthServerException::invalidRefreshToken('Token has been revoked');
         } catch (Throwable $exception) {
             $db->rollBack();
             if ($this->revokedInCore !== null) {
@@ -85,7 +90,10 @@ final class LineageRefreshTokenGrant extends RefreshTokenGrant
             $this->accountEnded = [(string) $data['access_token_id'], (string) $data['refresh_token_id']];
             throw OAuthServerException::invalidRefreshToken('The account cannot use the app');
         }
-        $this->oldRefreshTokenId = (string) $data['refresh_token_id'];
+        // Locks the device row and the refresh token row, then checks the
+        // refresh token again: a removal or a parallel refresh that came
+        // first has revoked it by now.
+        $this->boundRowId = $this->devices->lockLineage((string) $data['refresh_token_id']);
         return $data;
     }
 
