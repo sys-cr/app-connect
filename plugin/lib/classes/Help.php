@@ -30,7 +30,7 @@ final class Help
             : [
                 Translation::text('Auf dieser Seite sehen Sie, welche Geräte mit der Stud.App auf Ihr Konto zugreifen. Verbunden wird die App über die Anmeldung in der App.'),
             ];
-        $texts[] = Translation::text('Unter „Mit der App verbundene Geräte“ steht jedes Gerät, das Zugang zu Ihrem Konto hat. Entfernen Sie ein Gerät, verliert es den Zugang sofort, etwa wenn es verloren gegangen ist.');
+        $texts[] = Translation::text('Unter „Mit der App verbundene Geräte“ steht jedes Gerät, das Zugang zu Ihrem Konto hat. Entfernen Sie ein Gerät, verliert die App darauf den Zugang sofort, etwa wenn es verloren gegangen ist. Ein Kalender-Abo endet erst, wenn Sie den Kalender-Schlüssel auf der Kalender-Seite von Stud.IP oder in der App zurücksetzen.');
         $texts[] = Translation::text('„Zuletzt aktiv“ ist der Tag, an dem die App ihre Anmeldung zuletzt erneuert hat. Während Sie die App nutzen, geschieht das etwa einmal pro Stunde.');
         return $texts;
     }

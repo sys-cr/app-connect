@@ -30,6 +30,12 @@ Alle nennenswerten Änderungen an diesem Projekt stehen in dieser Datei. Das For
 - Die Spalte „Zuletzt verwendet“ auf „Stud.App Verbindung“ heißt jetzt „Zuletzt aktiv“. Sie
   zeigt den Tag der letzten Token-Erneuerung; der Hilfetext erklärt das (#11).
 
+### Änderungen
+
+- „Gerät entfernen“ sagt jetzt, was endet und was nicht: Die App auf dem Gerät verliert den
+  Zugang; ein Kalender-Abo und eine im Browser geöffnete Sitzung bleiben. Bestätigung,
+  Meldung, Hilfetext und Nutzer-Doku nennen das (#7).
+
 ## [1.1.1] – 2026-11-08
 
 ### Änderungen
@@ -165,6 +171,12 @@ All notable changes to this project are documented in this file. The format foll
 
 - The column "Zuletzt verwendet" on "Stud.App Verbindung" is now called "Zuletzt aktiv" (last
   active). It shows the day of the last token refresh; the help text explains this (#11).
+
+#### Changes
+
+- "Gerät entfernen" (remove device) now says what ends and what does not: the app on the
+  device loses access; a calendar subscription and a session open in the browser stay.
+  Confirmation, message, help text and user docs say so (#7).
 
 ### [1.1.1] – 2026-11-08
 

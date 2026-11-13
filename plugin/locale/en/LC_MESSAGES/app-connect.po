@@ -42,8 +42,8 @@ msgstr "The connection with the app is not switched on at this institution."
 msgid "Sie haben in der letzten Stunde zu viele Codes erzeugt. Bitte versuchen Sie es später noch einmal."
 msgstr "You have created too many codes in the last hour. Please try again later."
 
-msgid "Das Gerät wurde entfernt. Es kann nicht mehr auf Ihr Konto zugreifen."
-msgstr "The device has been removed. It can no longer access your account."
+msgid "Das Gerät wurde entfernt. Die App darauf kann nicht mehr auf Ihr Konto zugreifen. Ein Kalender-Abo endet erst, wenn Sie den Kalender-Schlüssel zurücksetzen."
+msgstr "The device was removed. The app on it can no longer access your account. A calendar subscription ends only when you reset the calendar key."
 
 msgid "Die weiteren Anmeldungen wurden beendet."
 msgstr "The other sign-ins have been ended."
@@ -147,8 +147,8 @@ msgstr "via browser sign-in"
 msgid "Gerät entfernen"
 msgstr "Remove device"
 
-msgid "Das Gerät verliert den Zugang zu Ihrem Konto. Fortfahren?"
-msgstr "The device loses access to your account. Continue?"
+msgid "Die App auf diesem Gerät verliert den Zugang zu Ihrem Konto. Ein Kalender-Abo und eine im Browser geöffnete Stud.IP-Sitzung bleiben bestehen. Fortfahren?"
+msgstr "The app on this device loses access to your account. A calendar subscription and a Stud.IP session open in the browser stay. Continue?"
 
 msgid "Weitere Anmeldungen der App ohne Gerätezuordnung: %u"
 msgstr "Other sign-ins of the app without a device: %u"
@@ -230,8 +230,8 @@ msgstr "The QR code is valid for five minutes and only once. Whoever scans it ge
 msgid "Auf dieser Seite sehen Sie, welche Geräte mit der Stud.App auf Ihr Konto zugreifen. Verbunden wird die App über die Anmeldung in der App."
 msgstr "This page shows which devices access your account with the Stud.App. The app is connected by signing in within the app."
 
-msgid "Unter „Mit der App verbundene Geräte“ steht jedes Gerät, das Zugang zu Ihrem Konto hat. Entfernen Sie ein Gerät, verliert es den Zugang sofort, etwa wenn es verloren gegangen ist."
-msgstr "“Devices connected with the app” lists every device that has access to your account. If you remove a device, for example one that was lost, it loses access at once."
+msgid "Unter „Mit der App verbundene Geräte“ steht jedes Gerät, das Zugang zu Ihrem Konto hat. Entfernen Sie ein Gerät, verliert die App darauf den Zugang sofort, etwa wenn es verloren gegangen ist. Ein Kalender-Abo endet erst, wenn Sie den Kalender-Schlüssel auf der Kalender-Seite von Stud.IP oder in der App zurücksetzen."
+msgstr "“Devices connected with the app” lists every device that has access to your account. If you remove a device, for example one that was lost, the app on it loses access at once. A calendar subscription ends only when you reset the calendar key on the Stud.IP calendar page or in the app."
 
 msgid "app-connect: Aufräumen"
 msgstr "app-connect: cleanup"

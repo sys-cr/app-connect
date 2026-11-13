@@ -80,7 +80,7 @@
                                     Icon::create('trash'),
                                     [
                                         'formaction' => $controller->link_for('connect/remove/' . $device->id),
-                                        'data-confirm' => $_('Das Gerät verliert den Zugang zu Ihrem Konto. Fortfahren?'),
+                                        'data-confirm' => $_('Die App auf diesem Gerät verliert den Zugang zu Ihrem Konto. Ein Kalender-Abo und eine im Browser geöffnete Stud.IP-Sitzung bleiben bestehen. Fortfahren?'),
                                     ]
                                 ) ?>
                             </td>

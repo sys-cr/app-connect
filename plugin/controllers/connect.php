@@ -185,7 +185,7 @@ class ConnectController extends PluginController
     {
         CSRFProtection::verifyUnsafeRequest();
         if ($this->devices->remove($this->userId, (int) $id)) {
-            PageLayout::postSuccess($this->_('Das Gerät wurde entfernt. Es kann nicht mehr auf Ihr Konto zugreifen.'));
+            PageLayout::postSuccess($this->_('Das Gerät wurde entfernt. Die App darauf kann nicht mehr auf Ihr Konto zugreifen. Ein Kalender-Abo endet erst, wenn Sie den Kalender-Schlüssel zurücksetzen.'));
         }
         $this->redirect('connect/index');
     }
