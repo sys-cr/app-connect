@@ -18,6 +18,10 @@ tests on every side.
 | Connect link | "Open in the app" on the landing page | `de.studapp2.open:/connect?host=studip.example.org&p=7K2M9QX4T8WZ3RBN6FJ5HCDV0A` |
 | Connect link without code | address hand-over without pairing | `de.studapp2.open:/connect?host=studip.example.org` |
 
+Only instances at the root path of their host can be connected: the links carry the
+host, and the apps build every address from it. An instance below a path such as
+`/studip` is not supported; the plugin refuses to switch the connection on for one.
+
 The pairing code travels in the URL **fragment** of the landing page, so it never
 reaches server logs, proxies or a `Referer` header. Opening the landing page does
 not consume the code.

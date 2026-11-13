@@ -6,6 +6,14 @@ Alle nennenswerten Änderungen an diesem Projekt stehen in dieser Datei. Das For
 [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), die Versionen folgen
 [Semantic Versioning](https://semver.org/lang/de/).
 
+## [Unreleased]
+
+### Änderungen
+
+- Liegt Stud.IP unter einem Unterpfad (etwa `/studip`), lässt sich die App-Verbindung nicht
+  mehr einschalten, und das Plugin sagt warum. Die Apps erreichen solche Instanzen nicht;
+  Admin-Doku und Vertrag nennen die Voraussetzung (#6).
+
 ## [1.1.1] – 2026-11-08
 
 ### Änderungen
@@ -116,6 +124,14 @@ Erste veröffentlichte Version.
 All notable changes to this project are documented in this file. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/).
+
+### [Unreleased]
+
+#### Changes
+
+- If Stud.IP is installed below a path (such as `/studip`), the app connection can no longer
+  be switched on, and the plugin says why. The apps cannot reach such instances; admin docs
+  and contract name the requirement (#6).
 
 ### [1.1.1] – 2026-11-08
 

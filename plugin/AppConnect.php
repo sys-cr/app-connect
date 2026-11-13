@@ -8,6 +8,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/bootstrap.php';
 
 use AppConnect\Audit\EventLog;
+use AppConnect\Connect\ConnectLink;
 use AppConnect\Devices\DeviceRetention;
 use AppConnect\OAuth2\ClientProvisioner;
 use AppConnect\Privacy\UserDataExport;
@@ -140,6 +141,12 @@ class AppConnect extends StudIPPlugin implements SystemPlugin, JsonApiPlugin, Pr
         if ($field === OperatorConfig::ENABLED) {
             $provisioner = new ClientProvisioner(Runtime::settings());
             if (in_array((string) ($change['new_value'] ?? ''), ['1', 'true'], true)) {
+                if (!ConnectLink::isRootInstallation(Runtime::baseUrl())) {
+                    // Switching back off calls this hook again, which revokes.
+                    Config::get()->store(OperatorConfig::ENABLED, false);
+                    PageLayout::postError($this->_('Die App-Verbindung bleibt aus: Stud.IP liegt unter einem Unterpfad (ABSOLUTE_URI_STUDIP). Die Apps unterstützen bisher nur Installationen im Wurzelpfad eines Servers, etwa https://studip.example.org/.'));
+                    return;
+                }
                 $provisioner->provision(Runtime::baseUrl() . '/');
                 $this->allowRequestsWithoutSession();
             } else {
