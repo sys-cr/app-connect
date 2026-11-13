@@ -1,0 +1,50 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-FileCopyrightText: 2026 Bodo Steffen
+# Additional terms under GPL-3.0 section 7: see SUPPLEMENTAL-TERMS.txt
+#
+# Stud.IP with the plugin from plugin/, for the end-to-end tests. Started
+# through tests/e2e/run.sh, which sets E2E_IMAGE, E2E_PORT and E2E_PLUGIN_DIR.
+# The database lives in memory: every start is a fresh installation. The same
+# installation answers at / and, through an Apache alias, below /studip/.
+
+services:
+    db:
+        image: mariadb:10.11
+        environment:
+            MARIADB_RANDOM_ROOT_PASSWORD: '1'
+            MARIADB_DATABASE: studip
+            MARIADB_USER: studip
+            MARIADB_PASSWORD: app-connect-e2e
+        command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --sql-mode=
+        tmpfs:
+            - /var/lib/mysql
+        healthcheck:
+            test: ['CMD', 'healthcheck.sh', '--connect', '--innodb_initialized']
+            start_period: 120s
+            start_interval: 2s
+            interval: 60s
+
+    web:
+        image: ${E2E_IMAGE:?}
+        depends_on:
+            db:
+                condition: service_healthy
+        ports:
+            - '127.0.0.1:${E2E_PORT:?}:80'
+        environment:
+            MYSQL_HOST: db
+            MYSQL_DATABASE: studip
+            MYSQL_USER: studip
+            MYSQL_PASSWORD: app-connect-e2e
+            E2E_BASE_URL: http://localhost:${E2E_PORT:?}/
+        volumes:
+            - ./studip:/opt/app-connect-e2e:ro
+            - ${E2E_PLUGIN_DIR:?}:/var/www/studip/public/plugins_packages/studapp/AppConnect:ro
+        entrypoint: ['/opt/app-connect-e2e/entrypoint.sh']
+        command: ['apache2-foreground']
+        healthcheck:
+            # The web server starts only after the entrypoint has installed everything.
+            test: ['CMD', 'curl', '-fso', '/dev/null', 'http://localhost/jsonapi.php/v1/app-connect/discovery']
+            start_period: 600s
+            start_interval: 2s
+            interval: 60s
