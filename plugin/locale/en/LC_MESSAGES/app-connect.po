@@ -341,9 +341,6 @@ msgstr "The logo could not be fetched again: %s The apps keep receiving the vers
 msgid "Das Logo (APP_CONNECT_LOGO_URL) wird nicht verwendet: %s"
 msgstr "The logo (APP_CONNECT_LOGO_URL) is not used: %s"
 
-msgid "Löscht abgelaufene Kopplungscodes, Web-Anmeldelinks und Gerätezeilen der App-Anbindung nach Ablauf ihrer Aufbewahrungsfrist."
-msgstr "Deletes expired pairing codes, web sign-in links and device rows of the app connection once their retention period has passed."
-
 msgid "„Zuletzt aktiv“ ist der Tag, an dem die App ihre Anmeldung zuletzt erneuert hat. Während Sie die App nutzen, geschieht das etwa einmal pro Stunde."
 msgstr "“Zuletzt aktiv” (last active) is the day the app last renewed its sign-in. While you use the app, that happens about once an hour."
 

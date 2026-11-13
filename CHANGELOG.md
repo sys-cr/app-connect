@@ -6,84 +6,81 @@ Alle nennenswerten Änderungen an diesem Projekt stehen in dieser Datei. Das For
 [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), die Versionen folgen
 [Semantic Versioning](https://semver.org/lang/de/).
 
-## [Unreleased]
+## [1.2.0] – 2026-11-13
+
+Version 1.2.0 setzt die Befunde eines externen Audits von Version 1.1.1 um.
+
+### Sicherheit
+
+- Kopplung, Erneuerung der Tokens und Anmeldung im Web prüfen das Konto wie die
+  Passwortanmeldung des Kerns. Ein abgelaufenes, gesperrtes oder noch nicht aktiviertes
+  Konto kann kein Gerät verbinden, und ein verbundenes Gerät verliert bei der nächsten
+  Erneuerung den Zugang (GHSA-74w7-wfwq-mqj6).
+- Der Token-Endpunkt des Kerns lehnt die Erneuerung von Tokens des App-Clients ab; die Apps
+  erneuern ohnehin über das Plugin. Eine dort erneuerte Kette konnte „Gerät entfernen“
+  entgehen. Ist eine Kette trotzdem gebrochen, beendet das Entfernen alle gültigen
+  Anmeldungen der Person ohne Gerät, statt Nachfolger über Zeitstempel zu suchen
+  (GHSA-96vf-38vj-xw35).
+- Erneuern, Entfernen und Widerrufen sperren Gerätezeile und Refresh-Token in fester
+  Reihenfolge. Zwei gleichzeitige Erneuerungen oder eine Erneuerung während des Entfernens
+  konnten bisher eine gültige Token-Familie ohne Gerät hinterlassen (GHSA-mpgv-rh37-3q3h).
+- Die Zähler der Grenzen (Kopplung, Widerruf, Kalender-Schlüssel) liegen in der neuen
+  Tabelle `app_connect_counters` und zählen atomar. Im Cache konnten sich gleichzeitige
+  Anfragen gegenseitig überschreiben, sodass die Grenzen nicht griffen
+  (GHSA-h233-jcr9-9x32).
+- Konten mit den Rollen admin und root nutzen die Anmeldung im Web aus der App nur, wenn
+  der neue Schalter `APP_CONNECT_WEB_LOGIN_PRIVILEGED` an ist; ab Werk ist er aus (#8).
+- Ausschalten von `APP_CONNECT_ENABLED` beendet alle Verbindungen endgültig: Alle Geräte
+  gelten als entfernt, alle Tokens der App werden widerrufen. Bisher wurden alte
+  Verbindungen nach dem Wiedereinschalten wieder gültig. Deaktivieren des Plugins pausiert
+  weiterhin nur (#9).
 
 ### Funktionen
 
 - Das Plugin liefert das Logo der Hochschule selbst aus: `GET /jsonapi.php/v1/app-connect/logo`
   ohne Anmeldung, mit `ETag`/`304` und einen Tag cachebar. Die Apps laden das Logo nur vom
-  Server der Instanz; ein Logo auf einem anderen Server erschien bisher nicht. Das Plugin
-  ruft die Adresse aus `APP_CONNECT_LOGO_URL` nach dem Speichern und täglich im Cronjob ab
-  und speichert eine geprüfte Kopie in der neuen Tabelle `app_connect_logo`: nur https,
-  keine internen Netze, höchstens drei Weiterleitungen, PNG, JPEG oder WebP bis 512 KB mit
-  32 bis 2048 Pixeln je Seite; SVG wird abgelehnt. Scheitert ein späterer Abruf, bleibt die
-  letzte gute Kopie.
-- `branding.logoUrl` in der Discovery zeigt auf diese Route, mit einer Version für den
-  Cache, und fehlt ohne gültige Kopie.
-- Für root zeigt „Stud.App Verbindung“ das gespeicherte Logo, den Zeitpunkt des Abrufs oder
-  den Grund der Ablehnung und „Logo neu laden“.
-- Statt einer Adresse kann root dort eine Bilddatei hochladen (PNG, JPEG oder WebP, gleiche
-  Prüfungen). Sie hat Vorrang vor `APP_CONNECT_LOGO_URL`, bis sie entfernt wird.
+  Server der Instanz; ein Logo auf einem anderen Server erschien bisher nicht (#1).
+  - Das Plugin ruft die Adresse aus `APP_CONNECT_LOGO_URL` nach dem Speichern und täglich
+    im Cronjob ab und speichert eine geprüfte Kopie in der neuen Tabelle `app_connect_logo`:
+    nur https, keine internen Netze, höchstens drei Weiterleitungen, PNG, JPEG oder WebP bis
+    512 KB mit 32 bis 2048 Pixeln je Seite; SVG wird abgelehnt. Scheitert ein späterer
+    Abruf, bleibt die letzte gute Kopie.
+  - Statt einer Adresse kann root auf „Stud.App Verbindung“ eine Bilddatei hochladen (gleiche
+    Prüfungen). Sie hat Vorrang vor `APP_CONNECT_LOGO_URL`, bis sie entfernt wird.
+  - `branding.logoUrl` in der Discovery zeigt auf die Route, mit einer Version für den
+    Cache, und fehlt ohne gültiges Bild.
+  - Für root zeigt „Stud.App Verbindung“ das Logo, den Zeitpunkt des Abrufs oder den Grund
+    der Ablehnung sowie „Logo neu laden“.
 
 ### Änderungen
 
-- Die Spalte „Zuletzt verwendet“ auf „Stud.App Verbindung“ heißt jetzt „Zuletzt aktiv“. Sie
-  zeigt den Tag der letzten Token-Erneuerung; der Hilfetext erklärt das (#11).
-
-### Änderungen
-
-- „Gerät entfernen“ sagt jetzt, was endet und was nicht: Die App auf dem Gerät verliert den
+- „Gerät entfernen“ sagt, was endet und was nicht: Die App auf dem Gerät verliert den
   Zugang; ein Kalender-Abo und eine im Browser geöffnete Sitzung bleiben. Bestätigung,
   Meldung, Hilfetext und Nutzer-Doku nennen das (#7).
+- Die Spalte „Zuletzt verwendet“ heißt „Zuletzt aktiv“ und zeigt den Tag der letzten
+  Token-Erneuerung; der Hilfetext erklärt das (#11).
+- Liegt Stud.IP unter einem Unterpfad (etwa `/studip`), lässt sich die App-Verbindung nicht
+  einschalten, und das Plugin sagt warum. Die Apps erreichen solche Instanzen nicht;
+  Admin-Doku und Vertrag nennen die Voraussetzung (#6).
 
 ### Dokumentation
 
 - Die Admin-Doku sagt, dass die Funktionsschalter steuern, was die App anbietet, und keine
   Berechtigungen sind; serverseitig gesperrt werden nur die Routen des Plugins (#10).
 
-### Änderungen
-
-- Liegt Stud.IP unter einem Unterpfad (etwa `/studip`), lässt sich die App-Verbindung nicht
-  mehr einschalten, und das Plugin sagt warum. Die Apps erreichen solche Instanzen nicht;
-  Admin-Doku und Vertrag nennen die Voraussetzung (#6).
-
-### Änderungen
-
-- Ausschalten von `APP_CONNECT_ENABLED` beendet alle Verbindungen endgültig: Alle Geräte
-  gelten als entfernt, alle Tokens der App werden widerrufen. Bisher wurden alte
-  Verbindungen nach dem Wiedereinschalten wieder gültig. Deaktivieren des Plugins pausiert
-  weiterhin nur (#9).
-
-### Änderungen
-
-- Konten mit den Rollen admin und root nutzen die Anmeldung im Web aus der App nur noch,
-  wenn der neue Schalter `APP_CONNECT_WEB_LOGIN_PRIVILEGED` an ist; ab Werk ist er aus
-  (Migration 016) (#8).
-
 ### Entwicklung
 
-- Integrationstests gegen MariaDB (`make test-integration`): Kopplungscode und Web-Ticket
-  lassen sich auch bei zehn gleichzeitigen Anfragen nur einmal einlösen, dazu die Abfragen
-  auf den OAuth2-Tabellen. GitHub Actions prüft jede Änderung mit PHP 8.1 bis 8.3 (#12).
+- Integrationstests gegen MariaDB (`make test-integration`), unter anderem für das
+  einmalige Einlösen von Kopplungscode und Web-Ticket bei gleichzeitigen Anfragen. GitHub
+  Actions prüft jede Änderung mit PHP 8.1 bis 8.3 (#12).
 
-### Sicherheit
+### Hinweise zum Update
 
-- Die Zähler der Grenzen (Kopplung, Widerruf, Kalender-Schlüssel) liegen in der neuen
-  Tabelle `app_connect_counters` (Migration 017) und zählen atomar. Im Cache konnten sich
-  gleichzeitige Anfragen gegenseitig überschreiben, sodass die Grenzen nicht griffen
-  (GHSA-h233-jcr9-9x32).
-- Erneuern, Entfernen und Widerrufen sperren Gerätezeile und Refresh-Token in fester
-  Reihenfolge. Zwei gleichzeitige Erneuerungen oder eine Erneuerung während des Entfernens
-  konnten bisher eine gültige Token-Familie ohne Gerät hinterlassen (GHSA-mpgv-rh37-3q3h).
-- Der Token-Endpunkt des Kerns lehnt die Erneuerung von Tokens des App-Clients ab; die Apps
-  erneuern ohnehin über das Plugin. Eine dort erneuerte Kette konnte „Gerät entfernen“
-  entgehen. Ist eine Kette trotzdem gebrochen, beendet das Entfernen alle gültigen
-  Anmeldungen der Person ohne Gerät, statt Nachfolger über Zeitstempel zu suchen
-  (GHSA-96vf-38vj-xw35).
-- Kopplung und Erneuerung der Tokens prüfen das Konto wie die Passwortanmeldung des Kerns.
-  Ein abgelaufenes, gesperrtes oder noch nicht aktiviertes Konto kann kein Gerät verbinden,
-  und ein verbundenes Gerät verliert bei der nächsten Erneuerung den Zugang
-  (GHSA-74w7-wfwq-mqj6).
+- Drei Migrationen: `015` (Logo), `016` (Schalter für admin und root), `017` (Zähler).
+- Nach dem Update gelten die Zähler der Grenzen neu; die Werte im Cache werden nicht mehr
+  gelesen.
+- admin- und root-Konten öffnen Stud.IP-Seiten aus der App erst wieder ohne Anmeldung,
+  wenn ihr `APP_CONNECT_WEB_LOGIN_PRIVILEGED` einschaltet.
 
 ## [1.1.1] – 2026-11-08
 
@@ -198,78 +195,76 @@ All notable changes to this project are documented in this file. The format foll
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/).
 
-### [Unreleased]
+### [1.2.0] – 2026-11-13
+
+Version 1.2.0 addresses the findings of an external audit of version 1.1.1.
+
+#### Security
+
+- Pairing, token refresh and the web login check the account like the core's password
+  login. An expired, locked or not yet activated account cannot connect a device, and a
+  connected device loses access at its next refresh (GHSA-74w7-wfwq-mqj6).
+- The core's token endpoint refuses to refresh tokens of the app client; the apps refresh
+  through the plugin anyway. A chain refreshed there could escape "remove device". If a
+  chain is broken all the same, removal ends every valid sign-in of the person without a
+  device instead of looking for successors by time stamp (GHSA-96vf-38vj-xw35).
+- Refresh, removal and revocation lock the device row and the refresh token in a fixed
+  order. Two simultaneous refreshes or a refresh during removal could leave a valid token
+  family without a device (GHSA-mpgv-rh37-3q3h).
+- The limit counters (pairing, revocation, calendar key) live in the new table
+  `app_connect_counters` and count atomically. In the cache, concurrent requests could
+  overwrite each other, so the limits did not hold (GHSA-h233-jcr9-9x32).
+- Accounts with the roles admin and root use the web login from the app only when the new
+  switch `APP_CONNECT_WEB_LOGIN_PRIVILEGED` is on; it is off by default (#8).
+- Switching `APP_CONNECT_ENABLED` off ends every connection for good: all devices count as
+  removed and all tokens of the app are revoked. So far, old connections became valid again
+  after switching on. Disabling the plugin still only pauses (#9).
 
 #### Features
 
 - The plugin serves the institution logo itself: `GET /jsonapi.php/v1/app-connect/logo`
   without sign-in, with `ETag`/`304` and cacheable for a day. The apps load the logo only
-  from the instance's server; a logo on another server did not show so far. The plugin
-  fetches the address in `APP_CONNECT_LOGO_URL` after it is saved and daily in the cronjob
-  and keeps a checked copy in the new table `app_connect_logo`: https only, no internal
-  networks, at most three redirects, PNG, JPEG or WebP up to 512 KB with 32 to 2048 pixels
-  per side; SVG is refused. If a later fetch fails, the last good copy stays.
-- `branding.logoUrl` in the discovery points to this route, with a version for caches, and
-  is left out without a valid copy.
-- For root, "Stud.App connection" shows the stored logo, when it was fetched or why it was
-  refused, and "Logo neu laden" (fetch the logo again).
-- Instead of an address, root can upload a picture there (PNG, JPEG or WebP, same checks). It
-  takes precedence over `APP_CONNECT_LOGO_URL` until it is removed.
+  from the instance's server; a logo on another server did not show so far (#1).
+  - The plugin fetches the address in `APP_CONNECT_LOGO_URL` after it is saved and daily in
+    the cronjob and keeps a checked copy in the new table `app_connect_logo`: https only, no
+    internal networks, at most three redirects, PNG, JPEG or WebP up to 512 KB with 32 to
+    2048 pixels per side; SVG is refused. If a later fetch fails, the last good copy stays.
+  - Instead of an address, root can upload a picture on "Stud.App Verbindung" (same checks).
+    It takes precedence over `APP_CONNECT_LOGO_URL` until it is removed.
+  - `branding.logoUrl` in the discovery points to the route, with a version for caches, and
+    is left out without a valid picture.
+  - For root, "Stud.App Verbindung" shows the logo, when it was fetched or why it was
+    refused, and "Logo neu laden" (fetch the logo again).
 
 #### Changes
 
-- The column "Zuletzt verwendet" on "Stud.App Verbindung" is now called "Zuletzt aktiv" (last
-  active). It shows the day of the last token refresh; the help text explains this (#11).
-
-#### Changes
-
-- "Gerät entfernen" (remove device) now says what ends and what does not: the app on the
+- "Gerät entfernen" (remove device) says what ends and what does not: the app on the
   device loses access; a calendar subscription and a session open in the browser stay.
   Confirmation, message, help text and user docs say so (#7).
+- The column "Zuletzt verwendet" is now "Zuletzt aktiv" (last active) and shows the day of
+  the last token refresh; the help text explains this (#11).
+- If Stud.IP is installed below a path (such as `/studip`), the app connection cannot be
+  switched on, and the plugin says why. The apps cannot reach such instances; admin docs
+  and contract name the requirement (#6).
 
 #### Documentation
 
 - The admin docs say that the feature switches control what the app offers and are not
   permissions; only the plugin's own routes are blocked on the server (#10).
 
-#### Changes
-
-- If Stud.IP is installed below a path (such as `/studip`), the app connection can no longer
-  be switched on, and the plugin says why. The apps cannot reach such instances; admin docs
-  and contract name the requirement (#6).
-
-#### Changes
-
-- Switching `APP_CONNECT_ENABLED` off ends every connection for good: all devices count as
-  removed and all tokens of the app are revoked. So far, old connections became valid again
-  after switching on. Disabling the plugin still only pauses (#9).
-
-#### Changes
-
-- Accounts with the roles admin and root use the web login from the app only when the new
-  switch `APP_CONNECT_WEB_LOGIN_PRIVILEGED` is on; it is off by default (migration 016) (#8).
-
 #### Development
 
-- Integration tests against MariaDB (`make test-integration`): pairing code and web ticket
-  can be redeemed only once even with ten concurrent requests, plus the queries on the
-  OAuth2 tables. GitHub Actions checks every change with PHP 8.1 to 8.3 (#12).
+- Integration tests against MariaDB (`make test-integration`), among them the one-time
+  redemption of pairing code and web ticket under concurrent requests. GitHub Actions
+  checks every change with PHP 8.1 to 8.3 (#12).
 
-#### Security
+#### Upgrade notes
 
-- The limit counters (pairing, revocation, calendar key) live in the new table
-  `app_connect_counters` (migration 017) and count atomically. In the cache, concurrent
-  requests could overwrite each other, so the limits did not hold (GHSA-h233-jcr9-9x32).
-- Refresh, removal and revocation lock the device row and the refresh token in a fixed
-  order. Two simultaneous refreshes or a refresh during removal could leave a valid token
-  family without a device (GHSA-mpgv-rh37-3q3h).
-- The core's token endpoint refuses to refresh tokens of the app client; the apps refresh
-  through the plugin anyway. A chain refreshed there could escape "remove device". If a
-  chain is broken all the same, removal ends every valid sign-in of the person without a
-  device instead of looking for successors by time stamp (GHSA-96vf-38vj-xw35).
-- Pairing and token refresh check the account like the core's password login. An expired,
-  locked or not yet activated account cannot connect a device, and a connected device loses
-  access at its next refresh (GHSA-74w7-wfwq-mqj6).
+- Three migrations: `015` (logo), `016` (switch for admin and root), `017` (counters).
+- After the update the limit counters start over; the values in the cache are no longer
+  read.
+- admin and root accounts open Stud.IP pages from the app without signing in again only
+  once you switch `APP_CONNECT_WEB_LOGIN_PRIVILEGED` on.
 
 ### [1.1.1] – 2026-11-08
 
