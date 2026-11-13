@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace AppConnect\WebLogin;
 
+use AppConnect\Account\AccountGate;
 use AppConnect\Devices\DeviceRecord;
 use AppConnect\Devices\TokenLedger;
 use AppConnect\Runtime;
@@ -27,16 +28,13 @@ final class WebSignIn
      */
     public static function isAllowed(\User $user): bool
     {
-        if ($user->id === 'nobody' || (string) $user->username === '' || $user->locked || $user->isExpired()) {
+        if (!AccountGate::mayUseApp($user)) {
             return false;
         }
         if (!self::roleMayUseWebLogin(
             (string) $user->perms,
             (bool) \Config::get()->getValue(OperatorConfig::WEB_LOGIN_PRIVILEGED)
         )) {
-            return false;
-        }
-        if ((string) $user->validation_key !== '') {
             return false;
         }
         $checkIpRange = (!empty($GLOBALS['ENABLE_ADMIN_IP_CHECK']) && $user->perms === 'admin')

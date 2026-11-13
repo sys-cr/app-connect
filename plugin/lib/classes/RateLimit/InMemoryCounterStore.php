@@ -18,8 +18,8 @@ final class InMemoryCounterStore implements CounterStore
         return $this->values[$key] ?? 0;
     }
 
-    public function write(string $key, int $value, int $ttlSeconds): void
+    public function increment(string $key, int $ttlSeconds): int
     {
-        $this->values[$key] = $value;
+        return $this->values[$key] = ($this->values[$key] ?? 0) + 1;
     }
 }

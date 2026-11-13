@@ -28,7 +28,7 @@ Komponenten in `plugin/lib/classes/`:
 | `WebLogin` | einmalige Tickets für die Anmeldung im Web, Prüfung von `return_to`, die Anmeldung wie im Kern-Login |
 | `Calendar` | der Kalender der Person in den Ressourcen der Kern-Route `users/{id}/events` mit Kursfarben (`UserEvents`); Abo-Adresse des Kalender-Schlüssels (`IcalSubscription`), neue Schlüssel und ihre Grenze (`IcalKey`, `IcalKeyLimit`) |
 | `Places`, `Profile` | Orte von Terminen mit Koordinaten, die Profilsprache |
-| `RateLimit`, `Audit`, `Mail` | Grenzen je Adresse und für die Instanz (`Limits`; Adressen als HMAC mit dem Schlüssel der Installation), Aktionen des Ereignisprotokolls, die Verbindungsmail |
+| `RateLimit`, `Audit`, `Mail` | Grenzen je Adresse und für die Instanz (`Limits`; Adressen als HMAC mit dem Schlüssel der Installation; atomare Zähler in `app_connect_counters`, `DatabaseCounterStore`), Aktionen des Ereignisprotokolls, die Verbindungsmail |
 | `Routes` | schlanke JSON:API-Controller der Routen unten; `AppToken` lässt nur das Token des App-Clients zu |
 | `Help` | kurze Hilfetexte für die Hilfelasche von `connect` und `get` |
 | `ContentBox` | Stil der h2-Überschriften in den Inhaltskästen, mit den Werten des Kerns |
@@ -150,18 +150,24 @@ benutzten oder abgelaufenen Code, `429 slow_down` nach zu vielen Fehlversuchen.
 Es gibt einen OAuth2-Client für alle Installationen. Ein Gerät ist an die Kette seiner
 Tokens gebunden: Jede Erneuerung über den Endpunkt des Plugins verschiebt die Bindung auf
 das neue Refresh-Token (`LineageRefreshTokenGrant`). Entfernen widerruft die gebundenen
-Tokens; eine Erneuerung am Endpunkt des Kerns unterbricht die Kette, deshalb folgt das
-Entfernen auch den Nachfolgern, die beim Rotieren jedes Tokens ausgestellt wurden
-(höchstens 50 Schritte). Der Zeitabgleich nutzt das `chdate` des Access-Tokens, weil
-Refresh-Tokens kein Änderungsdatum haben; beim Widerruf bleibt das `chdate` eines Tokens,
-das der Kern schon widerrufen hat, erhalten, und die Nachfolger werden ermittelt, bevor das
-gebundene Token widerrufen wird.
+Tokens. Eine Erneuerung am Token-Endpunkt des Kerns würde die Kette unterbrechen; das
+Plugin lehnt sie für den App-Client deshalb ab (`CoreRefreshGuard`, als Systemplugin vor dem
+Controller des Kerns geladen). Ist eine Kette trotzdem gebrochen (gebundenes Refresh-Token
+widerrufen, Gerät noch aktiv), beendet das Entfernen zusätzlich alle gültigen Anmeldungen
+der Person, die keinem aktiven Gerät gehören: lieber mehr als weniger.
+
+Erneuern, Entfernen und Widerrufen sperren in derselben Reihenfolge: zuerst die Gerätezeile
+(`SELECT … FOR UPDATE`), dann die Zeile des Refresh-Tokens. Der Refresh prüft nach dem
+Sperren den Widerruf erneut; findet er die Gerätezeile beim Umbinden nicht mehr aktiv,
+rollt er zurück und gibt keine Tokens aus (`LineageEnded`). So entsteht weder durch zwei
+gleichzeitige Erneuerungen noch durch Erneuern während des Entfernens eine gültige
+Token-Familie ohne Gerät.
 
 Die Kernseite „Drittanwendungen“ widerruft nur das Access-Token. Eine normale Erneuerung
 widerruft beide; ein widerrufenes Access-Token mit gültigem Refresh-Token bedeutet also
 einen Widerruf im Kern: Der Refresh-Grant des Plugins lehnt das Refresh-Token dann ab,
-widerruft es und markiert das Gerät als entfernt. Der Token-Endpunkt des Kerns kennt diese
-Regel nicht; die Apps nutzen den Endpunkt des Plugins aus der Discovery.
+widerruft es und markiert das Gerät als entfernt. Am Token-Endpunkt des Kerns erneuert der
+App-Client nicht (siehe oben); die Apps nutzen den Endpunkt des Plugins aus der Discovery.
 
 Der Widerrufs-Endpunkt (`app-connect/revoke`) beendet ein Paar wie das Entfernen auf
 „Stud.App Verbindung“: Ist ein Gerät an das Paar gebunden, wird es mit allen Nachfolgern
@@ -197,7 +203,7 @@ Components in `plugin/lib/classes/`:
 | `WebLogin` | one-time tickets for the web login, `return_to` checks, the sign-in like the core login |
 | `Calendar` | the person's calendar in the shapes of the core route `users/{id}/events`, with course colours (`UserEvents`); the subscription address of the calendar key (`IcalSubscription`), new keys and their limit (`IcalKey`, `IcalKeyLimit`) |
 | `Places`, `Profile` | places of course dates with coordinates, the profile language |
-| `RateLimit`, `Audit`, `Mail` | limits per address and for the instance (`Limits`; addresses as an HMAC with the installation's key), event log actions, the connection mail |
+| `RateLimit`, `Audit`, `Mail` | limits per address and for the instance (`Limits`; addresses as an HMAC with the installation's key; atomic counters in `app_connect_counters`, `DatabaseCounterStore`), event log actions, the connection mail |
 | `Routes` | thin JSON:API controllers of the routes below; `AppToken` admits only the app client's token |
 | `Help` | short help texts for the help bar of `connect` and `get` |
 | `ContentBox` | style of the h2 headings in the content boxes, with the core's values |
@@ -317,18 +323,24 @@ expired code, `429 slow_down` after too many failures.
 
 There is one OAuth2 client for all installations. A device is bound to the lineage of its
 tokens: every refresh through the plugin's endpoint moves the binding to the new refresh
-token (`LineageRefreshTokenGrant`). Removing a device revokes the bound tokens; a refresh
-done at the core endpoint breaks the chain, so removal also follows the successors issued
-when each token was rotated (at most 50 steps). The time match uses the access token's
-`chdate`, because refresh tokens have no change date; revoking keeps the `chdate` of a
-token the core revoked already, and successors are looked up before the bound token is
-revoked.
+token (`LineageRefreshTokenGrant`). Removing a device revokes the bound tokens. A refresh
+at the core's token endpoint would break the chain, so the plugin refuses it for the app
+client (`CoreRefreshGuard`, loaded as a system plugin before the core's controller). If a
+chain is broken all the same (bound refresh token revoked, device still active), removal
+also ends every valid sign-in of the person that belongs to no active device: more rather
+than fewer.
+
+Refresh, removal and revocation lock in the same order: the device row first (`SELECT …
+FOR UPDATE`), then the refresh token row. The refresh checks the revocation again after
+locking; if the device row is no longer active when it rebinds, it rolls back and hands out
+no tokens (`LineageEnded`). Neither two simultaneous refreshes nor a refresh during removal
+can leave a valid token family without a device.
 
 The core page "Drittanwendungen" revokes only the access token. A normal refresh revokes
 both, so a revoked access token with a valid refresh token means a revocation in the core:
 the plugin's refresh grant then refuses the refresh token, revokes it and marks the device
-as removed. The core token endpoint does not know this rule; the apps use the plugin's
-endpoint from the discovery.
+as removed. The app client does not refresh at the core token endpoint (see above); the
+apps use the plugin's endpoint from the discovery.
 
 The revocation endpoint (`app-connect/revoke`) ends a pair as removing it on "Stud.App
 connection" does: a device bound to the pair is removed with all successors; the named pair

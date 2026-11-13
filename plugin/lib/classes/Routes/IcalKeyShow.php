@@ -11,7 +11,7 @@ use AppConnect\Audit\EventLog;
 use AppConnect\Calendar\IcalKey;
 use AppConnect\Calendar\IcalKeyLimit;
 use AppConnect\Calendar\IcalSubscription;
-use AppConnect\RateLimit\StudipCacheCounterStore;
+use AppConnect\RateLimit\DatabaseCounterStore;
 use AppConnect\Runtime;
 use AppConnect\Settings\Settings;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -60,7 +60,7 @@ final class IcalKeyShow extends \JsonApi\NonJsonApiController
 
         $key = \IcalExport::getKeyByUser($userId);
         if (!IcalSubscription::isValidKey($key)) {
-            $limit = new IcalKeyLimit(new StudipCacheCounterStore());
+            $limit = new IcalKeyLimit(new DatabaseCounterStore());
             if (!$limit->allows($userId)) {
                 return JsonErrors::write($response, 429, 'app-connect-too-many-requests', 'Too many new calendar keys, try again later')
                     ->withHeader('Retry-After', (string) $limit->retryAfter());

@@ -9,6 +9,7 @@ require_once __DIR__ . '/../bootstrap.php';
 
 use AppConnect\Devices\DeviceRetention;
 use AppConnect\Pairing\PairingService;
+use AppConnect\RateLimit\DatabaseCounterStore;
 use AppConnect\Runtime;
 use AppConnect\Translation;
 use AppConnect\WebLogin\DatabaseTicketStore;
@@ -42,6 +43,7 @@ class AppConnectCleanupJob extends CronJob
     {
         (new PairingService())->purge();
         (new WebLoginService(new DatabaseTicketStore()))->purge();
+        DatabaseCounterStore::purge(time());
         $removed = (new DeviceRetention())->purge(time());
         $logo = Runtime::logo()->refresh(Runtime::configuredLogoUrl());
         $logoState = match (true) {

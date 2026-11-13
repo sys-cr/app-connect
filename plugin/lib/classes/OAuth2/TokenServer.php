@@ -14,7 +14,7 @@ use AppConnect\Mail\ConnectedMail;
 use AppConnect\Pairing\PairingService;
 use AppConnect\RateLimit\Limits;
 use AppConnect\RateLimit\RateLimiter;
-use AppConnect\RateLimit\StudipCacheCounterStore;
+use AppConnect\RateLimit\DatabaseCounterStore;
 use AppConnect\Settings\Settings;
 use DateInterval;
 use League\OAuth2\Server\AuthorizationServer;
@@ -45,7 +45,7 @@ final class TokenServer
                 $settings,
                 new PairingService(),
                 $devices,
-                new RateLimiter(new StudipCacheCounterStore(), Limits::pairingFailures(), $settings->rateLimitKey()),
+                new RateLimiter(new DatabaseCounterStore(), Limits::pairingFailures(), $settings->rateLimitKey()),
                 $clientAddress,
                 static function (string $userId, DeviceRecord $device): void {
                     ConnectedMail::send($userId, $device);

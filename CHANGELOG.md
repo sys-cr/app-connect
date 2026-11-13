@@ -66,6 +66,25 @@ Alle nennenswerten Änderungen an diesem Projekt stehen in dieser Datei. Das For
   lassen sich auch bei zehn gleichzeitigen Anfragen nur einmal einlösen, dazu die Abfragen
   auf den OAuth2-Tabellen. GitHub Actions prüft jede Änderung mit PHP 8.1 bis 8.3 (#12).
 
+### Sicherheit
+
+- Die Zähler der Grenzen (Kopplung, Widerruf, Kalender-Schlüssel) liegen in der neuen
+  Tabelle `app_connect_counters` (Migration 017) und zählen atomar. Im Cache konnten sich
+  gleichzeitige Anfragen gegenseitig überschreiben, sodass die Grenzen nicht griffen
+  (GHSA-h233-jcr9-9x32).
+- Erneuern, Entfernen und Widerrufen sperren Gerätezeile und Refresh-Token in fester
+  Reihenfolge. Zwei gleichzeitige Erneuerungen oder eine Erneuerung während des Entfernens
+  konnten bisher eine gültige Token-Familie ohne Gerät hinterlassen (GHSA-mpgv-rh37-3q3h).
+- Der Token-Endpunkt des Kerns lehnt die Erneuerung von Tokens des App-Clients ab; die Apps
+  erneuern ohnehin über das Plugin. Eine dort erneuerte Kette konnte „Gerät entfernen“
+  entgehen. Ist eine Kette trotzdem gebrochen, beendet das Entfernen alle gültigen
+  Anmeldungen der Person ohne Gerät, statt Nachfolger über Zeitstempel zu suchen
+  (GHSA-96vf-38vj-xw35).
+- Kopplung und Erneuerung der Tokens prüfen das Konto wie die Passwortanmeldung des Kerns.
+  Ein abgelaufenes, gesperrtes oder noch nicht aktiviertes Konto kann kein Gerät verbinden,
+  und ein verbundenes Gerät verliert bei der nächsten Erneuerung den Zugang
+  (GHSA-74w7-wfwq-mqj6).
+
 ## [1.1.1] – 2026-11-08
 
 ### Änderungen
@@ -235,6 +254,22 @@ All notable changes to this project are documented in this file. The format foll
 - Integration tests against MariaDB (`make test-integration`): pairing code and web ticket
   can be redeemed only once even with ten concurrent requests, plus the queries on the
   OAuth2 tables. GitHub Actions checks every change with PHP 8.1 to 8.3 (#12).
+
+#### Security
+
+- The limit counters (pairing, revocation, calendar key) live in the new table
+  `app_connect_counters` (migration 017) and count atomically. In the cache, concurrent
+  requests could overwrite each other, so the limits did not hold (GHSA-h233-jcr9-9x32).
+- Refresh, removal and revocation lock the device row and the refresh token in a fixed
+  order. Two simultaneous refreshes or a refresh during removal could leave a valid token
+  family without a device (GHSA-mpgv-rh37-3q3h).
+- The core's token endpoint refuses to refresh tokens of the app client; the apps refresh
+  through the plugin anyway. A chain refreshed there could escape "remove device". If a
+  chain is broken all the same, removal ends every valid sign-in of the person without a
+  device instead of looking for successors by time stamp (GHSA-96vf-38vj-xw35).
+- Pairing and token refresh check the account like the core's password login. An expired,
+  locked or not yet activated account cannot connect a device, and a connected device loses
+  access at its next refresh (GHSA-74w7-wfwq-mqj6).
 
 ### [1.1.1] – 2026-11-08
 

@@ -14,7 +14,7 @@ use AppConnect\OAuth2\RevocableToken;
 use AppConnect\OAuth2\TokenRevocation;
 use AppConnect\RateLimit\Limits;
 use AppConnect\RateLimit\RateLimiter;
-use AppConnect\RateLimit\StudipCacheCounterStore;
+use AppConnect\RateLimit\DatabaseCounterStore;
 use AppConnect\Runtime;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -38,7 +38,7 @@ final class TokenRevocationCreate extends \JsonApi\NonJsonApiController
         $limits = Limits::revocations();
         $revocation = new TokenRevocation(
             $clientId,
-            new RateLimiter(new StudipCacheCounterStore(), $limits, $settings->rateLimitKey()),
+            new RateLimiter(new DatabaseCounterStore(), $limits, $settings->rateLimitKey()),
             $limits->perAddressWindow,
             static fn (string $token): ?RevocableToken
                 => RefreshTokenCipher::inspector($clientId)?->identify($token),

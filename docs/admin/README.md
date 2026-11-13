@@ -153,6 +153,12 @@ die App nicht installiert ist.
 Fehlgeschlagene Kopplungsversuche sind auf 10 je Adresse in 10 Minuten und 100 je Minute
 insgesamt begrenzt.
 
+Kopplung, Erneuerung der Tokens und Anmeldung im Web prüfen das Konto wie die
+Passwortanmeldung des Kerns: nicht gesperrt, nicht abgelaufen, E-Mail-Adresse bestätigt,
+Status ab `autor`. Ein gesperrtes oder abgelaufenes Konto kann kein Gerät verbinden; ein
+schon verbundenes Gerät verliert den Zugang bei der nächsten Erneuerung, spätestens nach
+einer Stunde, und gilt dann als entfernt.
+
 ## Anmeldung im Web aus der App
 
 Öffnet eine App eine Seite der Weboberfläche (Eintragen in eine Veranstaltung, Courseware,
@@ -258,13 +264,15 @@ Ereignisprotokolls.
 | Kopplungscodes | `app_connect_pairing_codes` | SHA-256-Hash, Person, Geräte-ID, Zeitpunkte |
 | Geräte | `app_connect_devices` | in der App gewählter Gerätename, Plattform, Art der Verbindung, IDs der OAuth2-Tokens (nicht die Tokens), Zeitpunkte |
 | Links für die Anmeldung im Web | `app_connect_web_login_tickets` | SHA-256-Hash, Person, zu öffnende Seite, Verweis auf Token und Gerät, Zeitpunkte |
-| Kalender-Schlüssel | Konfiguration der Person (Kern, `IcalExport`) | wie vom Kern verwaltet; das Plugin legt ihn an oder löscht ihn, ein Zähler der neuen Schlüssel liegt eine Stunde im Cache |
+| Kalender-Schlüssel | Konfiguration der Person (Kern, `IcalExport`) | wie vom Kern verwaltet; das Plugin legt ihn an oder löscht ihn, ein Zähler der neuen Schlüssel liegt eine Stunde in `app_connect_counters` |
 | Logo | `app_connect_logo` | eine Zeile: Adresse oder Kennung `upload`, Bild (PNG, JPEG oder WebP, höchstens 512 KB), SHA-256, Zeitpunkte von Abruf oder Hochladen und letztem Versuch, Grund einer Ablehnung; keine Personendaten. Gelöscht, wenn `APP_CONNECT_LOGO_URL` geleert und kein Logo hochgeladen ist, wenn root das hochgeladene Logo entfernt oder wenn das Plugin deinstalliert wird |
 | Einstellungen | `config` (Sektion „Stud.App“), `app_connect_settings` | eure Einstellungen, Client-ID, gespeicherte Adresse, zufälliger Schlüssel für die Zähler der Grenzen |
-| Fehlversuche beim Koppeln | Stud.IP-Cache | Zähler je Adresse, 10 Minuten |
-| Widerrufe von Tokens | Stud.IP-Cache | Zähler je Adresse, 10 Minuten |
+| Fehlversuche beim Koppeln | `app_connect_counters` | Zähler je Adresse, 10 Minuten |
+| Widerrufe von Tokens | `app_connect_counters` | Zähler je Adresse, 10 Minuten |
 
-Die Zähler im Cache enthalten keine IP-Adressen. Statt der Adresse steht dort ein HMAC-SHA256
+Die Zähler liegen in der Datenbank, damit gleichzeitige Anfragen alle gezählt werden und
+alle Webserver dieselben Werte sehen; der Aufräum-Cronjob löscht abgelaufene. Sie enthalten
+keine IP-Adressen. Statt der Adresse steht dort ein HMAC-SHA256
 mit dem Schlüssel der Installation, gekürzt auf 128 Bit; ohne diesen Schlüssel lässt sich
 die Adresse auch durch Ausprobieren aller IPv4-Adressen nicht zurückgewinnen. Der Schlüssel
 entsteht bei der ersten Anfrage und liegt nur in `app_connect_settings`.
@@ -502,6 +510,11 @@ installed.
 Failed pairing attempts are limited to 10 per address in 10 minutes and 100 per minute
 overall.
 
+Pairing, token refresh and the web login check the account like the core's password login:
+not locked, not expired, e-mail address confirmed, status `autor` or higher. A locked or
+expired account cannot connect a device; a device already connected loses access at its
+next refresh, within an hour at most, and then counts as removed.
+
 ### Web login from the app
 
 When an app opens a page of the web interface (course enrolment, Courseware that the app
@@ -602,13 +615,15 @@ days; the other entries of the plugin follow your event log settings.
 | pairing codes | `app_connect_pairing_codes` | SHA-256 hash, person, device id, times |
 | devices | `app_connect_devices` | device name chosen in the app, platform, how it was connected, ids of the OAuth2 tokens (not the tokens), times |
 | web login links | `app_connect_web_login_tickets` | SHA-256 hash, person, page to open, token/device reference, times |
-| calendar key | the person's configuration (core, `IcalExport`) | as the core keeps it; the plugin creates or deletes it, a count of new keys stays in the cache for an hour |
+| calendar key | the person's configuration (core, `IcalExport`) | as the core keeps it; the plugin creates or deletes it, a count of new keys stays in `app_connect_counters` for an hour |
 | logo | `app_connect_logo` | one row: address or the marker `upload`, picture (PNG, JPEG or WebP, at most 512 KB), SHA-256, times of the fetch or upload and the last attempt, reason of a refusal; no personal data. Deleted when `APP_CONNECT_LOGO_URL` is emptied and no logo is uploaded, when root removes the uploaded logo, or when the plugin is uninstalled |
 | settings | `config` (section "Stud.App"), `app_connect_settings` | your settings, client id, recorded address, random key for the limit counters |
-| failed pairing attempts | Stud.IP cache | counter per address, 10 minutes |
-| token revocations | Stud.IP cache | counter per address, 10 minutes |
+| failed pairing attempts | `app_connect_counters` | counter per address, 10 minutes |
+| token revocations | `app_connect_counters` | counter per address, 10 minutes |
 
-The counters in the cache hold no IP addresses. In place of the address they hold an
+The counters live in the database, so concurrent requests are all counted and every web
+server sees the same values; the cleanup cronjob deletes expired ones. They hold no IP
+addresses. In place of the address they hold an
 HMAC-SHA256 with the installation's key, shortened to 128 bits; without that key the address
 cannot be recovered, not even by trying every IPv4 address. The key is created on the first
 request and lives only in `app_connect_settings`.

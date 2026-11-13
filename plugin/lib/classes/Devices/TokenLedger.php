@@ -24,6 +24,51 @@ final class TokenLedger
         return $id === false || $id === null ? null : (string) $id;
     }
 
+    /**
+     * Locks the active device row bound to $refreshTokenId and returns its
+     * id; null when no active row is bound to it.
+     */
+    public function lockDeviceRowByRefreshToken(string $refreshTokenId): ?int
+    {
+        $id = \DBManager::get()->fetchColumn(
+            'SELECT `id` FROM `app_connect_devices` WHERE `refresh_token_id` = ? AND `revoked_at` IS NULL FOR UPDATE',
+            [$refreshTokenId]
+        );
+        return $id === false || $id === null ? null : (int) $id;
+    }
+
+    /** Locks the active device row bound to the pair and returns its id; null when there is none. */
+    public function lockDeviceRowByPair(string $accessTokenId, ?string $refreshTokenId): ?int
+    {
+        $id = \DBManager::get()->fetchColumn(
+            'SELECT `id` FROM `app_connect_devices`
+              WHERE `revoked_at` IS NULL AND (`access_token_id` = ? OR `refresh_token_id` = ?) FOR UPDATE',
+            [$accessTokenId, $refreshTokenId ?? '']
+        );
+        return $id === false || $id === null ? null : (int) $id;
+    }
+
+    /** Locks the device row $rowId of $userId; false when it is not active or not theirs. */
+    public function lockDeviceRow(int $rowId, string $userId): bool
+    {
+        $id = \DBManager::get()->fetchColumn(
+            'SELECT `id` FROM `app_connect_devices`
+              WHERE `id` = ? AND `user_id` = ? AND `revoked_at` IS NULL FOR UPDATE',
+            [$rowId, $userId]
+        );
+        return $id !== false && $id !== null;
+    }
+
+    /** Locks the refresh token row and tells whether it is revoked (or missing). */
+    public function lockRefreshTokenIsRevoked(string $refreshTokenId): bool
+    {
+        $revoked = \DBManager::get()->fetchColumn(
+            'SELECT `revoked` FROM `oauth2_refresh_tokens` WHERE `id` = ? FOR UPDATE',
+            [$refreshTokenId]
+        );
+        return $revoked === false || (int) $revoked === 1;
+    }
+
     public function isRefreshTokenRevoked(string $refreshTokenId): bool
     {
         $revoked = \DBManager::get()->fetchColumn(
@@ -40,34 +85,6 @@ final class TokenLedger
             [$accessTokenId]
         );
         return $revoked === false || (int) $revoked === 1;
-    }
-
-    /** When the access token was last changed (for a revoked token: when it was revoked). */
-    public function accessTokenChangedAt(string $accessTokenId): ?int
-    {
-        $chdate = \DBManager::get()->fetchColumn(
-            'SELECT `chdate` FROM `oauth2_access_tokens` WHERE `id` = ?',
-            [$accessTokenId]
-        );
-        return $chdate === false || $chdate === null ? null : (int) $chdate;
-    }
-
-    /**
-     * Access tokens of the user and client issued within a second of $time,
-     * other than those listed in $exclude. Used to follow a lineage that was
-     * refreshed at the core token endpoint.
-     *
-     * @param list<string> $exclude
-     * @return list<string> access token ids
-     */
-    public function accessTokensIssuedAround(string $userId, string $clientId, int $time, array $exclude): array
-    {
-        $ids = \DBManager::get()->fetchFirst(
-            'SELECT `id` FROM `oauth2_access_tokens`
-              WHERE `user_id` = ? AND `client_id` = ? AND `mkdate` BETWEEN ? AND ?',
-            [$userId, $clientId, $time - 1, $time + 1]
-        );
-        return array_values(array_diff(array_map('strval', $ids), $exclude));
     }
 
     /**
@@ -118,9 +135,8 @@ final class TokenLedger
     public function revokeLineageStep(string $accessTokenId, ?string $refreshTokenId = null): void
     {
         $db = \DBManager::get();
-        // A token the core already revoked keeps its chdate: that is the time of
-        // its rotation, which the successor search relies on. MySQL assigns left
-        // to right, so chdate must be set before revoked.
+        // A token the core already revoked keeps its chdate, the time of its
+        // rotation. MySQL assigns left to right, so chdate is set before revoked.
         $db->execute(
             'UPDATE `oauth2_access_tokens`
                 SET `chdate` = IF(`revoked` = 1, `chdate`, UNIX_TIMESTAMP()), `revoked` = 1

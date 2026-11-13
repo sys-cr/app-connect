@@ -36,8 +36,7 @@ final class IcalKeyLimit
     /** Counts one created key. */
     public function record(string $userId): void
     {
-        $key = $this->key($userId);
-        $this->store->write($key, $this->store->read($key) + 1, self::WINDOW);
+        $this->store->increment($this->key($userId), self::WINDOW);
     }
 
     /** Seconds until the current window ends. */

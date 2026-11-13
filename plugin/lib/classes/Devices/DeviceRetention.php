@@ -44,6 +44,7 @@ final class DeviceRetention
         $db = \DBManager::get();
         $db->execute('DELETE FROM `app_connect_devices` WHERE `user_id` = ?', [$userId]);
         $db->execute('DELETE FROM `app_connect_pairing_codes` WHERE `user_id` = ?', [$userId]);
+        \AppConnect\RateLimit\DatabaseCounterStore::forgetUser($userId);
         (new DatabaseTicketStore())->deleteForUser($userId);
     }
 }
