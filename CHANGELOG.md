@@ -10,6 +10,11 @@ Alle nennenswerten Änderungen an diesem Projekt stehen in dieser Datei. Das For
 
 ### Sicherheit
 
+- Der Token-Endpunkt des Kerns lehnt die Erneuerung von Tokens des App-Clients ab; die Apps
+  erneuern ohnehin über das Plugin. Eine dort erneuerte Kette konnte „Gerät entfernen“
+  entgehen. Ist eine Kette trotzdem gebrochen, beendet das Entfernen alle gültigen
+  Anmeldungen der Person ohne Gerät, statt Nachfolger über Zeitstempel zu suchen
+  (GHSA-96vf-38vj-xw35).
 - Kopplung und Erneuerung der Tokens prüfen das Konto wie die Passwortanmeldung des Kerns.
   Ein abgelaufenes, gesperrtes oder noch nicht aktiviertes Konto kann kein Gerät verbinden,
   und ein verbundenes Gerät verliert bei der nächsten Erneuerung den Zugang
@@ -130,6 +135,10 @@ All notable changes to this project are documented in this file. The format foll
 
 #### Security
 
+- The core's token endpoint refuses to refresh tokens of the app client; the apps refresh
+  through the plugin anyway. A chain refreshed there could escape "remove device". If a
+  chain is broken all the same, removal ends every valid sign-in of the person without a
+  device instead of looking for successors by time stamp (GHSA-96vf-38vj-xw35).
 - Pairing and token refresh check the account like the core's password login. An expired,
   locked or not yet activated account cannot connect a device, and a connected device loses
   access at its next refresh (GHSA-74w7-wfwq-mqj6).

@@ -138,18 +138,17 @@ benutzten oder abgelaufenen Code, `429 slow_down` nach zu vielen Fehlversuchen.
 Es gibt einen OAuth2-Client für alle Installationen. Ein Gerät ist an die Kette seiner
 Tokens gebunden: Jede Erneuerung über den Endpunkt des Plugins verschiebt die Bindung auf
 das neue Refresh-Token (`LineageRefreshTokenGrant`). Entfernen widerruft die gebundenen
-Tokens; eine Erneuerung am Endpunkt des Kerns unterbricht die Kette, deshalb folgt das
-Entfernen auch den Nachfolgern, die beim Rotieren jedes Tokens ausgestellt wurden
-(höchstens 50 Schritte). Der Zeitabgleich nutzt das `chdate` des Access-Tokens, weil
-Refresh-Tokens kein Änderungsdatum haben; beim Widerruf bleibt das `chdate` eines Tokens,
-das der Kern schon widerrufen hat, erhalten, und die Nachfolger werden ermittelt, bevor das
-gebundene Token widerrufen wird.
+Tokens. Eine Erneuerung am Token-Endpunkt des Kerns würde die Kette unterbrechen; das
+Plugin lehnt sie für den App-Client deshalb ab (`CoreRefreshGuard`, als Systemplugin vor dem
+Controller des Kerns geladen). Ist eine Kette trotzdem gebrochen (gebundenes Refresh-Token
+widerrufen, Gerät noch aktiv), beendet das Entfernen zusätzlich alle gültigen Anmeldungen
+der Person, die keinem aktiven Gerät gehören: lieber mehr als weniger.
 
 Die Kernseite „Drittanwendungen“ widerruft nur das Access-Token. Eine normale Erneuerung
 widerruft beide; ein widerrufenes Access-Token mit gültigem Refresh-Token bedeutet also
 einen Widerruf im Kern: Der Refresh-Grant des Plugins lehnt das Refresh-Token dann ab,
-widerruft es und markiert das Gerät als entfernt. Der Token-Endpunkt des Kerns kennt diese
-Regel nicht; die Apps nutzen den Endpunkt des Plugins aus der Discovery.
+widerruft es und markiert das Gerät als entfernt. Am Token-Endpunkt des Kerns erneuert der
+App-Client nicht (siehe oben); die Apps nutzen den Endpunkt des Plugins aus der Discovery.
 
 Der Widerrufs-Endpunkt (`app-connect/revoke`) beendet ein Paar wie das Entfernen auf
 „Stud.App Verbindung“: Ist ein Gerät an das Paar gebunden, wird es mit allen Nachfolgern
@@ -293,18 +292,18 @@ expired code, `429 slow_down` after too many failures.
 
 There is one OAuth2 client for all installations. A device is bound to the lineage of its
 tokens: every refresh through the plugin's endpoint moves the binding to the new refresh
-token (`LineageRefreshTokenGrant`). Removing a device revokes the bound tokens; a refresh
-done at the core endpoint breaks the chain, so removal also follows the successors issued
-when each token was rotated (at most 50 steps). The time match uses the access token's
-`chdate`, because refresh tokens have no change date; revoking keeps the `chdate` of a
-token the core revoked already, and successors are looked up before the bound token is
-revoked.
+token (`LineageRefreshTokenGrant`). Removing a device revokes the bound tokens. A refresh
+at the core's token endpoint would break the chain, so the plugin refuses it for the app
+client (`CoreRefreshGuard`, loaded as a system plugin before the core's controller). If a
+chain is broken all the same (bound refresh token revoked, device still active), removal
+also ends every valid sign-in of the person that belongs to no active device: more rather
+than fewer.
 
 The core page "Drittanwendungen" revokes only the access token. A normal refresh revokes
 both, so a revoked access token with a valid refresh token means a revocation in the core:
 the plugin's refresh grant then refuses the refresh token, revokes it and marks the device
-as removed. The core token endpoint does not know this rule; the apps use the plugin's
-endpoint from the discovery.
+as removed. The app client does not refresh at the core token endpoint (see above); the
+apps use the plugin's endpoint from the discovery.
 
 The revocation endpoint (`app-connect/revoke`) ends a pair as removing it on "Stud.App
 connection" does: a device bound to the pair is removed with all successors; the named pair

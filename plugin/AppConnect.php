@@ -10,6 +10,7 @@ require_once __DIR__ . '/bootstrap.php';
 use AppConnect\Audit\EventLog;
 use AppConnect\Devices\DeviceRetention;
 use AppConnect\OAuth2\ClientProvisioner;
+use AppConnect\OAuth2\CoreRefreshGuard;
 use AppConnect\Privacy\UserDataExport;
 use AppConnect\Routes\CourseDatePlacesShow;
 use AppConnect\Routes\DevicesCreate;
@@ -41,6 +42,10 @@ class AppConnect extends StudIPPlugin implements SystemPlugin, JsonApiPlugin, Pr
     public function __construct()
     {
         parent::__construct();
+
+        // The app client refreshes only at the plugin's endpoint, so removing
+        // a device always reaches its current tokens.
+        CoreRefreshGuard::apply(static fn (): ?string => Runtime::settings()->clientId());
 
         // A deleted account leaves nothing behind in the plugin tables.
         NotificationCenter::on('UserDidDelete', static function ($event, $user): void {

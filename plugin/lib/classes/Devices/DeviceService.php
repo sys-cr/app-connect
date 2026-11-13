@@ -16,9 +16,6 @@ final class DeviceService
     public const VIA_PAIRING = 'pairing';
     public const VIA_BROWSER = 'browser';
 
-    /** Upper bound when following a lineage refreshed outside the plugin. */
-    private const MAX_FOLLOW_STEPS = 50;
-
     public function __construct(private readonly TokenLedger $ledger, private readonly string $clientId)
     {
     }
@@ -165,52 +162,24 @@ final class DeviceService
     }
 
     /**
-     * Revokes the bound pair. If the lineage was refreshed at the core token
-     * endpoint (bound refresh token revoked, row still active), the successors
-     * are found by time and revoked too – more rather than fewer.
+     * Revokes the bound pair. If the lineage was broken anyway (bound refresh
+     * token revoked, row still active, e.g. by a refresh at the core endpoint
+     * before that was refused), the current tokens cannot be told apart, so
+     * every valid sign-in of the person that belongs to no active device is
+     * ended too: more rather than fewer.
      */
     private function revoke(DeviceRecord $row): void
     {
         $accessTokenId = (string) $row->access_token_id;
         $refreshTokenId = $row->refresh_token_id !== null ? (string) $row->refresh_token_id : null;
-        $broken = $refreshTokenId !== null && $this->ledger->isRefreshTokenRevoked($refreshTokenId);
-
-        // Successors are found by the rotation time of the bound token, so
-        // they are looked up before the bound token is touched.
-        if ($broken) {
-            $this->revokeSuccessors((string) $row->user_id, $accessTokenId);
+        if ($refreshTokenId !== null && $this->ledger->isRefreshTokenRevoked($refreshTokenId)) {
+            foreach ($this->unassignedTokens((string) $row->user_id) as $unbound) {
+                $this->ledger->revokeLineageStep($unbound);
+            }
         }
         $this->ledger->revokeLineageStep($accessTokenId, $refreshTokenId);
         $row->revoked_at = time();
         $row->store();
-    }
-
-    private function revokeSuccessors(string $userId, string $accessTokenId): void
-    {
-        $bound = [];
-        foreach (DeviceRecord::findBySQL('`user_id` = ? AND `revoked_at` IS NULL', [$userId]) as $other) {
-            $bound[] = (string) $other->access_token_id;
-        }
-        $queue = [$accessTokenId];
-        $seen = [$accessTokenId => true];
-        for ($step = 0; $queue !== [] && $step < self::MAX_FOLLOW_STEPS; $step++) {
-            $current = array_shift($queue);
-            $changedAt = $this->ledger->accessTokenChangedAt($current);
-            if ($changedAt === null) {
-                continue;
-            }
-            $exclude = array_merge($bound, array_keys($seen));
-            foreach ($this->ledger->accessTokensIssuedAround($userId, $this->clientId, $changedAt, $exclude) as $successor) {
-                // Its own rotation time is read before anything is revoked.
-                $seen[$successor] = true;
-                $queue[] = $successor;
-            }
-        }
-        foreach (array_keys($seen) as $id) {
-            if ($id !== $accessTokenId) {
-                $this->ledger->revokeLineageStep($id);
-            }
-        }
     }
 
     /** @return list<DeviceRecord> */
