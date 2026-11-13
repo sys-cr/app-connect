@@ -10,9 +10,9 @@
 | `plugin/AppConnect.php` | Plugin-Klasse (`SystemPlugin`, `JsonApiPlugin`): Routen und Navigationseinträge (Admin, Profil-Einstellungen) |
 | `plugin/lib/classes/` | Namensraum `AppConnect\`, siehe Komponenten unten |
 | `plugin/controllers/`, `plugin/views/` | Profilseite (`connect`), öffentliche Landing-Page (`get`), Anmeldung im Web aus der App (`web`: `enter`, `redeem`, `confirm`); die Betreiber-Einstellungen sind Konfigurationseinträge der Sektion „Stud.App“ (`Settings\OperatorConfig`, Migration `004`) |
-| `plugin/migrations/` | Datenbank-Migrationen (`NNN_name.php`); `003` registriert den Aufräum-Cronjob, `010` und `011` setzen die Aufbewahrung der Ereignisprotokoll-Einträge zu Web-Anmeldung und Kalender-Schlüssel, `015` legt die Tabelle der Logo-Kopie an |
-| `plugin/cronjobs/` | `AppConnectCleanupJob` (tägliches Aufräumen, Logo neu abrufen); lädt `bootstrap.php` selbst, weil der Cron-Runner das Plugin nicht lädt |
-| `plugin/tests/` | PHPUnit: `Unit` (Logik ohne Stud.IP) und `Contract` (Schema, gemeinsame Test-Vektoren); `Fixtures/logo` mit kleinen Bildern, `Support/FakeHttpFetcher` beantwortet Abrufe ohne Netz |
+| `plugin/migrations/` | Datenbank-Migrationen (`NNN_name.php`); `003` registriert den Aufräum-Cronjob, `010` und `011` setzen die Aufbewahrung der Ereignisprotokoll-Einträge zu Web-Anmeldung und Kalender-Schlüssel, `015` legt die Tabelle der Logo-Kopie an, `016` den Schalter der Web-Anmeldung für admin und root, `017` die Tabelle der Zähler |
+| `plugin/cronjobs/` | `AppConnectCleanupJob` (tägliches Aufräumen, abgelaufene Zähler, Logo neu abrufen); lädt `bootstrap.php` selbst, weil der Cron-Runner das Plugin nicht lädt |
+| `plugin/tests/` | PHPUnit: `Unit` (Logik ohne Stud.IP), `Contract` (Schema, gemeinsame Test-Vektoren) und `Integration` (gegen MariaDB); `Fixtures/logo` mit kleinen Bildern, `Support/FakeHttpFetcher` beantwortet Abrufe ohne Netz |
 | `plugin/LICENSE`, `plugin/SUPPLEMENTAL-TERMS.txt` | Kopien von `LICENSES/GPL-3.0-or-later.txt` und `SUPPLEMENTAL-TERMS.txt`, damit das Plugin-Verzeichnis beide mitbringt; `AttributionTest` hält sie gleich |
 
 Komponenten in `plugin/lib/classes/`:
@@ -50,7 +50,15 @@ Stud.IP getestet.
 ```bash
 make lint     # php -l
 make test     # PHPUnit, beide Suiten (installiert beim ersten Lauf die Dev-Abhängigkeiten)
+make test-integration   # gegen eine MariaDB 10.11 in Docker, die danach wieder verschwindet
 ```
+
+Die Integrationstests laufen gegen eine echte Datenbank. Die Tabellen des Plugins legen
+seine eigenen Migrationen an, von den OAuth2-Tabellen des Kerns nur die Spalten, die das
+Plugin liest. Gleichzeitige Anfragen erzeugen sie mit mehreren Prozessen (`pcntl`), jeder
+mit eigener Verbindung. Ohne `APP_CONNECT_TEST_DB` (PDO-DSN, dazu `…_USER` und
+`…_PASSWORD`) überspringt `make test` sie. GitHub Actions führt `make lint` und `make test`
+mit PHP 8.1 bis 8.3 aus und die Integrationstests mit einer MariaDB als Dienst.
 
 Der Plugin-Code muss auf den PHP-Versionen aller unterstützten Stud.IP-Versionen laufen
 (PHP 8.1 und neuer); `php -l` daher auch mit der ältesten ausführen. Werkzeuge: PHP 8.1+,
@@ -171,9 +179,9 @@ entfernt; das genannte Paar wird in jedem Fall widerrufen.
 | `plugin/AppConnect.php` | plugin class (`SystemPlugin`, `JsonApiPlugin`): routes and the navigation entries (admin, profile settings) |
 | `plugin/lib/classes/` | namespace `AppConnect\`, see the components below |
 | `plugin/controllers/`, `plugin/views/` | profile page (`connect`), public landing page (`get`), web login from the app (`web`: `enter`, `redeem`, `confirm`); the operator settings are configuration entries of the section "Stud.App" (`Settings\OperatorConfig`, migration `004`) |
-| `plugin/migrations/` | database migrations (`NNN_name.php`); `003` registers the cleanup cronjob, `010` and `011` set the retention of the event log entries about the web login and the calendar key, `015` creates the table of the logo copy |
-| `plugin/cronjobs/` | `AppConnectCleanupJob` (daily retention cleanup, fetching the logo again); loads `bootstrap.php` itself because the cron runner does not load the plugin |
-| `plugin/tests/` | PHPUnit: `Unit` (logic without Stud.IP) and `Contract` (schema, shared test vectors); `Fixtures/logo` holds tiny pictures, `Support/FakeHttpFetcher` answers fetches without network |
+| `plugin/migrations/` | database migrations (`NNN_name.php`); `003` registers the cleanup cronjob, `010` and `011` set the retention of the event log entries about the web login and the calendar key, `015` creates the table of the logo copy, `016` the switch of the web login for admin and root, `017` the table of the counters |
+| `plugin/cronjobs/` | `AppConnectCleanupJob` (daily retention cleanup, expired counters, fetching the logo again); loads `bootstrap.php` itself because the cron runner does not load the plugin |
+| `plugin/tests/` | PHPUnit: `Unit` (logic without Stud.IP), `Contract` (schema, shared test vectors) and `Integration` (against MariaDB); `Fixtures/logo` holds tiny pictures, `Support/FakeHttpFetcher` answers fetches without network |
 | `plugin/LICENSE`, `plugin/SUPPLEMENTAL-TERMS.txt` | copies of `LICENSES/GPL-3.0-or-later.txt` and `SUPPLEMENTAL-TERMS.txt`, so the plugin directory ships both; `AttributionTest` keeps them identical |
 
 Components in `plugin/lib/classes/`:
@@ -211,7 +219,15 @@ running Stud.IP.
 ```bash
 make lint     # php -l
 make test     # PHPUnit, both suites (installs the dev dependencies on first run)
+make test-integration   # against MariaDB 10.11 in Docker, removed again afterwards
 ```
+
+The integration tests run against a real database. The plugin's own migrations create its
+tables; of the core's OAuth2 tables only the columns the plugin reads are created.
+Concurrent requests come from several processes (`pcntl`), each with its own connection.
+Without `APP_CONNECT_TEST_DB` (a PDO DSN, plus `…_USER` and `…_PASSWORD`) `make test`
+skips them. GitHub Actions runs `make lint` and `make test` with PHP 8.1 to 8.3 and the
+integration tests with MariaDB as a service.
 
 The plugin code must run on the PHP versions of every supported Stud.IP release (PHP 8.1
 and later); run `php -l` with the oldest one as well. Tools: PHP 8.1+, Composer (dev

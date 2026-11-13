@@ -1,0 +1,54 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-FileCopyrightText: 2026 Bodo Steffen
+# Additional terms under GPL-3.0 section 7: see SUPPLEMENTAL-TERMS.txt
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        php: ['8.1', '8.2', '8.3']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: composer
+          coverage: none
+      - run: make lint
+      - run: make test
+
+  integration:
+    runs-on: ubuntu-24.04
+    services:
+      mariadb:
+        image: mariadb:10.11
+        env:
+          MARIADB_ROOT_PASSWORD: app-connect-it
+          MARIADB_DATABASE: app_connect_it
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mariadb-admin ping -uroot -papp-connect-it"
+          --health-interval=5s --health-timeout=5s --health-retries=20
+    env:
+      APP_CONNECT_TEST_DB: mysql:host=127.0.0.1;port=3306;dbname=app_connect_it
+      APP_CONNECT_TEST_DB_USER: root
+      APP_CONNECT_TEST_DB_PASSWORD: app-connect-it
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: pdo_mysql, pcntl
+          tools: composer
+          coverage: none
+      - run: make test-integration

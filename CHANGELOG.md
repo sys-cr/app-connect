@@ -60,6 +60,12 @@ Alle nennenswerten Änderungen an diesem Projekt stehen in dieser Datei. Das For
   wenn der neue Schalter `APP_CONNECT_WEB_LOGIN_PRIVILEGED` an ist; ab Werk ist er aus
   (Migration 016) (#8).
 
+### Entwicklung
+
+- Integrationstests gegen MariaDB (`make test-integration`): Kopplungscode und Web-Ticket
+  lassen sich auch bei zehn gleichzeitigen Anfragen nur einmal einlösen, dazu die Abfragen
+  auf den OAuth2-Tabellen. GitHub Actions prüft jede Änderung mit PHP 8.1 bis 8.3 (#12).
+
 ## [1.1.1] – 2026-11-08
 
 ### Änderungen
@@ -223,6 +229,12 @@ All notable changes to this project are documented in this file. The format foll
 
 - Accounts with the roles admin and root use the web login from the app only when the new
   switch `APP_CONNECT_WEB_LOGIN_PRIVILEGED` is on; it is off by default (migration 016) (#8).
+
+#### Development
+
+- Integration tests against MariaDB (`make test-integration`): pairing code and web ticket
+  can be redeemed only once even with ten concurrent requests, plus the queries on the
+  OAuth2 tables. GitHub Actions checks every change with PHP 8.1 to 8.3 (#12).
 
 ### [1.1.1] – 2026-11-08
 
