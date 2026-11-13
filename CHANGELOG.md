@@ -36,6 +36,11 @@ Alle nennenswerten Änderungen an diesem Projekt stehen in dieser Datei. Das For
   Zugang; ein Kalender-Abo und eine im Browser geöffnete Sitzung bleiben. Bestätigung,
   Meldung, Hilfetext und Nutzer-Doku nennen das (#7).
 
+### Dokumentation
+
+- Die Admin-Doku sagt, dass die Funktionsschalter steuern, was die App anbietet, und keine
+  Berechtigungen sind; serverseitig gesperrt werden nur die Routen des Plugins (#10).
+
 ## [1.1.1] – 2026-11-08
 
 ### Änderungen
@@ -177,6 +182,11 @@ All notable changes to this project are documented in this file. The format foll
 - "Gerät entfernen" (remove device) now says what ends and what does not: the app on the
   device loses access; a calendar subscription and a session open in the browser stay.
   Confirmation, message, help text and user docs say so (#7).
+
+#### Documentation
+
+- The admin docs say that the feature switches control what the app offers and are not
+  permissions; only the plugin's own routes are blocked on the server (#10).
 
 ### [1.1.1] – 2026-11-08
 
