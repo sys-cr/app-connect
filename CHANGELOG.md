@@ -76,6 +76,11 @@ Version 1.2.0 setzt die Befunde eines externen Audits von Version 1.1.1 um.
 - Integrationstests gegen MariaDB (`make test-integration`), unter anderem für das
   einmalige Einlösen von Kopplungscode und Web-Ticket bei gleichzeitigen Anfragen. GitHub
   Actions prüft jede Änderung mit PHP 8.1 bis 8.3 (#12).
+- End-to-End-Tests gegen ein echtes Stud.IP in Docker (`make test-e2e STUDIP=6.0` bis
+  `6.3`), an der Wurzel und unter `/studip`: Discovery, Landing-Page, Kopplung, Erneuern
+  und Widerruf, die Sperre des Refresh am Kern-Endpunkt, gesperrtes Konto, Ausschalten der
+  App-Verbindung, Anmeldung im Web aus der App und der QR-Code im Profil. GitHub Actions
+  führt sie für 6.0 und 6.3 aus (#12).
 
 ### Hinweise zum Update
 
@@ -262,6 +267,11 @@ Version 1.2.0 addresses the findings of an external audit of version 1.1.1.
 - Integration tests against MariaDB (`make test-integration`), among them the one-time
   redemption of pairing code and web ticket under concurrent requests. GitHub Actions
   checks every change with PHP 8.1 to 8.3 (#12).
+- End-to-end tests against a real Stud.IP in Docker (`make test-e2e STUDIP=6.0` to `6.3`),
+  at the root and below `/studip`: discovery, landing page, pairing, refresh and
+  revocation, the refused refresh at the core endpoint, a locked account, switching the
+  app connection off, the web login from the app and the QR code on the profile page.
+  GitHub Actions runs them for 6.0 and 6.3 (#12).
 
 #### Upgrade notes
 

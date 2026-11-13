@@ -12,7 +12,7 @@
 | `plugin/controllers/`, `plugin/views/` | Profilseite (`connect`), öffentliche Landing-Page (`get`), Anmeldung im Web aus der App (`web`: `enter`, `redeem`, `confirm`); die Betreiber-Einstellungen sind Konfigurationseinträge der Sektion „Stud.App“ (`Settings\OperatorConfig`, Migration `004`) |
 | `plugin/migrations/` | Datenbank-Migrationen (`NNN_name.php`); `003` registriert den Aufräum-Cronjob, `010` und `011` setzen die Aufbewahrung der Ereignisprotokoll-Einträge zu Web-Anmeldung und Kalender-Schlüssel, `015` legt die Tabelle der Logo-Kopie an, `016` den Schalter der Web-Anmeldung für admin und root, `017` die Tabelle der Zähler |
 | `plugin/cronjobs/` | `AppConnectCleanupJob` (tägliches Aufräumen, abgelaufene Zähler, Logo neu abrufen); lädt `bootstrap.php` selbst, weil der Cron-Runner das Plugin nicht lädt |
-| `plugin/tests/` | PHPUnit: `Unit` (Logik ohne Stud.IP), `Contract` (Schema, gemeinsame Test-Vektoren) und `Integration` (gegen MariaDB); `Fixtures/logo` mit kleinen Bildern, `Support/FakeHttpFetcher` beantwortet Abrufe ohne Netz |
+| `plugin/tests/` | PHPUnit: `Unit` (Logik ohne Stud.IP), `Contract` (Schema, gemeinsame Test-Vektoren) `Integration` (gegen MariaDB) und `E2E` (gegen Stud.IP in Docker); `Fixtures/logo` mit kleinen Bildern, `Support/FakeHttpFetcher` beantwortet Abrufe ohne Netz |
 | `plugin/LICENSE`, `plugin/SUPPLEMENTAL-TERMS.txt` | Kopien von `LICENSES/GPL-3.0-or-later.txt` und `SUPPLEMENTAL-TERMS.txt`, damit das Plugin-Verzeichnis beide mitbringt; `AttributionTest` hält sie gleich |
 
 Komponenten in `plugin/lib/classes/`:
@@ -51,6 +51,7 @@ Stud.IP getestet.
 make lint     # php -l
 make test     # PHPUnit, beide Suiten (installiert beim ersten Lauf die Dev-Abhängigkeiten)
 make test-integration   # gegen eine MariaDB 10.11 in Docker, die danach wieder verschwindet
+make test-e2e STUDIP=6.0   # gegen Stud.IP 6.0 in Docker (6.0 bis 6.3, ohne STUDIP 6.3)
 ```
 
 Die Integrationstests laufen gegen eine echte Datenbank. Die Tabellen des Plugins legen
@@ -59,6 +60,48 @@ Plugin liest. Gleichzeitige Anfragen erzeugen sie mit mehreren Prozessen (`pcntl
 mit eigener Verbindung. Ohne `APP_CONNECT_TEST_DB` (PDO-DSN, dazu `…_USER` und
 `…_PASSWORD`) überspringt `make test` sie. GitHub Actions führt `make lint` und `make test`
 mit PHP 8.1 bis 8.3 aus und die Integrationstests mit einer MariaDB als Dienst.
+
+Die End-to-End-Tests (`plugin/tests/E2E`) laufen gegen ein echtes Stud.IP mit dem Plugin.
+`tests/e2e/run.sh` baut dafür ein Image aus den Quellen des Kerns mit dem Dockerfile, das
+der Kern mitbringt (`docker/studip/Dockerfile`, Stände in `run.sh` festgelegt; beim ersten
+Mal einige Minuten), startet es mit einer MariaDB im Arbeitsspeicher, installiert Stud.IP,
+bindet `plugin/` als Plugin ein (registrieren, aktivieren, migrieren), legt die
+OAuth2-Schlüssel und Testkonten an und schaltet die App-Verbindung über
+`Config::get()->store()` ein, also über denselben Hook wie die Konfiguration im Browser.
+Dieselbe Installation antwortet unter `http://localhost:846<Minor>/` und unter `…/studip/`
+(Apache-Alias, `$ABSOLUTE_URI_STUDIP` mit `/studip/`). Die Tests sprechen HTTP mit der
+Instanz; Testdaten legt `tests/e2e/studip/cli.php` im Container an. Abgedeckt sind:
+
+- Discovery und Landing-Page an der Wurzel und unter `/studip` (Endpunkte und
+  Verbindungslink tragen den Basispfad), Discovery gegen das Schema, `ETag`/`304`
+- Kopplung: Code einlösen, mit dem Token eine Route der Kern-JSON:API aufrufen, denselben
+  Code erneut einlösen (abgelehnt), unbekannter Code, fremder Client
+- Erneuern am Endpunkt des Plugins (neue Tokens, altes Refresh-Token abgelehnt, Gerät folgt
+  der Kette) und Ablehnung am Token-Endpunkt des Kerns (`invalid_grant`, `CoreRefreshGuard`)
+- Widerruf über `app-connect/revoke` mit Refresh- und Access-Token: Paar und Gerät enden
+- gesperrtes Konto: die nächste Erneuerung scheitert, das Gerät gilt als entfernt;
+  Kopplung abgelehnt
+- Ausschalten von `APP_CONNECT_ENABLED`: Discovery `404`, alle Tokens ungültig, auch nach
+  dem Wiedereinschalten; ein Basispfad außerhalb der Regeln lässt die Verbindung aus
+- Anmeldung im Web aus der App unter `/studip` bis zur Sitzung, damit im Profil ein
+  QR-Code, dessen Adresse den Basispfad trägt und dessen Code ein Gerät verbindet; für root
+  nur mit `APP_CONNECT_WEB_LOGIN_PRIVILEGED`
+
+Nicht abgedeckt sind Browser-Anmeldung (`authorization_code` mit PKCE), Identity Provider
+und Zwei-Faktor-Prüfung, Kalender-Schlüssel, Ablauf eines Kontos, Upgrade, Deaktivieren
+und Reaktivieren des Plugins sowie die Apps selbst. Ein abgelehntes Refresh-Token
+beantwortet die OAuth2-Bibliothek des Kerns mit `401 invalid_request`.
+
+```bash
+tests/e2e/run.sh up 6.3     # Instanz starten und stehen lassen
+tests/e2e/run.sh test 6.3   # Suite gegen die laufende Instanz, PHPUnit-Argumente möglich
+tests/e2e/run.sh down 6.3   # Instanz entfernen
+```
+
+`E2E_STUDIP_IMAGE` nimmt ein vorhandenes Image statt eines eigenen Builds, `E2E_PORT`
+einen anderen Port. Ohne `APP_CONNECT_E2E_URL` und `APP_CONNECT_E2E_CONTAINER` überspringt
+`make test` die Suite. GitHub Actions führt sie für Stud.IP 6.0 und 6.3 aus und legt die
+gebauten Images im Cache ab. Im Plugin-ZIP sind die Tests nicht enthalten.
 
 Der Plugin-Code muss auf den PHP-Versionen aller unterstützten Stud.IP-Versionen laufen
 (PHP 8.1 und neuer); `php -l` daher auch mit der ältesten ausführen. Werkzeuge: PHP 8.1+,
@@ -187,7 +230,7 @@ entfernt; das genannte Paar wird in jedem Fall widerrufen.
 | `plugin/controllers/`, `plugin/views/` | profile page (`connect`), public landing page (`get`), web login from the app (`web`: `enter`, `redeem`, `confirm`); the operator settings are configuration entries of the section "Stud.App" (`Settings\OperatorConfig`, migration `004`) |
 | `plugin/migrations/` | database migrations (`NNN_name.php`); `003` registers the cleanup cronjob, `010` and `011` set the retention of the event log entries about the web login and the calendar key, `015` creates the table of the logo copy, `016` the switch of the web login for admin and root, `017` the table of the counters |
 | `plugin/cronjobs/` | `AppConnectCleanupJob` (daily retention cleanup, expired counters, fetching the logo again); loads `bootstrap.php` itself because the cron runner does not load the plugin |
-| `plugin/tests/` | PHPUnit: `Unit` (logic without Stud.IP), `Contract` (schema, shared test vectors) and `Integration` (against MariaDB); `Fixtures/logo` holds tiny pictures, `Support/FakeHttpFetcher` answers fetches without network |
+| `plugin/tests/` | PHPUnit: `Unit` (logic without Stud.IP), `Contract` (schema, shared test vectors) `Integration` (against MariaDB) and `E2E` (against Stud.IP in Docker); `Fixtures/logo` holds tiny pictures, `Support/FakeHttpFetcher` answers fetches without network |
 | `plugin/LICENSE`, `plugin/SUPPLEMENTAL-TERMS.txt` | copies of `LICENSES/GPL-3.0-or-later.txt` and `SUPPLEMENTAL-TERMS.txt`, so the plugin directory ships both; `AttributionTest` keeps them identical |
 
 Components in `plugin/lib/classes/`:
@@ -226,6 +269,7 @@ running Stud.IP.
 make lint     # php -l
 make test     # PHPUnit, both suites (installs the dev dependencies on first run)
 make test-integration   # against MariaDB 10.11 in Docker, removed again afterwards
+make test-e2e STUDIP=6.0   # against Stud.IP 6.0 in Docker (6.0 to 6.3, 6.3 without STUDIP)
 ```
 
 The integration tests run against a real database. The plugin's own migrations create its
@@ -234,6 +278,49 @@ Concurrent requests come from several processes (`pcntl`), each with its own con
 Without `APP_CONNECT_TEST_DB` (a PDO DSN, plus `…_USER` and `…_PASSWORD`) `make test`
 skips them. GitHub Actions runs `make lint` and `make test` with PHP 8.1 to 8.3 and the
 integration tests with MariaDB as a service.
+
+The end-to-end tests (`plugin/tests/E2E`) run against a real Stud.IP with the plugin.
+`tests/e2e/run.sh` builds an image from the core sources with the Dockerfile the core
+ships (`docker/studip/Dockerfile`, versions pinned in `run.sh`; a few minutes the first
+time), starts it with MariaDB in memory, installs Stud.IP, mounts `plugin/` as the plugin
+(register, activate, migrate), creates the OAuth2 keys and test accounts and switches the
+app connection on through `Config::get()->store()`, so through the same hook as the
+configuration in the browser. The same installation answers at
+`http://localhost:846<minor>/` and at `…/studip/` (Apache alias, `$ABSOLUTE_URI_STUDIP`
+with `/studip/`). The tests talk HTTP to the instance; `tests/e2e/studip/cli.php` prepares
+data inside the container. Covered:
+
+- discovery and landing page at the root and below `/studip` (endpoints and connect link
+  carry the base path), discovery against the schema, `ETag`/`304`
+- pairing: redeem a code, call a route of the core JSON:API with the token, redeem the
+  same code again (refused), unknown code, foreign client
+- refresh at the plugin's endpoint (new tokens, old refresh token refused, the device
+  follows the lineage) and the refusal at the core token endpoint (`invalid_grant`,
+  `CoreRefreshGuard`)
+- revocation through `app-connect/revoke` with refresh and access token: pair and device
+  end
+- locked account: the next refresh fails, the device counts as removed; pairing refused
+- switching `APP_CONNECT_ENABLED` off: discovery `404`, every token invalid, also after
+  switching on again; a base path outside the rules keeps the connection off
+- the web login from the app below `/studip` up to the session, then on the profile page a
+  QR code whose address carries the base path and whose code connects a device; for root
+  only with `APP_CONNECT_WEB_LOGIN_PRIVILEGED`
+
+Not covered: the browser sign-in (`authorization_code` with PKCE), identity providers and
+the two-factor check, the calendar key, an expired account, upgrade, disabling and
+re-enabling the plugin, and the apps themselves. The core's OAuth2 library answers a
+refused refresh token with `401 invalid_request`.
+
+```bash
+tests/e2e/run.sh up 6.3     # start an instance and keep it running
+tests/e2e/run.sh test 6.3   # the suite against the running instance, PHPUnit arguments allowed
+tests/e2e/run.sh down 6.3   # remove the instance
+```
+
+`E2E_STUDIP_IMAGE` takes an existing image instead of building one, `E2E_PORT` another
+port. Without `APP_CONNECT_E2E_URL` and `APP_CONNECT_E2E_CONTAINER`, `make test` skips the
+suite. GitHub Actions runs it for Stud.IP 6.0 and 6.3 and caches the built images. The
+plugin ZIP does not contain the tests.
 
 The plugin code must run on the PHP versions of every supported Stud.IP release (PHP 8.1
 and later); run `php -l` with the oldest one as well. Tools: PHP 8.1+, Composer (dev
