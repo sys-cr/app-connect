@@ -103,6 +103,12 @@ die App nicht installiert ist.
 Fehlgeschlagene Kopplungsversuche sind auf 10 je Adresse in 10 Minuten und 100 je Minute
 insgesamt begrenzt.
 
+Kopplung, Erneuerung der Tokens und Anmeldung im Web prüfen das Konto wie die
+Passwortanmeldung des Kerns: nicht gesperrt, nicht abgelaufen, E-Mail-Adresse bestätigt,
+Status ab `autor`. Ein gesperrtes oder abgelaufenes Konto kann kein Gerät verbinden; ein
+schon verbundenes Gerät verliert den Zugang bei der nächsten Erneuerung, spätestens nach
+einer Stunde, und gilt dann als entfernt.
+
 ## Anmeldung im Web aus der App
 
 Öffnet eine App eine Seite der Weboberfläche (Eintragen in eine Veranstaltung, Courseware,
@@ -397,6 +403,11 @@ installed.
 
 Failed pairing attempts are limited to 10 per address in 10 minutes and 100 per minute
 overall.
+
+Pairing, token refresh and the web login check the account like the core's password login:
+not locked, not expired, e-mail address confirmed, status `autor` or higher. A locked or
+expired account cannot connect a device; a device already connected loses access at its
+next refresh, within an hour at most, and then counts as removed.
 
 ### Web login from the app
 

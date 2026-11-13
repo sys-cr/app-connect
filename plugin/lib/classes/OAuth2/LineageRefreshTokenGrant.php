@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace AppConnect\OAuth2;
 
+use AppConnect\Account\AccountGate;
 use AppConnect\Devices\DeviceService;
 use DateInterval;
 use League\OAuth2\Server\Entities\AccessTokenEntityInterface;
@@ -26,6 +27,10 @@ use Throwable;
  * The core page "Drittanwendungen" revokes only the access token. A refresh
  * token whose access token was revoked there is therefore refused here, the
  * refresh token is revoked and the device counts as removed.
+ *
+ * The same happens when the account may no longer use the app (locked,
+ * expired, not activated, see {@see AccountGate}): the pair is revoked and
+ * the device counts as removed.
  */
 final class LineageRefreshTokenGrant extends RefreshTokenGrant
 {
@@ -33,6 +38,8 @@ final class LineageRefreshTokenGrant extends RefreshTokenGrant
     private ?string $newAccessTokenId = null;
     private ?string $newRefreshTokenId = null;
     private ?string $revokedInCore = null;
+    /** @var array{0: string, 1: string}|null access and refresh token id of an account that may no longer use the app */
+    private ?array $accountEnded = null;
 
     public function __construct(RefreshTokenRepositoryInterface $refreshTokenRepository, private readonly DeviceService $devices)
     {
@@ -58,6 +65,9 @@ final class LineageRefreshTokenGrant extends RefreshTokenGrant
             if ($this->revokedInCore !== null) {
                 $this->devices->endRevokedLineage($this->revokedInCore);
             }
+            if ($this->accountEnded !== null) {
+                $this->devices->revokePair($this->accountEnded[0], $this->accountEnded[1]);
+            }
             throw $exception;
         }
     }
@@ -70,6 +80,10 @@ final class LineageRefreshTokenGrant extends RefreshTokenGrant
         if ($this->devices->isAccessTokenRevoked((string) $data['access_token_id'])) {
             $this->revokedInCore = (string) $data['refresh_token_id'];
             throw OAuthServerException::invalidRefreshToken('Token has been revoked');
+        }
+        if (!AccountGate::mayUseApp(\User::find((string) $data['user_id']))) {
+            $this->accountEnded = [(string) $data['access_token_id'], (string) $data['refresh_token_id']];
+            throw OAuthServerException::invalidRefreshToken('The account cannot use the app');
         }
         $this->oldRefreshTokenId = (string) $data['refresh_token_id'];
         return $data;

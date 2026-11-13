@@ -6,6 +6,15 @@ Alle nennenswerten Änderungen an diesem Projekt stehen in dieser Datei. Das For
 [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), die Versionen folgen
 [Semantic Versioning](https://semver.org/lang/de/).
 
+## [Unreleased]
+
+### Sicherheit
+
+- Kopplung und Erneuerung der Tokens prüfen das Konto wie die Passwortanmeldung des Kerns.
+  Ein abgelaufenes, gesperrtes oder noch nicht aktiviertes Konto kann kein Gerät verbinden,
+  und ein verbundenes Gerät verliert bei der nächsten Erneuerung den Zugang
+  (GHSA-74w7-wfwq-mqj6).
+
 ## [1.1.1] – 2026-11-08
 
 ### Änderungen
@@ -116,6 +125,14 @@ Erste veröffentlichte Version.
 All notable changes to this project are documented in this file. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/).
+
+### [Unreleased]
+
+#### Security
+
+- Pairing and token refresh check the account like the core's password login. An expired,
+  locked or not yet activated account cannot connect a device, and a connected device loses
+  access at its next refresh (GHSA-74w7-wfwq-mqj6).
 
 ### [1.1.1] – 2026-11-08
 

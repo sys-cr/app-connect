@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace AppConnect\OAuth2;
 
+use AppConnect\Account\AccountGate;
 use AppConnect\Connect\PairingCode;
 use AppConnect\Devices\DeviceInput;
 use AppConnect\Devices\DeviceRecord;
@@ -33,7 +34,6 @@ final class PairingGrant extends AbstractGrant
     public const IDENTIFIER = 'urn:studip:app-connect:pairing';
 
     /** Accounts that may connect the app. */
-    private const PERMISSIONS = ['autor', 'tutor', 'dozent', 'admin', 'root'];
 
     /** @var \Closure(string, DeviceRecord): void|null */
     private ?\Closure $onConnected;
@@ -134,9 +134,6 @@ final class PairingGrant extends AbstractGrant
 
     private function mayConnect(string $userId): bool
     {
-        $user = \User::find($userId);
-        return $user !== null
-            && (int) $user->locked === 0
-            && in_array($user->perms, self::PERMISSIONS, true);
+        return AccountGate::mayUseApp(\User::find($userId));
     }
 }
