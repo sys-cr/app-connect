@@ -105,4 +105,32 @@ final class RateLimiterTest extends TestCase
     {
         return 0;
     }
+
+    /** Counting is one atomic increment per counter, never a read followed by a write. */
+    public function testRecordingOnlyIncrements(): void
+    {
+        $store = new class implements \AppConnect\RateLimit\CounterStore {
+            public int $reads = 0;
+            /** @var list<string> */
+            public array $increments = [];
+
+            public function read(string $key): int
+            {
+                $this->reads++;
+                return 0;
+            }
+
+            public function increment(string $key, int $ttlSeconds): int
+            {
+                $this->increments[] = $key;
+                return 1;
+            }
+        };
+        $limiter = new RateLimiter($store, Limits::pairingFailures(), self::SECRET, static fn (): int => 1_000_000);
+
+        $limiter->record('192.0.2.1');
+
+        self::assertSame(0, $store->reads);
+        self::assertCount(2, $store->increments);
+    }
 }

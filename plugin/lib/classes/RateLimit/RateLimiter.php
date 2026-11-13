@@ -11,9 +11,10 @@ use InvalidArgumentException;
 
 /**
  * Fixed-window limits per client address and for the whole instance.
- * Counters live in the cache, so a flushed cache only resets them early.
+ * Counters live in the database ({@see DatabaseCounterStore}) and go up
+ * atomically, so concurrent requests are all counted.
  *
- * The cache holds no client addresses: an address is replaced by a keyed
+ * The counters hold no client addresses: an address is replaced by a keyed
  * HMAC with the installation's secret, shortened to 128 bits. Without the
  * secret the value cannot be traced back to an address, not even by trying
  * every IPv4 address.
@@ -40,13 +41,11 @@ final class RateLimiter
             || $this->store->read($this->globalKey()) >= $this->limits->global;
     }
 
-    /** Counts one event from $address. */
+    /** Counts one event from $address; each counter goes up in one atomic step. */
     public function record(string $address): void
     {
-        $addressKey = $this->addressKey($address);
-        $this->store->write($addressKey, $this->store->read($addressKey) + 1, $this->limits->perAddressWindow);
-        $globalKey = $this->globalKey();
-        $this->store->write($globalKey, $this->store->read($globalKey) + 1, $this->limits->globalWindow);
+        $this->store->increment($this->addressKey($address), $this->limits->perAddressWindow);
+        $this->store->increment($this->globalKey(), $this->limits->globalWindow);
     }
 
     /** The cache key of $address in the current window. */

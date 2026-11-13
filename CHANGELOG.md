@@ -10,6 +10,10 @@ Alle nennenswerten Änderungen an diesem Projekt stehen in dieser Datei. Das For
 
 ### Sicherheit
 
+- Die Zähler der Grenzen (Kopplung, Widerruf, Kalender-Schlüssel) liegen in der neuen
+  Tabelle `app_connect_counters` (Migration 017) und zählen atomar. Im Cache konnten sich
+  gleichzeitige Anfragen gegenseitig überschreiben, sodass die Grenzen nicht griffen
+  (GHSA-h233-jcr9-9x32).
 - Erneuern, Entfernen und Widerrufen sperren Gerätezeile und Refresh-Token in fester
   Reihenfolge. Zwei gleichzeitige Erneuerungen oder eine Erneuerung während des Entfernens
   konnten bisher eine gültige Token-Familie ohne Gerät hinterlassen (GHSA-mpgv-rh37-3q3h).
@@ -138,6 +142,9 @@ All notable changes to this project are documented in this file. The format foll
 
 #### Security
 
+- The limit counters (pairing, revocation, calendar key) live in the new table
+  `app_connect_counters` (migration 017) and count atomically. In the cache, concurrent
+  requests could overwrite each other, so the limits did not hold (GHSA-h233-jcr9-9x32).
 - Refresh, removal and revocation lock the device row and the refresh token in a fixed
   order. Two simultaneous refreshes or a refresh during removal could leave a valid token
   family without a device (GHSA-mpgv-rh37-3q3h).

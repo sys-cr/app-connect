@@ -80,7 +80,7 @@ token is known or not: 300 per client address in 10 minutes and 300 per minute
 for the whole instance. Opening a refresh token costs a key
 derivation, so the limit protects the server, not the tokens; the tokens are
 encrypted or signed and cannot be guessed. Addresses are counted as a keyed
-HMAC in the Stud.IP cache, never in plain form. The address is `REMOTE_ADDR`;
+HMAC in the table `app_connect_counters`, never in plain form. The address is `REMOTE_ADDR`;
 behind a reverse proxy the operator must make it the client's address (see
 the operator manual).
 

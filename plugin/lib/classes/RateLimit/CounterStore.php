@@ -7,10 +7,16 @@ declare(strict_types=1);
 
 namespace AppConnect\RateLimit;
 
-/** Short-lived counters behind {@see RateLimiter}. */
+/** Short-lived counters behind {@see RateLimiter} and {@see \AppConnect\Calendar\IcalKeyLimit}. */
 interface CounterStore
 {
+    /** The current count of $key, 0 when it does not exist or has expired. */
     public function read(string $key): int;
 
-    public function write(string $key, int $value, int $ttlSeconds): void;
+    /**
+     * Adds one to $key in a single atomic step and returns the new count, so
+     * concurrent requests never overwrite each other. A new key expires
+     * after $ttlSeconds.
+     */
+    public function increment(string $key, int $ttlSeconds): int;
 }

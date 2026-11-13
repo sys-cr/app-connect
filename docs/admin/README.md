@@ -208,12 +208,14 @@ Ereignisprotokolls.
 | Kopplungscodes | `app_connect_pairing_codes` | SHA-256-Hash, Person, Geräte-ID, Zeitpunkte |
 | Geräte | `app_connect_devices` | in der App gewählter Gerätename, Plattform, Art der Verbindung, IDs der OAuth2-Tokens (nicht die Tokens), Zeitpunkte |
 | Links für die Anmeldung im Web | `app_connect_web_login_tickets` | SHA-256-Hash, Person, zu öffnende Seite, Verweis auf Token und Gerät, Zeitpunkte |
-| Kalender-Schlüssel | Konfiguration der Person (Kern, `IcalExport`) | wie vom Kern verwaltet; das Plugin legt ihn an oder löscht ihn, ein Zähler der neuen Schlüssel liegt eine Stunde im Cache |
+| Kalender-Schlüssel | Konfiguration der Person (Kern, `IcalExport`) | wie vom Kern verwaltet; das Plugin legt ihn an oder löscht ihn, ein Zähler der neuen Schlüssel liegt eine Stunde in `app_connect_counters` |
 | Einstellungen | `config` (Sektion „Stud.App“), `app_connect_settings` | eure Einstellungen, Client-ID, gespeicherte Adresse, zufälliger Schlüssel für die Zähler der Grenzen |
-| Fehlversuche beim Koppeln | Stud.IP-Cache | Zähler je Adresse, 10 Minuten |
-| Widerrufe von Tokens | Stud.IP-Cache | Zähler je Adresse, 10 Minuten |
+| Fehlversuche beim Koppeln | `app_connect_counters` | Zähler je Adresse, 10 Minuten |
+| Widerrufe von Tokens | `app_connect_counters` | Zähler je Adresse, 10 Minuten |
 
-Die Zähler im Cache enthalten keine IP-Adressen. Statt der Adresse steht dort ein HMAC-SHA256
+Die Zähler liegen in der Datenbank, damit gleichzeitige Anfragen alle gezählt werden und
+alle Webserver dieselben Werte sehen; der Aufräum-Cronjob löscht abgelaufene. Sie enthalten
+keine IP-Adressen. Statt der Adresse steht dort ein HMAC-SHA256
 mit dem Schlüssel der Installation, gekürzt auf 128 Bit; ohne diesen Schlüssel lässt sich
 die Adresse auch durch Ausprobieren aller IPv4-Adressen nicht zurückgewinnen. Der Schlüssel
 entsteht bei der ersten Anfrage und liegt nur in `app_connect_settings`.
@@ -504,12 +506,14 @@ days; the other entries of the plugin follow your event log settings.
 | pairing codes | `app_connect_pairing_codes` | SHA-256 hash, person, device id, times |
 | devices | `app_connect_devices` | device name chosen in the app, platform, how it was connected, ids of the OAuth2 tokens (not the tokens), times |
 | web login links | `app_connect_web_login_tickets` | SHA-256 hash, person, page to open, token/device reference, times |
-| calendar key | the person's configuration (core, `IcalExport`) | as the core keeps it; the plugin creates or deletes it, a count of new keys stays in the cache for an hour |
+| calendar key | the person's configuration (core, `IcalExport`) | as the core keeps it; the plugin creates or deletes it, a count of new keys stays in `app_connect_counters` for an hour |
 | settings | `config` (section "Stud.App"), `app_connect_settings` | your settings, client id, recorded address, random key for the limit counters |
-| failed pairing attempts | Stud.IP cache | counter per address, 10 minutes |
-| token revocations | Stud.IP cache | counter per address, 10 minutes |
+| failed pairing attempts | `app_connect_counters` | counter per address, 10 minutes |
+| token revocations | `app_connect_counters` | counter per address, 10 minutes |
 
-The counters in the cache hold no IP addresses. In place of the address they hold an
+The counters live in the database, so concurrent requests are all counted and every web
+server sees the same values; the cleanup cronjob deletes expired ones. They hold no IP
+addresses. In place of the address they hold an
 HMAC-SHA256 with the installation's key, shortened to 128 bits; without that key the address
 cannot be recovered, not even by trying every IPv4 address. The key is created on the first
 request and lives only in `app_connect_settings`.

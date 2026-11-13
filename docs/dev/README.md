@@ -27,7 +27,7 @@ Komponenten in `plugin/lib/classes/`:
 | `WebLogin` | einmalige Tickets für die Anmeldung im Web, Prüfung von `return_to`, die Anmeldung wie im Kern-Login |
 | `Calendar` | der Kalender der Person in den Ressourcen der Kern-Route `users/{id}/events` mit Kursfarben (`UserEvents`); Abo-Adresse des Kalender-Schlüssels (`IcalSubscription`), neue Schlüssel und ihre Grenze (`IcalKey`, `IcalKeyLimit`) |
 | `Places`, `Profile` | Orte von Terminen mit Koordinaten, die Profilsprache |
-| `RateLimit`, `Audit`, `Mail` | Grenzen je Adresse und für die Instanz (`Limits`; Adressen als HMAC mit dem Schlüssel der Installation), Aktionen des Ereignisprotokolls, die Verbindungsmail |
+| `RateLimit`, `Audit`, `Mail` | Grenzen je Adresse und für die Instanz (`Limits`; Adressen als HMAC mit dem Schlüssel der Installation; atomare Zähler in `app_connect_counters`, `DatabaseCounterStore`), Aktionen des Ereignisprotokolls, die Verbindungsmail |
 | `Routes` | schlanke JSON:API-Controller der Routen unten; `AppToken` lässt nur das Token des App-Clients zu |
 | `Help` | kurze Hilfetexte für die Hilfelasche von `connect` und `get` |
 | `ContentBox` | Stil der h2-Überschriften in den Inhaltskästen, mit den Werten des Kerns |
@@ -190,7 +190,7 @@ Components in `plugin/lib/classes/`:
 | `WebLogin` | one-time tickets for the web login, `return_to` checks, the sign-in like the core login |
 | `Calendar` | the person's calendar in the shapes of the core route `users/{id}/events`, with course colours (`UserEvents`); the subscription address of the calendar key (`IcalSubscription`), new keys and their limit (`IcalKey`, `IcalKeyLimit`) |
 | `Places`, `Profile` | places of course dates with coordinates, the profile language |
-| `RateLimit`, `Audit`, `Mail` | limits per address and for the instance (`Limits`; addresses as an HMAC with the installation's key), event log actions, the connection mail |
+| `RateLimit`, `Audit`, `Mail` | limits per address and for the instance (`Limits`; addresses as an HMAC with the installation's key; atomic counters in `app_connect_counters`, `DatabaseCounterStore`), event log actions, the connection mail |
 | `Routes` | thin JSON:API controllers of the routes below; `AppToken` admits only the app client's token |
 | `Help` | short help texts for the help bar of `connect` and `get` |
 | `ContentBox` | style of the h2 headings in the content boxes, with the core's values |
