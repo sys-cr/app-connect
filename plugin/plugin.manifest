@@ -5,4 +5,4 @@ version=1.1.1
 localedomain=app-connect
 description=Connects the Stud.App mobile apps to this Stud.IP instance: discovery of the instance data and one managed OAuth2 client.
 studipMinVersion=6.0
-studipMaxVersion=6.99
+studipMaxVersion=6.3

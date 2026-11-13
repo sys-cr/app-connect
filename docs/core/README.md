@@ -97,10 +97,10 @@ Das Plugin bereitet den Übergang vor; was noch fehlt, kommt mit einer letzten 1
 
   Erkannt wird das an einer Klasse oder einem Konfigurationseintrag des Kerns, nicht an der
   Versionsnummer.
-- **Versionsgrenze.** Sobald feststeht, mit welcher Version der Kern die Funktionen
-  mitbringt, steht diese Version minus eins als `studipMaxVersion` im Manifest. Kern und Plugin
-  dürfen dieselben Routen nie gleichzeitig registrieren, sonst lehnt der Router der JSON:API
-  alle Anfragen ab.
+- **Versionsgrenze.** `studipMaxVersion` im Manifest nennt die neueste geprüfte Version,
+  zurzeit 6.3. Sobald feststeht, mit welcher Version der Kern die Funktionen mitbringt, bleibt
+  die Grenze darunter. Kern und Plugin dürfen dieselben Routen nie gleichzeitig registrieren,
+  sonst lehnt der Router der JSON:API alle Anfragen ab.
 - **Übersetzung.** Die Texte stehen mit deutschen msgids in der Textdomäne `app-connect`
   (`plugin/locale`). Beim Übergang wandern msgids und englische Übersetzungen unverändert
   in den Kernkatalog.
@@ -269,9 +269,10 @@ The plugin prepares the move; what is still missing comes with a last 1.x versio
   - and leaves tables, configuration and client untouched in its `down()` migrations.
 
   Detection uses a core class or configuration entry, not the version number.
-- **Version limit.** As soon as it is known which version brings the functions, that version
-  minus one goes into the manifest as `studipMaxVersion`. Core and plugin must never register
-  the same routes at the same time, or the JSON:API router refuses every request.
+- **Version limit.** `studipMaxVersion` in the manifest names the newest tested version,
+  currently 6.3. Once it is known which version brings the functions, the limit stays below
+  it. Core and plugin must never register the same routes at the same time, or the JSON:API
+  router refuses every request.
 - **Translation.** The texts have German msgids in the text domain `app-connect`
   (`plugin/locale`). On the move, msgids and English translations go unchanged into the
   core catalogue.

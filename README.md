@@ -21,7 +21,7 @@ Funktionen erfahren sie über dieses Plugin.
 **Download:** Das installierbare Plugin-ZIP liegt bei jedem Release unter
 [Releases](https://github.com/sys-cr/app-connect/releases/latest), zusammen mit seiner SHA-256-Prüfsumme.
 
-Unterstützt: Stud.IP 6.0 und neuere 6.x-Versionen. Für Betreiber:
+Unterstützt: Stud.IP 6.0 bis 6.3. Für Betreiber:
 [`docs/admin/README.md`](docs/admin/README.md) mit Einrichtung, allen API-Endpunkten,
 gespeicherten Daten und Aufbewahrung. Für Studierende, Lehrende und Mitarbeitende:
 [`docs/user/README.md`](docs/user/README.md). Wie die Funktionen in den Stud.IP-Kern
@@ -91,7 +91,7 @@ the OAuth2 client and the available features from this plugin.
 **Download:** the installable plugin ZIP comes with every release under
 [Releases](https://github.com/sys-cr/app-connect/releases/latest), together with its SHA-256 checksum.
 
-Supported: Stud.IP 6.0 and later 6.x releases. Operators: see
+Supported: Stud.IP 6.0 to 6.3. Operators: see
 [`docs/admin/README.md`](docs/admin/README.md) for setup, all API endpoints, stored data
 and retention. Students, teachers and staff: see [`docs/user/README.md`](docs/user/README.md). How the functions are meant to move
 into the Stud.IP core: [`docs/core/README.md`](docs/core/README.md).
