@@ -181,4 +181,16 @@ final class WebLoginTest extends TestCase
         self::assertNull($this->service->redeem($mine));
         self::assertNotNull($this->service->redeem($theirs));
     }
+
+    /** admin and root use the web login only when the operator allows it. */
+    public function testAdminAndRootNeedTheSwitch(): void
+    {
+        foreach (['user', 'autor', 'tutor', 'dozent'] as $perms) {
+            self::assertTrue(\AppConnect\WebLogin\WebSignIn::roleMayUseWebLogin($perms, false), $perms);
+        }
+        foreach (['admin', 'root'] as $perms) {
+            self::assertFalse(\AppConnect\WebLogin\WebSignIn::roleMayUseWebLogin($perms, false), $perms);
+            self::assertTrue(\AppConnect\WebLogin\WebSignIn::roleMayUseWebLogin($perms, true), $perms);
+        }
+    }
 }

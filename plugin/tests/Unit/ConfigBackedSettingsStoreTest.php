@@ -109,7 +109,8 @@ final class ConfigBackedSettingsStoreTest extends TestCase
             [OperatorConfig::ENABLED, OperatorConfig::PAIRING_ENABLED, OperatorConfig::PROFILE_ENTRY,
                 OperatorConfig::INSTANCE_NAME, OperatorConfig::INSTANCE_SHORT_NAME, OperatorConfig::PRIVACY_POLICY_URL,
                 OperatorConfig::ROOM_FINDER_PROPERTY, OperatorConfig::SUPPORT_EMAIL, OperatorConfig::LOGO_URL,
-                OperatorConfig::ACCENT_COLOR, OperatorConfig::MENSA_OPENMENSA_IDS, OperatorConfig::MENSA_URL],
+                OperatorConfig::ACCENT_COLOR, OperatorConfig::MENSA_OPENMENSA_IDS, OperatorConfig::MENSA_URL,
+                OperatorConfig::WEB_LOGIN_PRIVILEGED],
             array_values(OperatorConfig::LINK_FIELDS),
             array_values(OperatorConfig::STORE_FIELDS),
             array_values(OperatorConfig::FEATURE_FIELDS)

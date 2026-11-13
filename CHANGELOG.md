@@ -6,6 +6,14 @@ Alle nennenswerten Änderungen an diesem Projekt stehen in dieser Datei. Das For
 [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), die Versionen folgen
 [Semantic Versioning](https://semver.org/lang/de/).
 
+## [Unreleased]
+
+### Änderungen
+
+- Konten mit den Rollen admin und root nutzen die Anmeldung im Web aus der App nur noch,
+  wenn der neue Schalter `APP_CONNECT_WEB_LOGIN_PRIVILEGED` an ist; ab Werk ist er aus
+  (Migration 016) (#8).
+
 ## [1.1.1] – 2026-11-08
 
 ### Änderungen
@@ -116,6 +124,13 @@ Erste veröffentlichte Version.
 All notable changes to this project are documented in this file. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/).
+
+### [Unreleased]
+
+#### Changes
+
+- Accounts with the roles admin and root use the web login from the app only when the new
+  switch `APP_CONNECT_WEB_LOGIN_PRIVILEGED` is on; it is off by default (migration 016) (#8).
 
 ### [1.1.1] – 2026-11-08
 
