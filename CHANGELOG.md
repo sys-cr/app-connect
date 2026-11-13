@@ -6,6 +6,13 @@ Alle nennenswerten Änderungen an diesem Projekt stehen in dieser Datei. Das For
 [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), die Versionen folgen
 [Semantic Versioning](https://semver.org/lang/de/).
 
+## [Unreleased]
+
+### Dokumentation
+
+- Die Admin-Doku sagt, dass die Funktionsschalter steuern, was die App anbietet, und keine
+  Berechtigungen sind; serverseitig gesperrt werden nur die Routen des Plugins (#10).
+
 ## [1.1.1] – 2026-11-08
 
 ### Änderungen
@@ -116,6 +123,13 @@ Erste veröffentlichte Version.
 All notable changes to this project are documented in this file. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/).
+
+### [Unreleased]
+
+#### Documentation
+
+- The admin docs say that the feature switches control what the app offers and are not
+  permissions; only the plugin's own routes are blocked on the server (#10).
 
 ### [1.1.1] – 2026-11-08
 

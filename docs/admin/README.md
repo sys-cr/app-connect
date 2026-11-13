@@ -71,6 +71,14 @@ brauchen, kommt aus den eigenen Routen des Plugins.
    nicht. Die Adresse eures Stud.IP braucht keinen Eintrag: Das Plugin nimmt sie von der
    Instanz.
 
+   Die Schalter `APP_CONNECT_FEATURE_*` steuern, was die App anbietet, und sind keine
+   Berechtigungen. Die App erhält den OAuth2-Scope `api` und erreicht damit die JSON:API so
+   weit, wie der Kern sie der Person freigibt, auch bei ausgeschaltetem Schalter. Serverseitig
+   gesperrt werden nur die Routen des Plugins: Web-Anmeldung, Kalender-Schlüssel, Kalender der
+   Person und Orte von Terminen. Soll ein Zugriff wirklich verboten sein, etwa auf
+   Nachrichten oder Blubber, regelt ihr das über die Rechte, Module und Einstellungen des
+   Kerns.
+
 Ausschalten widerruft den Client: Angemeldete Apps verlieren sofort den Zugang. Erneutes
 Einschalten verwendet denselben Client wieder. Dasselbe gilt, wenn ihr das Plugin in der
 Plugin-Verwaltung deaktiviert oder deinstalliert: Der Client wird widerrufen. Aktiviert ihr
@@ -365,6 +373,13 @@ from the plugin's own routes.
    the colour `#RRGGBB` and the OpenMensa ids numbers; the core editor accepts anything, so
    the plugin shows a warning after saving and does not use other values. The address of
    your Stud.IP needs no entry: the plugin takes it from the instance.
+
+   The `APP_CONNECT_FEATURE_*` switches control what the app offers; they are not
+   permissions. The app gets the OAuth2 scope `api` and reaches the JSON:API as far as the
+   core grants it to the person, even with a switch off. Only the plugin's own routes are
+   blocked on the server: web login, calendar key, the person's calendar and places of
+   course dates. To really forbid an access, for example to messages or Blubber, use the
+   core's permissions, modules and settings.
 
 Switching off revokes the client: signed-in apps lose access immediately. Switching on
 again reuses the same client. The same happens when you disable or uninstall the plugin in
