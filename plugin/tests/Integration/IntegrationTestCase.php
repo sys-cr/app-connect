@@ -17,7 +17,11 @@ use PHPUnit\Framework\TestCase;
  */
 abstract class IntegrationTestCase extends TestCase
 {
-    private const MIGRATIONS = ['002_create_devices_and_pairing_codes.php', '009_add_web_login.php'];
+    private const MIGRATIONS = [
+        '002_create_devices_and_pairing_codes.php',
+        '009_add_web_login.php',
+        '017_count_limits_in_the_database.php',
+    ];
 
     public static function setUpBeforeClass(): void
     {
@@ -32,7 +36,7 @@ abstract class IntegrationTestCase extends TestCase
         \DBManager::reconnect();
         $db = \DBManager::get();
         foreach (['app_connect_devices', 'app_connect_pairing_codes', 'app_connect_web_login_tickets',
-            'oauth2_refresh_tokens', 'oauth2_access_tokens'] as $table) {
+            'app_connect_counters', 'oauth2_refresh_tokens', 'oauth2_access_tokens'] as $table) {
             $db->exec("DROP TABLE IF EXISTS `$table`");
         }
         foreach (self::MIGRATIONS as $file) {
@@ -51,10 +55,10 @@ abstract class IntegrationTestCase extends TestCase
     }
 
     /**
-     * Runs $work in $count processes at once and returns their results.
-     * Each process uses its own database connection.
+     * Runs $work in $count processes at once and returns their results in
+     * order. Each process gets its index and its own database connection.
      *
-     * @param \Closure(): (string|null) $work
+     * @param \Closure(int): (string|null) $work
      * @return list<string|null>
      */
     protected function concurrently(int $count, \Closure $work): array
@@ -69,7 +73,7 @@ abstract class IntegrationTestCase extends TestCase
             $pid = pcntl_fork();
             if ($pid === 0) {
                 \DBManager::reconnect();
-                file_put_contents($files[$i], serialize($work()));
+                file_put_contents($files[$i], serialize($work($i)));
                 exit(0);
             }
             $pids[] = $pid;
