@@ -19,6 +19,8 @@ final class InstanceInfo
      * @param string $pluginVersion from plugin.manifest
      * @param string $locale        e.g. de_DE
      * @param bool   $coursewareModule whether the core module Courseware is active
+     * @param string|null $logoVersion content version of the plugin's copy of the
+     *                    logo ({@see \AppConnect\Logo\LogoImage::version()}), null without one
      */
     public function __construct(
         public readonly string $baseUrl,
@@ -27,6 +29,7 @@ final class InstanceInfo
         public readonly string $pluginVersion,
         public readonly string $locale,
         public readonly bool $coursewareModule = false,
+        public readonly ?string $logoVersion = null,
     ) {
     }
 }

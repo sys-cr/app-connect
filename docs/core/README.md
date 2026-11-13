@@ -24,6 +24,7 @@ Dokument ist der Vorschlag dafür.
 | Funktion im Plugin | Ziel im Kern | Was im Kern entfällt |
 |---|---|---|
 | Discovery `GET app-connect/discovery` (`Discovery\*`) | Route der Kern-JSON:API unter demselben Pfad, Werte aus `Config` | Feld-Allowlist für Plugin-Einstellungen, eigene Versionsermittlung |
+| Logo `GET app-connect/logo` (`Logo\*`, Tabelle `app_connect_logo`) | Logo als Datei im Kern, z. B. im Konfigurationseditor hochgeladen und beim Hochladen geprüft, und dieselbe Route | Abruf einer fremden Adresse mit eigenem SSRF-Schutz, Tabelle für die Kopie |
 | Betreiber-Einstellungen, Sektion „Stud.App“ (`Settings\OperatorConfig`) | dieselben Einträge `APP_CONNECT_*` in einer produktneutralen Sektion; Prüfung der Werte im Konfigurationseditor | Warnung nach dem Speichern über `ConfigValueDidChange` |
 | Interne Werte `app_connect_settings` (Client-ID, Basis-Adresse) | Konfigurationseinträge des Kerns | Tabelle `app_connect_settings` |
 | Ein OAuth2-Client für alle Apps (`OAuth2\ClientProvisioner`) | vom Kern verwalteter Client mit Kennzeichen „vom System verwaltet“, nicht bearbeitbar in der OAuth2-Verwaltung | Bereitstellen und Widerrufen über `ConfigValueDidChange`, `onEnable`/`onDisable` |
@@ -77,6 +78,7 @@ Die Tabellen sind von Anfang an so geschnitten, wie sie im Kern aussehen sollen.
 | `app_connect_pairing_codes` | wird übernommen (bzw. `oauth2_pairing_codes`) |
 | `app_connect_web_login_tickets` | wird übernommen oder geht in ein gehärtetes `Token` auf |
 | `app_connect_settings` | entfällt; Werte gehen in die Konfiguration |
+| `app_connect_logo` | entfällt; das Logo wird eine Datei des Kerns |
 | `config`, Einträge `APP_CONNECT_*` | bleiben mit Namen und Werten; nur die Sektion wird umbenannt |
 | `log_actions` `APPCONNECT_*` | werden Kern-Aktionen (`type = 'core'`); vorhandene `log_events` bleiben |
 | Cronjob `AppConnectCleanupJob` | wird durch den Kern-Cronjob ersetzt |
@@ -197,6 +199,7 @@ Stud.IP e.V. This document is the proposal for that.
 | Function in the plugin | Target in the core | What the core no longer needs |
 |---|---|---|
 | Discovery `GET app-connect/discovery` (`Discovery\*`) | route of the core JSON:API under the same path, values from `Config` | field allowlist for plugin settings, own version lookup |
+| Logo `GET app-connect/logo` (`Logo\*`, table `app_connect_logo`) | the logo as a file in the core, for example uploaded in the configuration editor and checked on upload, and the same route | fetching a foreign address with its own SSRF protection, the table for the copy |
 | Operator settings, section "Stud.App" (`Settings\OperatorConfig`) | the same `APP_CONNECT_*` entries in a product-neutral section; values validated in the configuration editor | warning after saving via `ConfigValueDidChange` |
 | Internal values `app_connect_settings` (client id, base URL) | core configuration entries | table `app_connect_settings` |
 | One OAuth2 client for all apps (`OAuth2\ClientProvisioner`) | client managed by the core, flagged "managed by the system", not editable in the OAuth2 administration | provisioning and revoking via `ConfigValueDidChange`, `onEnable`/`onDisable` |
@@ -250,6 +253,7 @@ The tables are cut from the start the way they should look in the core.
 | `app_connect_pairing_codes` | taken over (or `oauth2_pairing_codes`) |
 | `app_connect_web_login_tickets` | taken over or merged into a hardened `Token` |
 | `app_connect_settings` | dropped; values move into the configuration |
+| `app_connect_logo` | dropped; the logo becomes a core file |
 | `config`, entries `APP_CONNECT_*` | keep names and values; only the section is renamed |
 | `log_actions` `APPCONNECT_*` | become core actions (`type = 'core'`); existing `log_events` stay |
 | Cronjob `AppConnectCleanupJob` | replaced by the core cronjob |

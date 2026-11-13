@@ -69,7 +69,10 @@
       "properties": {
         "accentColor": { "$ref": "#/$defs/hexColor" },
         "gradient": { "type": "array", "items": { "$ref": "#/$defs/hexColor" }, "minItems": 1, "maxItems": 3 },
-        "logoUrl": { "$ref": "#/$defs/httpsUrl" }
+        "logoUrl": {
+          "$ref": "#/$defs/httpsUrl",
+          "description": "The plugin's own copy of the institution logo on the instance host: <baseUrl>/jsonapi.php/v1/app-connect/logo?v=<content version>. PNG, JPEG or WebP, 32 to 2048 pixels per side. Left out while the plugin holds no valid copy; never the address the operator configured, because the apps load the logo only from the instance host."
+        }
       }
     },
     "links": {

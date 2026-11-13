@@ -9,6 +9,7 @@ require_once __DIR__ . '/bootstrap.php';
 
 use AppConnect\Audit\EventLog;
 use AppConnect\Devices\DeviceRetention;
+use AppConnect\Logo\LogoStatusText;
 use AppConnect\OAuth2\ClientProvisioner;
 use AppConnect\Privacy\UserDataExport;
 use AppConnect\Routes\CourseDatePlacesShow;
@@ -16,6 +17,7 @@ use AppConnect\Routes\DevicesCreate;
 use AppConnect\Routes\DiscoveryShow;
 use AppConnect\Routes\IcalKeyDelete;
 use AppConnect\Routes\IcalKeyShow;
+use AppConnect\Routes\LogoShow;
 use AppConnect\Routes\TokenCreate;
 use AppConnect\Routes\TokenRevocationCreate;
 use AppConnect\Routes\UserEventsShow;
@@ -27,8 +29,9 @@ use JsonApi\Contracts\JsonApiPlugin;
 use Slim\Routing\RouteCollectorProxy;
 
 /**
- * Connects the mobile apps to this instance: the public discovery, the token
- * and revocation endpoints of the shared app client, device registration,
+ * Connects the mobile apps to this instance: the public discovery and the
+ * institution logo it names, the token and revocation endpoints of the
+ * shared app client, device registration,
  * the one-time web login from the app, the page "Stud.App Verbindung" under
  * Profile → Settings and the operator settings in the configuration section
  * "Stud.App" (Admin → System → Konfiguration).
@@ -109,6 +112,7 @@ class AppConnect extends StudIPPlugin implements SystemPlugin, JsonApiPlugin, Pr
     public function registerUnauthenticatedRoutes(RouteCollectorProxy $group)
     {
         $group->get('/app-connect/discovery', DiscoveryShow::class);
+        $group->get('/app-connect/logo', LogoShow::class);
         $group->post('/app-connect/token', TokenCreate::class);
         $group->post('/app-connect/revoke', TokenRevocationCreate::class);
     }
@@ -149,6 +153,9 @@ class AppConnect extends StudIPPlugin implements SystemPlugin, JsonApiPlugin, Pr
         }
         EventLog::record(EventLog::SETTINGS_CHANGE, $field);
         $value = trim((string) ($change['new_value'] ?? ''));
+        if ($field === OperatorConfig::LOGO_URL) {
+            $this->logoChanged($value);
+        }
         if ($field === OperatorConfig::SUPPORT_EMAIL && !OperatorConfig::isEmail($value)) {
             // The apps then send content reports to the project's own address.
             PageLayout::postInfo($this->_('Ohne Support-Adresse (APP_CONNECT_SUPPORT_EMAIL) gehen Meldungen von Inhalten aus der App an support@studapp2.de, den Support des Projekts Stud.App. Tragen Sie unter Admin → System → Konfiguration, Sektion „Stud.App“, die Support-Adresse Ihrer Hochschule ein, damit Meldungen dort ankommen.'));
@@ -173,7 +180,17 @@ class AppConnect extends StudIPPlugin implements SystemPlugin, JsonApiPlugin, Pr
     }
 
     /**
-     * The discovery, the token and the revocation endpoint are called
+     * A new logo address is fetched at once, so the operator learns right
+     * after saving whether the apps get the picture; an empty or non-https
+     * address deletes the copy.
+     */
+    private function logoChanged(string $url): void
+    {
+        LogoStatusText::post(Runtime::logo($url)->refresh($url));
+    }
+
+    /**
+     * The discovery, the logo, the token and the revocation endpoint are called
      * without a session, so the plugin must be loaded for the "Nobody" role
      * as well.
      */

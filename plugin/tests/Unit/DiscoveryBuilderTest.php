@@ -107,6 +107,29 @@ final class DiscoveryBuilderTest extends TestCase
         self::assertSame(['blubberChannel' => 20], $payload['pollIntervals']);
     }
 
+    public function testTheLogoPointsToThePluginRouteOnlyWithAValidCopy(): void
+    {
+        $settings = new Settings(new InMemorySettingsStore([
+            Settings::OAUTH_CLIENT_ID => '7',
+            Settings::BRANDING => ['logoUrl' => 'https://www.example.org/img/logo.png'],
+        ]));
+        $withCopy = new InstanceInfo('https://studip.example.org', 'Uni', '6.3.0', '1.1.1', 'de_DE', false, '0123456789abcdef');
+
+        $payload = (new DiscoveryBuilder())->build($settings, $withCopy);
+
+        DiscoverySchema::assertValid($payload);
+        self::assertSame(
+            'https://studip.example.org/jsonapi.php/v1/app-connect/logo?v=0123456789abcdef',
+            $payload['branding']['logoUrl']
+        );
+        // The configured address is never published: the apps load the logo
+        // only from the instance's host.
+        $withoutCopy = new InstanceInfo('https://studip.example.org', 'Uni', '6.3.0', '1.1.1', 'de_DE');
+        self::assertArrayNotHasKey('branding', (new DiscoveryBuilder())->build($settings, $withoutCopy));
+        $badVersion = new InstanceInfo('https://studip.example.org', 'Uni', '6.3.0', '1.1.1', 'de_DE', false, '../x');
+        self::assertArrayNotHasKey('branding', (new DiscoveryBuilder())->build($settings, $badVersion));
+    }
+
     public function testInvalidOptionalValuesAreDroppedNotPublished(): void
     {
         $payload = $this->build([

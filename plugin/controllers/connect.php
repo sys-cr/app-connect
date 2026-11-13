@@ -6,10 +6,15 @@
 declare(strict_types=1);
 
 use AppConnect\Attribution;
+use AppConnect\Audit\EventLog;
 use AppConnect\Connect\ConnectLink;
 use AppConnect\Devices\DeviceService;
 use AppConnect\Devices\TokenLedger;
+use AppConnect\Discovery\DiscoveryBuilder;
 use AppConnect\Help;
+use AppConnect\Logo\LogoImage;
+use AppConnect\Logo\LogoRejected;
+use AppConnect\Logo\LogoStatusText;
 use AppConnect\Pairing\PairingService;
 use AppConnect\Runtime;
 use AppConnect\Settings\Settings;
@@ -18,7 +23,8 @@ use AppConnect\Settings\Settings;
  * Profile → Settings → "Stud.App Verbindung", above "Drittanwendungen":
  * create a pairing code shown as QR code, watch the connection happen, list and
  * remove connected devices. Acts only for the signed-in person; a `username`
- * parameter is ignored.
+ * parameter is ignored. For root the page also shows the state of the
+ * institution logo the plugin serves to the apps.
  */
 class ConnectController extends PluginController
 {
@@ -60,6 +66,71 @@ class ConnectController extends PluginController
         if ($GLOBALS['perm']->have_perm('root') && !is_string($supportEmail)) {
             PageLayout::postInfo($this->_('Ohne Support-Adresse (APP_CONNECT_SUPPORT_EMAIL) gehen Meldungen von Inhalten aus der App an support@studapp2.de, den Support des Projekts Stud.App. Tragen Sie unter Admin → System → Konfiguration, Sektion „Stud.App“, die Support-Adresse Ihrer Hochschule ein, damit Meldungen dort ankommen.'));
         }
+        $this->logo = null;
+        if ($GLOBALS['perm']->have_perm('root')) {
+            $url = Runtime::configuredLogoUrl();
+            $status = Runtime::logo()->status($url);
+            $this->logo = [
+                'configured' => $url,
+                'status' => $status,
+                'problem' => $status?->problem !== null ? LogoStatusText::reason($status->problem) : null,
+                'preview' => $status?->image !== null
+                    ? Runtime::baseUrl() . '/jsonapi.php/v1/' . DiscoveryBuilder::LOGO_ROUTE . '?v=' . $status->image->version()
+                    : null,
+            ];
+        }
+    }
+
+    /** Fetches the configured logo again (root only). */
+    public function reload_logo_action()
+    {
+        CSRFProtection::verifyUnsafeRequest();
+        $GLOBALS['perm']->check('root');
+        LogoStatusText::post(Runtime::logo()->refresh(Runtime::configuredLogoUrl()));
+        $this->redirect('connect/index');
+    }
+
+    /**
+     * Stores an uploaded picture as the logo (root only). It passes the same
+     * checks as a fetched one and takes precedence over the address.
+     */
+    public function upload_logo_action()
+    {
+        CSRFProtection::verifyUnsafeRequest();
+        $GLOBALS['perm']->check('root');
+        $file = $_FILES['logo'] ?? null;
+        $error = is_array($file) ? (int) ($file['error'] ?? UPLOAD_ERR_NO_FILE) : UPLOAD_ERR_NO_FILE;
+        try {
+            if ($error === UPLOAD_ERR_INI_SIZE || $error === UPLOAD_ERR_FORM_SIZE
+                || ($error === UPLOAD_ERR_OK && (int) $file['size'] > LogoImage::MAX_BYTES)) {
+                throw new LogoRejected(LogoRejected::TOO_LARGE);
+            }
+            if ($error !== UPLOAD_ERR_OK || !is_uploaded_file((string) $file['tmp_name'])) {
+                PageLayout::postError(htmlReady($this->_('Wählen Sie eine Bilddatei aus: PNG, JPEG oder WebP, höchstens 512 KB.')));
+            } else {
+                Runtime::logo()->upload((string) file_get_contents((string) $file['tmp_name']));
+                EventLog::record(EventLog::SETTINGS_CHANGE, 'logo upload');
+                PageLayout::postSuccess(htmlReady($this->_('Das Logo wurde hochgeladen. Die Apps erhalten es von diesem Server.')));
+            }
+        } catch (LogoRejected $rejected) {
+            PageLayout::postError(htmlReady(sprintf(
+                $this->_('Das Logo wurde nicht übernommen: %s'),
+                LogoStatusText::reason($rejected->reason)
+            )));
+        }
+        $this->redirect('connect/index');
+    }
+
+    /** Deletes the uploaded logo; the address from the configuration applies again (root only). */
+    public function remove_logo_action()
+    {
+        CSRFProtection::verifyUnsafeRequest();
+        $GLOBALS['perm']->check('root');
+        $logo = Runtime::logo()->removeUpload(Runtime::configuredLogoUrl());
+        EventLog::record(EventLog::SETTINGS_CHANGE, 'logo upload removed');
+        PageLayout::postSuccess(htmlReady($this->_('Das hochgeladene Logo wurde entfernt.')));
+        LogoStatusText::post($logo);
+        $this->redirect('connect/index');
     }
 
     public function create_code_action()

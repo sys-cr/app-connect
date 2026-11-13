@@ -123,7 +123,7 @@ final class OperatorConfig
             self::SUPPORT_EMAIL => ['type' => 'string', 'value' => '', 'description' =>
                 'E-Mail-Adresse des Supports der Hochschule für Hilfe und Meldungen von Inhalten in der App. Bitte eintragen: Ohne Adresse gehen Meldungen an support@studapp2.de (Projekt Stud.App).'],
             self::LOGO_URL => ['type' => 'string', 'value' => '', 'description' =>
-                'Adresse des Hochschul-Logos für die App, beginnend mit https://.'],
+                'Adresse des Hochschul-Logos für die App, beginnend mit https://. Das Bild wird vom Plugin abgerufen und auf diesem Server ausgeliefert; PNG, JPEG oder WebP, höchstens 512 KB, 32 bis 2048 Pixel je Seite.'],
             self::ACCENT_COLOR => ['type' => 'string', 'value' => '', 'description' =>
                 'Akzentfarbe der Hochschule als #RRGGBB. Die App leitet daraus ein kontrastsicheres Farbschema ab. Leer: Standardschema.'],
             self::LINK_HOMEPAGE => ['type' => 'string', 'value' => '', 'description' =>

@@ -8,6 +8,10 @@ declare(strict_types=1);
 namespace AppConnect;
 
 use AppConnect\Discovery\InstanceInfo;
+use AppConnect\Logo\CurlHttpFetcher;
+use AppConnect\Logo\DatabaseLogoStore;
+use AppConnect\Logo\LogoFetch;
+use AppConnect\Logo\LogoService;
 use AppConnect\OAuth2\ClientProvisioner;
 use AppConnect\Settings\ConfigBackedSettingsStore;
 use AppConnect\Settings\DatabaseSettingsStore;
@@ -16,8 +20,8 @@ use AppConnect\Settings\StudipConfigAccess;
 
 /**
  * Wiring to the running Stud.IP: settings from the configuration section
- * "Stud.App" and the plugin table, and the facts about the instance the
- * discovery needs.
+ * "Stud.App" and the plugin table, the copy of the institution logo, and
+ * the facts about the instance the discovery needs.
  */
 final class Runtime
 {
@@ -56,7 +60,77 @@ final class Runtime
             self::pluginVersion(),
             (string) (\Config::get()->getValue('DEFAULT_LANGUAGE') ?? ''),
             self::coursewareModuleActive(),
+            self::logoVersion(),
         );
+    }
+
+    /**
+     * Content version of the logo copy for the discovery. A missing table
+     * (an update whose migrations have not run yet) leaves the logo out
+     * instead of breaking the discovery.
+     */
+    private static function logoVersion(): ?string
+    {
+        try {
+            return self::logo()->current(self::configuredLogoUrl())?->version();
+        } catch (\PDOException) {
+            return null;
+        }
+    }
+
+    /** The logo address from the section "Stud.App" when it is https, else null. */
+    public static function configuredLogoUrl(): ?string
+    {
+        $url = self::settings()->arrayValue(Settings::BRANDING)['logoUrl'] ?? null;
+        return is_string($url) ? $url : null;
+    }
+
+    /**
+     * The plugin's copy of the logo. Fetches go out over the core's
+     * HTTP_PROXY unless the host is listed in HTTP_PROXY_IGNORE, as the
+     * core's own requests do.
+     *
+     * @param string|null $url the address about to be fetched; the configured one when null
+     */
+    public static function logo(?string $url = null): LogoService
+    {
+        $host = (string) parse_url(self::baseUrl(), PHP_URL_HOST);
+        $proxy = self::proxyFor($url ?? self::configuredLogoUrl());
+        return new LogoService(
+            new DatabaseLogoStore(),
+            new LogoFetch(new CurlHttpFetcher($proxy), self::resolver(), $host)
+        );
+    }
+
+    /** host:port of the core's proxy for $url, or null for a direct connection. */
+    private static function proxyFor(?string $url): ?string
+    {
+        $proxy = trim((string) \Config::get()->getValue('HTTP_PROXY'));
+        if ($proxy === '' || $url === null) {
+            return null;
+        }
+        $host = (string) parse_url($url, PHP_URL_HOST);
+        $ignore = array_filter(array_map('trim', explode(',', (string) \Config::get()->getValue('HTTP_PROXY_IGNORE'))));
+        foreach ($ignore as $pattern) {
+            if (fnmatch($pattern, $host)) {
+                return null;
+            }
+        }
+        return $proxy;
+    }
+
+    /** @return \Closure(string): list<string> the IPv4 and IPv6 addresses of a host name */
+    private static function resolver(): \Closure
+    {
+        return static function (string $host): array {
+            $addresses = @gethostbynamel($host) ?: [];
+            foreach (@dns_get_record($host, DNS_AAAA) ?: [] as $record) {
+                if (isset($record['ipv6']) && is_string($record['ipv6'])) {
+                    $addresses[] = $record['ipv6'];
+                }
+            }
+            return array_values(array_unique($addresses));
+        };
     }
 
     /**
