@@ -12,10 +12,12 @@ brauchen, kommt aus den eigenen Routen des Plugins.
 - Stud.IP 6.0 bis 6.3, PHP 8.1 oder neuer. Das Plugin-ZIP braucht zur
   Laufzeit keine Composer-Pakete.
 - HTTPS für die ganze Instanz.
-- Stud.IP im Wurzelpfad seines Servers, etwa `https://studip.example.org/`. Die
-  Verbindungslinks tragen nur den Server, deshalb erreichen die Apps eine Instanz unter einem
-  Unterpfad wie `https://example.org/studip/` nicht. Enthält `$ABSOLUTE_URI_STUDIP` einen
-  Pfad, lässt sich die App-Verbindung nicht einschalten.
+- Stud.IP im Wurzelpfad seines Servers (`https://studip.example.org/`) oder unter einem
+  Unterpfad (`https://example.org/studip/`). Den Unterpfad tragen QR-Code und
+  Verbindungslink mit; ihn verstehen nur App-Versionen, die den Basispfad kennen, ältere
+  melden „keine Stud.App-Verbindung“. Der Pfad darf bis zu acht Abschnitte aus Buchstaben,
+  Ziffern und `-`, `.`, `_`, `~` haben, sonst lässt sich die App-Verbindung nicht
+  einschalten. Einzelheiten: [`contract/connect-link.md`](../../contract/connect-link.md).
 - `$ABSOLUTE_URI_STUDIP` in `config/config_local.inc.php` gesetzt. Ohne diesen Wert leitet
   Stud.IP seine eigene Adresse aus dem `Host`-Header jeder Anfrage ab, und ein gefälschter
   Header kann eine fremde Adresse in erzeugte Links bringen. Das Plugin speichert die
@@ -374,10 +376,12 @@ from the plugin's own routes.
 - Stud.IP 6.0 to 6.3, PHP 8.1 or later. The plugin ZIP needs no Composer
   packages at runtime.
 - HTTPS for the whole instance.
-- Stud.IP at the root path of its server, such as `https://studip.example.org/`. The connect
-  links carry the server only, so the apps cannot reach an instance below a path such as
-  `https://example.org/studip/`. If `$ABSOLUTE_URI_STUDIP` contains a path, the app
-  connection cannot be switched on.
+- Stud.IP at the root path of its server (`https://studip.example.org/`) or below a path
+  (`https://example.org/studip/`). QR code and connect link carry the path; only app
+  versions that know the base path understand it, older ones report "no Stud.App
+  connection". The path may have up to eight segments of letters, digits and `-`, `.`, `_`,
+  `~`; otherwise the app connection cannot be switched on. Details:
+  [`contract/connect-link.md`](../../contract/connect-link.md).
 - `$ABSOLUTE_URI_STUDIP` set in `config/config_local.inc.php`. Without it Stud.IP derives
   its own address from the `Host` header of each request, and a forged header could put a
   foreign address into generated links. The plugin records the address when you switch the

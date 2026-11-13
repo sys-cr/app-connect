@@ -6,6 +6,16 @@ Alle nennenswerten Änderungen an diesem Projekt stehen in dieser Datei. Das For
 [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), die Versionen folgen
 [Semantic Versioning](https://semver.org/lang/de/).
 
+## [Unreleased]
+
+### Funktionen
+
+- Stud.IP unter einem Unterpfad (etwa `https://example.org/studip/`) lässt sich verbinden.
+  QR-Code und Verbindungslink tragen den Basispfad mit (`path` im Verbindungslink,
+  Vertrag Abschnitt 3); die Apps erkennen eine Instanz an Server und Pfad. Abgelehnt wird
+  nur noch ein Pfad, der sich nicht in den Link übernehmen lässt. Ältere Apps ignorieren
+  den Pfad und melden „keine Stud.App-Verbindung“ (#6).
+
 ## [1.2.0] – 2026-11-13
 
 Version 1.2.0 setzt die Befunde eines externen Audits von Version 1.1.1 um.
@@ -194,6 +204,15 @@ Erste veröffentlichte Version.
 All notable changes to this project are documented in this file. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/).
+
+### [Unreleased]
+
+#### Features
+
+- Stud.IP below a path (such as `https://example.org/studip/`) can be connected. QR code
+  and connect link carry the base path (`path` in the connect link, contract section 3);
+  the apps identify an instance by host and path. Only a path that cannot go into the link
+  is still refused. Older apps ignore the path and report "no Stud.App connection" (#6).
 
 ### [1.2.0] – 2026-11-13
 

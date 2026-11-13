@@ -41,6 +41,7 @@ final class ConnectLinkContractTest extends TestCase
             self::assertSame($vector['host'], $result->host);
             self::assertSame($vector['port'] ?? null, $result->port);
             self::assertSame($vector['code'] ?? null, $result->code);
+            self::assertSame($vector['path'] ?? '', $result->basePath);
         } else {
             self::assertContains($vector['reason'], $vector['reasons']);
             self::assertSame($vector['reason'], $result->reason);
@@ -61,14 +62,27 @@ final class ConnectLinkContractTest extends TestCase
         self::assertSame($code, $landing->code);
     }
 
-    /** The links carry the host only, so only root installations can be connected. */
-    public function testOnlyRootInstallationsCanBeConnected(): void
+    /** The base path of the instance travels in both forms and comes back unchanged. */
+    public function testBuiltLinksCarryTheBasePath(): void
     {
-        foreach (['https://studip.example.org', 'https://studip.example.org/', 'https://studip.example.org:8443'] as $url) {
-            self::assertTrue(ConnectLink::isRootInstallation($url), $url);
-        }
-        foreach (['https://example.org/studip', 'https://example.org/studip/', 'https://example.org/a/b'] as $url) {
-            self::assertFalse(ConnectLink::isRootInstallation($url), $url);
-        }
+        $code = '7K2M9QX4T8WZ3RBN6FJ5HCDV0A';
+
+        $link = ConnectLink::parseConnectLink(ConnectLink::connectLink('example.org', $code, '/studip'), false);
+        $landing = ConnectLink::parseLandingUrl(ConnectLink::landingUrl('https://example.org/studip/', $code), false);
+
+        self::assertSame('/studip', $link->basePath);
+        self::assertSame('/studip', $landing->basePath);
+        self::assertSame('example.org', $landing->host);
+        self::assertStringNotContainsString('path=', ConnectLink::connectLink('example.org', null));
+    }
+
+    public function testTheBasePathOfAnAddress(): void
+    {
+        self::assertSame('', ConnectLink::basePathOf('https://studip.example.org'));
+        self::assertSame('', ConnectLink::basePathOf('https://studip.example.org/'));
+        self::assertSame('/studip', ConnectLink::basePathOf('https://example.org/studip/'));
+        self::assertSame('/a/b', ConnectLink::basePathOf('https://example.org/a/b'));
+        self::assertNull(ConnectLink::basePathOf('https://example.org/stud ip/'));
+        self::assertNull(ConnectLink::basePathOf('https://example.org/a/../b'));
     }
 }

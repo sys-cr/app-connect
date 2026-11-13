@@ -45,7 +45,7 @@ class GetController extends PluginController
         // The host comes from ABSOLUTE_URI_STUDIP. Where a site has not set it,
         // Stud.IP derives it from the request; the page is sent `no-store`.
         $host = (string) ($base['host'] ?? '') . (isset($base['port']) ? ':' . $base['port'] : '');
-        $this->connect_link = ConnectLink::connectLink($host, null);
+        $this->connect_link = ConnectLink::connectLink($host, null, ConnectLink::basePathOf(Runtime::baseUrl()) ?? '');
         $this->instance_name = $settings->arrayValue(Settings::INSTANCE)['name'] ?? ($GLOBALS['UNI_NAME_CLEAN'] ?? 'Stud.IP');
 
         $links = $settings->arrayValue(Settings::STORE_LINKS);

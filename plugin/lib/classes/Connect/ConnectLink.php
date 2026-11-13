@@ -19,15 +19,27 @@ final class ConnectLink
     public const LANDING_PATH = '/plugins.php/appconnect/get';
     private const LOOPBACK = ['localhost', '127.0.0.1'];
 
+    /** Longest base path in characters (contract/connect-link.md, section 3). */
+    public const MAX_BASE_PATH = 200;
+
+    /** One to eight segments of unreserved characters, none of them `.` or `..`. */
+    private const BASE_PATH_PATTERN = '~^(?:/(?!\.\.?(?:/|$))[A-Za-z0-9._\~-]{1,63}){1,8}$~';
+
     /**
-     * Whether the instance is installed at the root of its host. The links
-     * carry the host only, so the apps cannot reach an instance below a
-     * path such as /studip (contract/connect-link.md).
+     * The installation path of $baseUrl below its host: '' for the root,
+     * '/studip' for https://example.org/studip/. Null when the path breaks
+     * the rules of the connect link, so the apps could not reach it.
      */
-    public static function isRootInstallation(string $baseUrl): bool
+    public static function basePathOf(string $baseUrl): ?string
     {
         $path = parse_url($baseUrl, PHP_URL_PATH);
-        return trim(is_string($path) ? $path : '', '/') === '';
+        $path = rtrim(is_string($path) ? $path : '', '/');
+        return $path === '' || self::isBasePath($path) ? $path : null;
+    }
+
+    public static function isBasePath(string $path): bool
+    {
+        return strlen($path) <= self::MAX_BASE_PATH && preg_match(self::BASE_PATH_PATTERN, $path) === 1;
     }
 
     /** URL of the landing page, the code in the fragment. */
@@ -37,9 +49,12 @@ final class ConnectLink
     }
 
     /** The link "Open in the app" hands to the operating system. */
-    public static function connectLink(string $host, ?string $code): string
+    public static function connectLink(string $host, ?string $code, string $basePath = ''): string
     {
         $query = ['host' => $host];
+        if ($basePath !== '') {
+            $query['path'] = $basePath;
+        }
         if ($code !== null) {
             $query['p'] = $code;
         }
@@ -76,6 +91,14 @@ final class ConnectLink
         if ($hostReason !== null) {
             return ConnectLinkResult::reject($hostReason);
         }
+        $paths = $params['path'] ?? [];
+        if (count($paths) > 1) {
+            return ConnectLinkResult::reject('basePathDuplicate');
+        }
+        $basePath = $paths[0] ?? '';
+        if ($paths !== [] && !self::isBasePath($basePath)) {
+            return ConnectLinkResult::reject('basePath');
+        }
         $codes = $params['p'] ?? [];
         if (count($codes) > 1) {
             return ConnectLinkResult::reject('codeDuplicate');
@@ -87,7 +110,7 @@ final class ConnectLink
                 return ConnectLinkResult::reject('code');
             }
         }
-        return ConnectLinkResult::accept($host, $port, $code);
+        return ConnectLinkResult::accept($host, $port, $code, $basePath);
     }
 
     /**
@@ -110,8 +133,13 @@ final class ConnectLink
         if (isset($parts['user']) || isset($parts['pass'])) {
             return ConnectLinkResult::reject('host');
         }
-        if (($parts['path'] ?? '') !== self::LANDING_PATH) {
+        $path = $parts['path'] ?? '';
+        if (!str_ends_with($path, self::LANDING_PATH)) {
             return ConnectLinkResult::reject('path');
+        }
+        $basePath = substr($path, 0, -strlen(self::LANDING_PATH));
+        if ($basePath !== '' && !self::isBasePath($basePath)) {
+            return ConnectLinkResult::reject('basePath');
         }
         if (isset($parts['query'])) {
             return ConnectLinkResult::reject('query');
@@ -129,7 +157,7 @@ final class ConnectLink
                 return ConnectLinkResult::reject('code');
             }
         }
-        return ConnectLinkResult::accept($host, $port, $code);
+        return ConnectLinkResult::accept($host, $port, $code, $basePath);
     }
 
     /** @return array<string, list<string>> */

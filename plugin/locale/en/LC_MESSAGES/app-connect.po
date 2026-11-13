@@ -344,8 +344,8 @@ msgstr "The logo (APP_CONNECT_LOGO_URL) is not used: %s"
 msgid "„Zuletzt aktiv“ ist der Tag, an dem die App ihre Anmeldung zuletzt erneuert hat. Während Sie die App nutzen, geschieht das etwa einmal pro Stunde."
 msgstr "“Zuletzt aktiv” (last active) is the day the app last renewed its sign-in. While you use the app, that happens about once an hour."
 
-msgid "Die App-Verbindung bleibt aus: Stud.IP liegt unter einem Unterpfad (ABSOLUTE_URI_STUDIP). Die Apps unterstützen bisher nur Installationen im Wurzelpfad eines Servers, etwa https://studip.example.org/."
-msgstr "The app connection stays off: Stud.IP is installed below a path (ABSOLUTE_URI_STUDIP). The apps support only installations at the root path of a server so far, such as https://studip.example.org/."
+msgid "Die App-Verbindung bleibt aus: Der Pfad von Stud.IP in ABSOLUTE_URI_STUDIP lässt sich nicht in den Verbindungslink übernehmen. Erlaubt sind bis zu acht Abschnitte aus Buchstaben, Ziffern und den Zeichen - . _ ~, etwa https://example.org/studip/."
+msgstr "The app connection stays off: the path of Stud.IP in ABSOLUTE_URI_STUDIP cannot go into the connect link. Allowed are up to eight segments of letters, digits and the characters - . _ ~, such as https://example.org/studip/."
 
 msgid "Alle Verbindungen der App sind beendet. Nach dem Einschalten muss jede Person die App neu verbinden."
 msgstr "All connections of the app have ended. After switching on again, everyone has to connect the app again."

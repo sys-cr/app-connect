@@ -19,12 +19,14 @@ final class ConnectLinkResult
         public readonly ?int $port,
         public readonly ?string $code,
         public readonly ?string $reason,
+        /** Installation path below the host, '' for the root (contract/connect-link.md, section 3). */
+        public readonly string $basePath = '',
     ) {
     }
 
-    public static function accept(string $host, ?int $port, ?string $code): self
+    public static function accept(string $host, ?int $port, ?string $code, string $basePath = ''): self
     {
-        return new self(true, $host, $port, $code, null);
+        return new self(true, $host, $port, $code, null, $basePath);
     }
 
     public static function reject(string $reason): self

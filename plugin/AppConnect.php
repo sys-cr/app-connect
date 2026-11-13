@@ -152,10 +152,10 @@ class AppConnect extends StudIPPlugin implements SystemPlugin, JsonApiPlugin, Pr
         if ($field === OperatorConfig::ENABLED) {
             $provisioner = new ClientProvisioner(Runtime::settings());
             if (in_array((string) ($change['new_value'] ?? ''), ['1', 'true'], true)) {
-                if (!ConnectLink::isRootInstallation(Runtime::baseUrl())) {
+                if (ConnectLink::basePathOf(Runtime::baseUrl()) === null) {
                     // Switching back off calls this hook again, which revokes.
                     Config::get()->store(OperatorConfig::ENABLED, false);
-                    PageLayout::postError($this->_('Die App-Verbindung bleibt aus: Stud.IP liegt unter einem Unterpfad (ABSOLUTE_URI_STUDIP). Die Apps unterstützen bisher nur Installationen im Wurzelpfad eines Servers, etwa https://studip.example.org/.'));
+                    PageLayout::postError($this->_('Die App-Verbindung bleibt aus: Der Pfad von Stud.IP in ABSOLUTE_URI_STUDIP lässt sich nicht in den Verbindungslink übernehmen. Erlaubt sind bis zu acht Abschnitte aus Buchstaben, Ziffern und den Zeichen - . _ ~, etwa https://example.org/studip/.'));
                     return;
                 }
                 $provisioner->provision(Runtime::baseUrl() . '/');
