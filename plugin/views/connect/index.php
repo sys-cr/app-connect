@@ -56,7 +56,7 @@
                         <tr>
                             <th><?= $_('Gerät') ?></th>
                             <th><?= $_('Verbunden') ?></th>
-                            <th><?= $_('Zuletzt verwendet') ?></th>
+                            <th><?= $_('Zuletzt aktiv') ?></th>
                             <th class="actions"><?= $_('Aktionen') ?></th>
                         </tr>
                     </thead>

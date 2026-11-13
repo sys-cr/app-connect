@@ -6,6 +6,13 @@ Alle nennenswerten Änderungen an diesem Projekt stehen in dieser Datei. Das For
 [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), die Versionen folgen
 [Semantic Versioning](https://semver.org/lang/de/).
 
+## [Unreleased]
+
+### Änderungen
+
+- Die Spalte „Zuletzt verwendet“ auf „Stud.App Verbindung“ heißt jetzt „Zuletzt aktiv“. Sie
+  zeigt den Tag der letzten Token-Erneuerung; der Hilfetext erklärt das (#11).
+
 ## [1.1.1] – 2026-11-08
 
 ### Änderungen
@@ -116,6 +123,13 @@ Erste veröffentlichte Version.
 All notable changes to this project are documented in this file. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/).
+
+### [Unreleased]
+
+#### Changes
+
+- The column "Zuletzt verwendet" on "Stud.App Verbindung" is now called "Zuletzt aktiv" (last
+  active). It shows the day of the last token refresh; the help text explains this (#11).
 
 ### [1.1.1] – 2026-11-08
 
