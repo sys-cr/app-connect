@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # SPDX-FileCopyrightText: 2026 Bodo Steffen
 # Additional terms under GPL-3.0 section 7: see SUPPLEMENTAL-TERMS.txt
-.PHONY: help lint locale test-plugin test-contract test dist
+.PHONY: help lint locale test-plugin test-contract test test-integration dist
 
 VERSION := $(shell sed -n 's/^version=//p' plugin/plugin.manifest)
 
@@ -9,7 +9,8 @@ help:
 	@echo "make lint              – php -l over every plugin file"
 	@echo "make test-plugin       – PHPUnit unit tests (plugin/tests/Unit)"
 	@echo "make test-contract     – schema and shared test vectors (plugin/tests/Contract)"
-	@echo "make test              – both test suites"
+	@echo "make test              – unit and contract tests (integration tests are skipped without a database)"
+	@echo "make test-integration  – integration tests against a throwaway MariaDB in Docker (plugin/tests/Integration)"
 	@echo "make locale            – compile the translations (plugin/locale/*/LC_MESSAGES/app-connect.po) with msgfmt"
 	@echo "make dist              – plugin ZIP of the committed plugin/ (without tests and Composer/PHPUnit files) in dist/"
 
@@ -33,6 +34,24 @@ test-contract: plugin/vendor
 
 test: plugin/vendor
 	cd plugin && vendor/bin/phpunit
+
+# Starts MariaDB 10.11 in Docker on a free local port, runs the integration
+# tests against it and stops the container (started with --rm, so it goes
+# away). With APP_CONNECT_TEST_DB already set, as in CI, that database is used.
+IT_DB_PASSWORD := app-connect-it
+test-integration: plugin/vendor
+	@if [ -n "$$APP_CONNECT_TEST_DB" ]; then \
+		cd plugin && vendor/bin/phpunit --testsuite integration; \
+	else \
+		id=$$(docker run -d --rm -e MARIADB_ROOT_PASSWORD=$(IT_DB_PASSWORD) -e MARIADB_DATABASE=app_connect_it -p 127.0.0.1::3306 mariadb:10.11) || exit 1; \
+		port=$$(docker port $$id 3306/tcp | head -1 | sed 's/.*://'); \
+		for i in $$(seq 1 60); do docker exec $$id mariadb-admin ping -uroot -p$(IT_DB_PASSWORD) --silent >/dev/null 2>&1 && break; sleep 1; done; \
+		sleep 2; \
+		cd plugin && APP_CONNECT_TEST_DB="mysql:host=127.0.0.1;port=$$port;dbname=app_connect_it" \
+			APP_CONNECT_TEST_DB_USER=root APP_CONNECT_TEST_DB_PASSWORD=$(IT_DB_PASSWORD) \
+			vendor/bin/phpunit --testsuite integration; status=$$?; \
+		docker stop $$id >/dev/null; exit $$status; \
+	fi
 
 # The plugin is installed from a ZIP of plugin/, so the license texts must be
 # inside it: plugin/LICENSE and plugin/SUPPLEMENTAL-TERMS.txt are copies of the

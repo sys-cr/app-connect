@@ -6,6 +6,14 @@ Alle nennenswerten Änderungen an diesem Projekt stehen in dieser Datei. Das For
 [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), die Versionen folgen
 [Semantic Versioning](https://semver.org/lang/de/).
 
+## [Unreleased]
+
+### Entwicklung
+
+- Integrationstests gegen MariaDB (`make test-integration`): Kopplungscode und Web-Ticket
+  lassen sich auch bei zehn gleichzeitigen Anfragen nur einmal einlösen, dazu die Abfragen
+  auf den OAuth2-Tabellen. GitHub Actions prüft jede Änderung mit PHP 8.1 bis 8.3 (#12).
+
 ## [1.1.1] – 2026-11-08
 
 ### Änderungen
@@ -116,6 +124,14 @@ Erste veröffentlichte Version.
 All notable changes to this project are documented in this file. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/).
+
+### [Unreleased]
+
+#### Development
+
+- Integration tests against MariaDB (`make test-integration`): pairing code and web ticket
+  can be redeemed only once even with ten concurrent requests, plus the queries on the
+  OAuth2 tables. GitHub Actions checks every change with PHP 8.1 to 8.3 (#12).
 
 ### [1.1.1] – 2026-11-08
 
