@@ -1,7 +1,7 @@
 pluginname=app-connect
 pluginclassname=AppConnect
 origin=studapp
-version=1.2.0
+version=1.2.1
 localedomain=app-connect
 description=Connects the Stud.App mobile apps to this Stud.IP instance: discovery of the instance data and one managed OAuth2 client.
 studipMinVersion=6.0
