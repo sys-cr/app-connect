@@ -6,6 +6,14 @@ Alle nennenswerten Änderungen an diesem Projekt stehen in dieser Datei. Das For
 [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), die Versionen folgen
 [Semantic Versioning](https://semver.org/lang/de/).
 
+## [Unreleased]
+
+### Änderungen
+
+- „Gerät entfernen“ sagt jetzt, was endet und was nicht: Die App auf dem Gerät verliert den
+  Zugang; ein Kalender-Abo und eine im Browser geöffnete Sitzung bleiben. Bestätigung,
+  Meldung, Hilfetext und Nutzer-Doku nennen das (#7).
+
 ## [1.1.1] – 2026-11-08
 
 ### Änderungen
@@ -116,6 +124,14 @@ Erste veröffentlichte Version.
 All notable changes to this project are documented in this file. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/).
+
+### [Unreleased]
+
+#### Changes
+
+- "Gerät entfernen" (remove device) now says what ends and what does not: the app on the
+  device loses access; a calendar subscription and a session open in the browser stay.
+  Confirmation, message, help text and user docs say so (#7).
 
 ### [1.1.1] – 2026-11-08
 

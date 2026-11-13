@@ -35,8 +35,11 @@ melde dich im Browser wie gewohnt an. Das Gerät erscheint danach ebenfalls in d
 „Stud.App Verbindung“ zeigt jedes verbundene Gerät mit Namen, Plattform, Art der
 Verbindung (per QR-Code, per Browser-Anmeldung) und letzter Nutzung.
 
-- **Gerät entfernen** beendet den Zugang des Geräts zu deinem Konto sofort. Du kannst es
-  jederzeit neu verbinden.
+- **Gerät entfernen** beendet den Zugang der App auf diesem Gerät sofort. Du kannst es
+  jederzeit neu verbinden. Zwei Zugänge bleiben bestehen: ein Kalender-Abo, denn der
+  Kalender-Schlüssel gilt für alle deine Abos (setze ihn zurück, siehe
+  [Den Kalender abonnieren](#den-kalender-abonnieren)), und eine Stud.IP-Sitzung, die im
+  Browser des Geräts schon offen ist; sie endet mit der Abmeldung dort oder wenn sie abläuft.
 - Anmeldungen der App, die zu keinem Gerät gehören, stehen gesondert; **Alle beenden**
   beendet sie.
 - Unter „Drittanwendungen“ steht die App nur, wenn du sie in der letzten Stunde benutzt
@@ -123,8 +126,11 @@ Verbindung".
 "Stud.App connection" lists every connected device with its name, the platform, how it was
 connected (per QR-Code, per Browser-Anmeldung) and when it was used last.
 
-- **Remove device** ends the device's access to your account at once. You can connect it
-  again at any time.
+- **Remove device** ends the access of the app on that device at once. You can connect it
+  again at any time. Two kinds of access stay: a calendar subscription, because the calendar
+  key covers all your subscriptions (reset it, see
+  [Subscribing to the calendar](#subscribing-to-the-calendar)), and a Stud.IP session already
+  open in the device's browser; it ends when you sign out there or when it expires.
 - Sign-ins of the app that belong to no device are listed separately; **End all** ends
   them.
 - "Drittanwendungen" lists the app only if you used it within the last hour: Stud.IP shows
