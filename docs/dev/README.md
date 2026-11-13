@@ -21,7 +21,7 @@ Komponenten in `plugin/lib/classes/`:
 |---|---|
 | `Settings` | Betreiber-Einstellungen (Konfigurationssektion „Stud.App“) und die eigene Einstellungstabelle; Prüfung von Adressen, Farben, IDs |
 | `Discovery` | die öffentliche Discovery aus einer Feld-Allowlist, `ETag`/`304` |
-| `Logo` | das Logo der Hochschule auf dem eigenen Server: Abruf mit SSRF-Schutz (`LogoFetch`, `AddressGuard`, `CurlHttpFetcher` mit festgelegter Adresse), Prüfung an den Bytes (`LogoImage`: PNG, JPEG, WebP, 512 KB, 32 bis 2048 Pixel), Kopie in `app_connect_logo` (`DatabaseLogoStore`), letzte gute Kopie bei Fehlern (`LogoService`), Antwort der Route (`LogoResponse`) |
+| `Logo` | das Logo der Hochschule auf dem eigenen Server: Abruf mit SSRF-Schutz (`LogoFetch`, `AddressGuard`, `CurlHttpFetcher` mit festgelegter Adresse), Prüfung an den Bytes (`LogoImage`: PNG, JPEG, WebP, 512 KB, 32 bis 2048 Pixel), Kopie in `app_connect_logo` (`DatabaseLogoStore`), letzte gute Kopie bei Fehlern und hochgeladenes Logo mit Vorrang (`LogoService`), Antwort der Route (`LogoResponse`) |
 | `OAuth2` | der eine öffentliche App-Client (`ClientProvisioner`), der Token-Endpunkt (`TokenServer`), der Kopplungs-Grant und der Refresh-Grant, der die Gerätebindung mitführt; der Widerruf nach RFC 7009 (`TokenRevocation`, `TokenInspector` prüft Access-Tokens gegen den öffentlichen Schlüssel des Kerns, `RefreshTokenCipher` entschlüsselt Refresh-Tokens mit dem Schlüssel des Kerns) |
 | `Pairing`, `Connect` | Kopplungscodes (nur Hash, fünf Minuten, die erste Einlösung gewinnt) und der Verbindungslink des QR-Codes |
 | `Devices` | Gerätezeilen, gebunden an eine Token-Kette; Entfernen und Widerruf in den Token-Tabellen des Kerns (`TokenLedger`), Aufbewahrung |
@@ -182,7 +182,7 @@ Components in `plugin/lib/classes/`:
 |---|---|
 | `Settings` | operator settings (configuration section "Stud.App") and the plugin's own settings table; validation of addresses, colours, ids |
 | `Discovery` | the public discovery payload from a field allowlist, `ETag`/`304` |
-| `Logo` | the institution logo on the instance's own server: fetch with SSRF protection (`LogoFetch`, `AddressGuard`, `CurlHttpFetcher` pinned to the checked address), checks on the bytes (`LogoImage`: PNG, JPEG, WebP, 512 KB, 32 to 2048 pixels), the copy in `app_connect_logo` (`DatabaseLogoStore`), the last good copy on failure (`LogoService`), the route's answer (`LogoResponse`) |
+| `Logo` | the institution logo on the instance's own server: fetch with SSRF protection (`LogoFetch`, `AddressGuard`, `CurlHttpFetcher` pinned to the checked address), checks on the bytes (`LogoImage`: PNG, JPEG, WebP, 512 KB, 32 to 2048 pixels), the copy in `app_connect_logo` (`DatabaseLogoStore`), the last good copy on failure and an uploaded logo that takes precedence (`LogoService`), the route's answer (`LogoResponse`) |
 | `OAuth2` | the one public app client (`ClientProvisioner`), the token endpoint (`TokenServer`), the pairing grant and the refresh grant that keeps the device binding; revocation per RFC 7009 (`TokenRevocation`; `TokenInspector` checks access tokens against the core's public key, `RefreshTokenCipher` decrypts refresh tokens with the core's key) |
 | `Pairing`, `Connect` | pairing codes (hash only, five minutes, first redemption wins) and the connect link of the QR code |
 | `Devices` | device rows bound to a token lineage, removal and revocation in the core token tables (`TokenLedger`), retention |

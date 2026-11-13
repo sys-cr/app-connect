@@ -126,4 +126,65 @@ final class LogoServiceTest extends TestCase
             self::assertStringNotContainsString('—', $text);
         }
     }
+
+    public function testAnUploadIsServedWhateverTheAddress(): void
+    {
+        $logo = $this->service()->upload(FakeHttpFetcher::fixture('logo.png'));
+
+        self::assertTrue($logo->isUpload());
+        self::assertSame('image/png', $logo->image?->mimeType);
+        self::assertSame($this->now, $logo->fetchedAt);
+        self::assertSame($logo->image, $this->service()->current(null));
+        self::assertSame($logo->image, $this->service()->current(self::URL));
+        self::assertTrue($this->service()->status(self::URL)?->isUpload());
+    }
+
+    public function testAnUploadTakesPrecedenceOverTheAddress(): void
+    {
+        $this->http->answer(self::URL, new HttpReply(200, FakeHttpFetcher::fixture('logo.jpg')));
+        $this->service()->upload(FakeHttpFetcher::fixture('logo.png'));
+
+        // Saving an address and the daily refresh leave the upload alone.
+        $kept = $this->service()->refresh(self::URL);
+        self::assertTrue($kept?->isUpload());
+        self::assertSame('image/png', $this->service()->current(self::URL)?->mimeType);
+        self::assertSame('info', LogoStatusText::outcome($kept)[0] ?? null);
+        self::assertTrue($this->service()->refresh(null)?->isUpload());
+        self::assertSame([], $this->http->requests);
+    }
+
+    public function testRemovingTheUploadBringsTheAddressBack(): void
+    {
+        $this->http->answer(self::URL, new HttpReply(200, FakeHttpFetcher::fixture('logo.jpg')));
+        $this->service()->upload(FakeHttpFetcher::fixture('logo.png'));
+
+        $logo = $this->service()->removeUpload(self::URL);
+
+        self::assertFalse($logo?->isUpload());
+        self::assertSame('image/jpeg', $this->service()->current(self::URL)?->mimeType);
+    }
+
+    public function testRemovingTheUploadWithoutAnAddressLeavesNoLogo(): void
+    {
+        $this->service()->upload(FakeHttpFetcher::fixture('logo.png'));
+
+        self::assertNull($this->service()->removeUpload(null));
+        self::assertNull($this->service()->current(null));
+    }
+
+    /** SVG stays refused; a refused upload changes nothing. */
+    public function testARefusedUploadKeepsThePreviousLogo(): void
+    {
+        $first = $this->service()->upload(FakeHttpFetcher::fixture('logo.png'));
+
+        foreach (['logo.svg' => LogoRejected::TYPE, 'too-small.png' => LogoRejected::DIMENSIONS] as $fixture => $reason) {
+            try {
+                $this->service()->upload(FakeHttpFetcher::fixture($fixture));
+                self::fail($fixture . ' was accepted');
+            } catch (LogoRejected $rejected) {
+                self::assertSame($reason, $rejected->reason);
+            }
+        }
+        self::assertSame($first->image, $this->service()->current(null));
+    }
 }

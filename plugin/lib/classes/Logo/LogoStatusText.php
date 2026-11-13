@@ -31,12 +31,15 @@ final class LogoStatusText
      * What happened, as a short message after saving the address or after
      * "Logo neu laden"; null when no address is set.
      *
-     * @return array{0: 'success'|'warning'|'error', 1: string}|null kind and plain text
+     * @return array{0: 'success'|'info'|'warning'|'error', 1: string}|null kind and plain text
      */
     public static function outcome(?StoredLogo $logo): ?array
     {
         if ($logo === null) {
             return null;
+        }
+        if ($logo->isUpload()) {
+            return ['info', Translation::text('Es gilt das hochgeladene Logo. Die Adresse in APP_CONNECT_LOGO_URL verwenden die Apps erst, wenn Sie das hochgeladene Logo auf der Seite „Stud.App Verbindung“ entfernen.')];
         }
         if ($logo->problem === null && $logo->image !== null) {
             return ['success', Translation::text('Das Logo wurde geladen. Die Apps erhalten es von diesem Server.')];
@@ -62,6 +65,7 @@ final class LogoStatusText
         [$kind, $text] = $outcome;
         match ($kind) {
             'success' => \PageLayout::postSuccess(htmlReady($text)),
+            'info' => \PageLayout::postInfo(htmlReady($text)),
             'warning' => \PageLayout::postWarning(htmlReady($text)),
             default => \PageLayout::postError(htmlReady($text)),
         };

@@ -242,8 +242,50 @@ msgstr "Deletes expired pairing codes, web sign-in links and device rows of the 
 msgid "Logo für die App"
 msgstr "Logo for the app"
 
-msgid "Es ist kein Logo eingetragen. Die Apps zeigen dann ein allgemeines Symbol. Tragen Sie die Adresse unter Admin → System → Konfiguration, Sektion „Stud.App“, bei APP_CONNECT_LOGO_URL ein: PNG, JPEG oder WebP, höchstens 512 KB."
-msgstr "No logo is set. The apps then show a generic symbol. Enter the address under Admin → System → Konfiguration, section “Stud.App”, in APP_CONNECT_LOGO_URL: PNG, JPEG or WebP, at most 512 KB."
+msgid "Es ist kein Logo hinterlegt. Die Apps zeigen dann ein allgemeines Symbol. Laden Sie unten eine Bilddatei hoch oder tragen Sie eine Adresse unter Admin → System → Konfiguration, Sektion „Stud.App“, bei APP_CONNECT_LOGO_URL ein."
+msgstr "No logo is set. The apps then show a generic symbol. Upload a picture below or enter an address under Admin → System → Konfiguration, section “Stud.App”, in APP_CONNECT_LOGO_URL."
+
+msgid "Wählen Sie eine Bilddatei aus: PNG, JPEG oder WebP, höchstens 512 KB."
+msgstr "Choose a picture: PNG, JPEG or WebP, at most 512 KB."
+
+msgid "Das Logo wurde hochgeladen. Die Apps erhalten es von diesem Server."
+msgstr "The logo was uploaded. The apps get it from this server."
+
+msgid "Das Logo wurde nicht übernommen: %s"
+msgstr "The logo was not accepted: %s"
+
+msgid "Das hochgeladene Logo wurde entfernt."
+msgstr "The uploaded logo was removed."
+
+msgid "Hochgeladen am %s (%s, %u × %u Pixel). Die Apps erhalten es von diesem Server."
+msgstr "Uploaded on %s (%s, %u × %u pixels). The apps get it from this server."
+
+msgid "Das hochgeladene Logo hat Vorrang. Diese Adresse aus der Konfiguration verwenden die Apps erst, wenn Sie es entfernen:"
+msgstr "The uploaded logo takes precedence. The apps use this address from the configuration only once you remove it:"
+
+msgid "Hochgeladenes Logo entfernen"
+msgstr "Remove uploaded logo"
+
+msgid "Die Apps erhalten dann das Logo von der Adresse aus der Konfiguration. Fortfahren?"
+msgstr "The apps then get the logo from the address in the configuration. Continue?"
+
+msgid "Die Apps zeigen dann ein allgemeines Symbol. Fortfahren?"
+msgstr "The apps then show a generic symbol. Continue?"
+
+msgid "Anderes Logo hochladen"
+msgstr "Upload another logo"
+
+msgid "Logo hochladen"
+msgstr "Upload logo"
+
+msgid "PNG, JPEG oder WebP, höchstens 512 KB, 32 bis 2048 Pixel je Seite. Ein hochgeladenes Logo hat Vorrang vor der Adresse in der Konfiguration."
+msgstr "PNG, JPEG or WebP, at most 512 KB, 32 to 2048 pixels per side. An uploaded logo takes precedence over the address in the configuration."
+
+msgid "Hochladen"
+msgstr "Upload"
+
+msgid "Es gilt das hochgeladene Logo. Die Adresse in APP_CONNECT_LOGO_URL verwenden die Apps erst, wenn Sie das hochgeladene Logo auf der Seite „Stud.App Verbindung“ entfernen."
+msgstr "The uploaded logo applies. The apps use the address in APP_CONNECT_LOGO_URL only once you remove the uploaded logo on the page “Stud.App Verbindung”."
 
 msgid "Das Plugin ruft das Logo von dieser Adresse ab und liefert es den Apps von diesem Server aus:"
 msgstr "The plugin fetches the logo from this address and serves it to the apps from this server:"

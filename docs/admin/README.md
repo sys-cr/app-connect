@@ -103,6 +103,10 @@ gilt auch, wenn das Logo schon auf dem Stud.IP-Server liegt.
   ihr Abruf nicht, bekommen die Apps kein Logo, bis er gelingt.
 - Ohne gültiges Bild fehlt `branding.logoUrl` in der Discovery, und die Apps zeigen ein
   allgemeines Symbol. Leert ihr `APP_CONNECT_LOGO_URL`, löscht das Plugin die Kopie.
+- Statt einer Adresse kann root auf „Stud.App Verbindung“ eine Bilddatei hochladen. Sie
+  durchläuft dieselben Prüfungen (PNG, JPEG oder WebP, kein SVG) und hat Vorrang: Solange
+  sie da ist, ruft das Plugin die Adresse nicht ab und liefert sie nicht aus. „Hochgeladenes
+  Logo entfernen“ schaltet zurück auf die Adresse und ruft sie gleich ab.
 
 ## Geräte verbinden
 
@@ -186,7 +190,7 @@ Seiten des Plugins (`plugins.php/appconnect/…`):
 
 | Seite | Anmeldung | Funktion |
 |---|---|---|
-| `connect` | ab `autor` | „Stud.App Verbindung“: QR-Code, Geräteliste, Geräte entfernen; für root zusätzlich der Zustand des Logos und „Logo neu laden“ |
+| `connect` | ab `autor` | „Stud.App Verbindung“: QR-Code, Geräteliste, Geräte entfernen; für root zusätzlich der Zustand des Logos, „Logo neu laden“ und das Hochladen eines Logos |
 | `get` | keine | „App holen“: Store-Links und „In der App öffnen“; der Kopplungscode bleibt im URL-Fragment |
 | `web/enter`, `web/redeem`, `web/confirm` | keine | Anmeldung im Web aus der App |
 
@@ -234,7 +238,7 @@ Ereignisprotokolls.
 | Geräte | `app_connect_devices` | in der App gewählter Gerätename, Plattform, Art der Verbindung, IDs der OAuth2-Tokens (nicht die Tokens), Zeitpunkte |
 | Links für die Anmeldung im Web | `app_connect_web_login_tickets` | SHA-256-Hash, Person, zu öffnende Seite, Verweis auf Token und Gerät, Zeitpunkte |
 | Kalender-Schlüssel | Konfiguration der Person (Kern, `IcalExport`) | wie vom Kern verwaltet; das Plugin legt ihn an oder löscht ihn, ein Zähler der neuen Schlüssel liegt eine Stunde im Cache |
-| Logo | `app_connect_logo` | eine Zeile: Adresse, Bild (PNG, JPEG oder WebP, höchstens 512 KB), SHA-256, Zeitpunkte von Abruf und letztem Versuch, Grund einer Ablehnung; keine Personendaten. Gelöscht, wenn `APP_CONNECT_LOGO_URL` geleert oder das Plugin deinstalliert wird |
+| Logo | `app_connect_logo` | eine Zeile: Adresse oder Kennung `upload`, Bild (PNG, JPEG oder WebP, höchstens 512 KB), SHA-256, Zeitpunkte von Abruf oder Hochladen und letztem Versuch, Grund einer Ablehnung; keine Personendaten. Gelöscht, wenn `APP_CONNECT_LOGO_URL` geleert und kein Logo hochgeladen ist, wenn root das hochgeladene Logo entfernt oder wenn das Plugin deinstalliert wird |
 | Einstellungen | `config` (Sektion „Stud.App“), `app_connect_settings` | eure Einstellungen, Client-ID, gespeicherte Adresse, zufälliger Schlüssel für die Zähler der Grenzen |
 | Fehlversuche beim Koppeln | Stud.IP-Cache | Zähler je Adresse, 10 Minuten |
 | Widerrufe von Tokens | Stud.IP-Cache | Zähler je Adresse, 10 Minuten |
@@ -429,6 +433,10 @@ already lives on the Stud.IP server.
   apps get no logo until it can.
 - Without a valid picture, `branding.logoUrl` is left out of the discovery and the apps show
   a generic symbol. Emptying `APP_CONNECT_LOGO_URL` deletes the copy.
+- Instead of an address, root can upload a picture on "Stud.App connection". It passes the
+  same checks (PNG, JPEG or WebP, no SVG) and takes precedence: while it is there, the plugin
+  neither fetches nor serves the address. "Hochgeladenes Logo entfernen" (remove uploaded
+  logo) switches back to the address and fetches it at once.
 
 ### Connecting devices
 
@@ -511,7 +519,7 @@ Pages of the plugin (`plugins.php/appconnect/…`):
 
 | Page | Sign-in | What it does |
 |---|---|---|
-| `connect` | `autor` and up | "Stud.App connection": QR code, device list, removing devices; for root also the state of the logo and "Logo neu laden" |
+| `connect` | `autor` and up | "Stud.App connection": QR code, device list, removing devices; for root also the state of the logo, "Logo neu laden" and uploading a logo |
 | `get` | none | "Get the app": store links and "Open in the app"; the pairing code stays in the URL fragment |
 | `web/enter`, `web/redeem`, `web/confirm` | none | web login from the app |
 
@@ -556,7 +564,7 @@ days; the other entries of the plugin follow your event log settings.
 | devices | `app_connect_devices` | device name chosen in the app, platform, how it was connected, ids of the OAuth2 tokens (not the tokens), times |
 | web login links | `app_connect_web_login_tickets` | SHA-256 hash, person, page to open, token/device reference, times |
 | calendar key | the person's configuration (core, `IcalExport`) | as the core keeps it; the plugin creates or deletes it, a count of new keys stays in the cache for an hour |
-| logo | `app_connect_logo` | one row: address, picture (PNG, JPEG or WebP, at most 512 KB), SHA-256, times of the fetch and the last attempt, reason of a refusal; no personal data. Deleted when `APP_CONNECT_LOGO_URL` is emptied or the plugin is uninstalled |
+| logo | `app_connect_logo` | one row: address or the marker `upload`, picture (PNG, JPEG or WebP, at most 512 KB), SHA-256, times of the fetch or upload and the last attempt, reason of a refusal; no personal data. Deleted when `APP_CONNECT_LOGO_URL` is emptied and no logo is uploaded, when root removes the uploaded logo, or when the plugin is uninstalled |
 | settings | `config` (section "Stud.App"), `app_connect_settings` | your settings, client id, recorded address, random key for the limit counters |
 | failed pairing attempts | Stud.IP cache | counter per address, 10 minutes |
 | token revocations | Stud.IP cache | counter per address, 10 minutes |

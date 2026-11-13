@@ -22,6 +22,8 @@ Alle nennenswerten Änderungen an diesem Projekt stehen in dieser Datei. Das For
   Cache, und fehlt ohne gültige Kopie.
 - Für root zeigt „Stud.App Verbindung“ das gespeicherte Logo, den Zeitpunkt des Abrufs oder
   den Grund der Ablehnung und „Logo neu laden“.
+- Statt einer Adresse kann root dort eine Bilddatei hochladen (PNG, JPEG oder WebP, gleiche
+  Prüfungen). Sie hat Vorrang vor `APP_CONNECT_LOGO_URL`, bis sie entfernt wird.
 
 ## [1.1.1] – 2026-11-08
 
@@ -149,6 +151,8 @@ All notable changes to this project are documented in this file. The format foll
   is left out without a valid copy.
 - For root, "Stud.App connection" shows the stored logo, when it was fetched or why it was
   refused, and "Logo neu laden" (fetch the logo again).
+- Instead of an address, root can upload a picture there (PNG, JPEG or WebP, same checks). It
+  takes precedence over `APP_CONNECT_LOGO_URL` until it is removed.
 
 ### [1.1.1] – 2026-11-08
 
