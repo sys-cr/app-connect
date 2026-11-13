@@ -6,6 +6,15 @@ Alle nennenswerten Änderungen an diesem Projekt stehen in dieser Datei. Das For
 [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), die Versionen folgen
 [Semantic Versioning](https://semver.org/lang/de/).
 
+## [Unreleased]
+
+### Änderungen
+
+- Ausschalten von `APP_CONNECT_ENABLED` beendet alle Verbindungen endgültig: Alle Geräte
+  gelten als entfernt, alle Tokens der App werden widerrufen. Bisher wurden alte
+  Verbindungen nach dem Wiedereinschalten wieder gültig. Deaktivieren des Plugins pausiert
+  weiterhin nur (#9).
+
 ## [1.1.1] – 2026-11-08
 
 ### Änderungen
@@ -116,6 +125,14 @@ Erste veröffentlichte Version.
 All notable changes to this project are documented in this file. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/).
+
+### [Unreleased]
+
+#### Changes
+
+- Switching `APP_CONNECT_ENABLED` off ends every connection for good: all devices count as
+  removed and all tokens of the app are revoked. So far, old connections became valid again
+  after switching on. Disabling the plugin still only pauses (#9).
 
 ### [1.1.1] – 2026-11-08
 

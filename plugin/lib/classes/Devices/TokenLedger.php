@@ -89,6 +89,26 @@ final class TokenLedger
         return array_map('strval', $ids);
     }
 
+    /**
+     * Revokes every token of the client, for every person: the end of all
+     * connections when the app connection is switched off.
+     */
+    public function revokeClient(string $clientId): void
+    {
+        $db = \DBManager::get();
+        $db->execute(
+            'UPDATE `oauth2_refresh_tokens` r JOIN `oauth2_access_tokens` a ON a.`id` = r.`access_token_id`
+                SET r.`revoked` = 1
+              WHERE a.`client_id` = ? AND r.`revoked` = 0',
+            [$clientId]
+        );
+        $db->execute(
+            'UPDATE `oauth2_access_tokens` SET `chdate` = UNIX_TIMESTAMP(), `revoked` = 1
+              WHERE `client_id` = ? AND `revoked` = 0',
+            [$clientId]
+        );
+    }
+
     /** Revokes an access token and every refresh token issued with it. */
     public function revokeRefreshToken(string $refreshTokenId): void
     {

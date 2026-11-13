@@ -238,3 +238,6 @@ msgstr "app-connect: cleanup"
 
 msgid "Löscht abgelaufene Kopplungscodes, Web-Anmeldelinks und Gerätezeilen der App-Anbindung nach Ablauf ihrer Aufbewahrungsfrist."
 msgstr "Deletes expired pairing codes, web sign-in links and device rows of the app connection once their retention period has passed."
+
+msgid "Alle Verbindungen der App sind beendet. Nach dem Einschalten muss jede Person die App neu verbinden."
+msgstr "All connections of the app have ended. After switching on again, everyone has to connect the app again."
