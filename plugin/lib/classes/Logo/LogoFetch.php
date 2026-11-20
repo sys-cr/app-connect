@@ -98,21 +98,56 @@ final class LogoFetch
         return $addresses[0];
     }
 
-    /** The absolute address of a Location header relative to $base. */
+    /**
+     * The absolute address of a Location header relative to $base, resolved
+     * as RFC 3986 section 5.2 says: a query alone keeps the path, a relative
+     * path is merged with the base, dot segments are removed, a fragment is
+     * dropped.
+     */
     private static function resolveLocation(string $base, string $location): string
     {
         if (preg_match('~^[a-z][a-z0-9+.-]*:~i', $location) === 1) {
             return $location;
         }
-        $parts = parse_url($base);
-        $origin = 'https://' . ($parts['host'] ?? '') . (isset($parts['port']) ? ':' . $parts['port'] : '');
         if (str_starts_with($location, '//')) {
             return 'https:' . $location;
         }
-        if (str_starts_with($location, '/')) {
-            return $origin . $location;
+        $parts = parse_url($base);
+        $origin = 'https://' . ($parts['host'] ?? '') . (isset($parts['port']) ? ':' . $parts['port'] : '');
+        $basePath = (string) ($parts['path'] ?? '/');
+        $location = explode('#', $location, 2)[0];
+        if ($location === '') {
+            return $origin . $basePath . (isset($parts['query']) ? '?' . $parts['query'] : '');
         }
-        $path = (string) ($parts['path'] ?? '/');
-        return $origin . substr($path, 0, (int) strrpos($path, '/') + 1) . $location;
+        if (str_starts_with($location, '?')) {
+            return $origin . $basePath . $location;
+        }
+        [$path, $query] = array_pad(explode('?', $location, 2), 2, null);
+        if (!str_starts_with($path, '/')) {
+            $path = substr($basePath, 0, (int) strrpos($basePath, '/') + 1) . $path;
+        }
+        return $origin . self::removeDotSegments($path) . ($query !== null ? '?' . $query : '');
+    }
+
+    /** RFC 3986 section 5.2.4 for an absolute path; `..` never climbs above the root. */
+    private static function removeDotSegments(string $path): string
+    {
+        $segments = explode('/', $path);
+        $last = count($segments) - 1;
+        $output = [];
+        foreach ($segments as $index => $segment) {
+            if ($segment === '.' || $segment === '..') {
+                if ($segment === '..' && count($output) > 1) {
+                    array_pop($output);
+                }
+                if ($index === $last) {
+                    $output[] = '';
+                }
+                continue;
+            }
+            $output[] = $segment;
+        }
+        $result = implode('/', $output);
+        return str_starts_with($result, '/') ? $result : '/' . $result;
     }
 }

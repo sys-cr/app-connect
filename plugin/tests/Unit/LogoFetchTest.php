@@ -149,6 +149,29 @@ final class LogoFetchTest extends TestCase
         );
     }
 
+    /** @return iterable<string, array{string, string}> */
+    public static function relativeRedirects(): iterable
+    {
+        yield 'query only' => ['?v=2', 'https://www.example.org/img/logo.png?v=2'];
+        yield 'parent directory' => ['../logo.png', 'https://www.example.org/logo.png'];
+        yield 'current directory' => ['./b/logo.png', 'https://www.example.org/img/b/logo.png'];
+        yield 'above the root' => ['../../../logo.png', 'https://www.example.org/logo.png'];
+        yield 'dots in an absolute path' => ['/a/./b/../logo.png', 'https://www.example.org/a/logo.png'];
+        yield 'with a fragment' => ['other.png#x', 'https://www.example.org/img/other.png'];
+        yield 'with a query' => ['../logo.png?size=64', 'https://www.example.org/logo.png?size=64'];
+    }
+
+    #[DataProvider('relativeRedirects')]
+    public function testRelativeRedirectsAreResolvedLikeABrowser(string $location, string $target): void
+    {
+        $this->http->answer('https://www.example.org/img/logo.png?v=1', new HttpReply(302, '', $location));
+        $this->http->answer($target, $this->png());
+
+        $this->fetcher()->fetch('https://www.example.org/img/logo.png?v=1');
+
+        self::assertSame($target, end($this->http->requests)['url']);
+    }
+
     public function testMoreThanThreeRedirectsAreRefused(): void
     {
         foreach (range(0, 3) as $hop) {
