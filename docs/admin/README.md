@@ -152,8 +152,9 @@ die Browser-Anmeldung) und die Links für App Store und Google Play setzen, die 
 öffentliche Seite `plugins.php/appconnect/get` zeigt. Diese Seite öffnet der QR-Code, wenn
 die App nicht installiert ist.
 
-Fehlgeschlagene Kopplungsversuche sind auf 10 je Adresse in 10 Minuten und 100 je Minute
-insgesamt begrenzt.
+Fehlgeschlagene Kopplungsversuche sind auf 10 je Adresse in 10 Minuten und 1000 je Minute
+insgesamt begrenzt. Ein Code hat 130 Bit, Raten ist aussichtslos; die Grenze insgesamt
+begrenzt nur die Last.
 
 Kopplung, Erneuerung der Tokens und Anmeldung im Web prüfen das Konto wie die
 Passwortanmeldung des Kerns: nicht gesperrt, nicht abgelaufen, E-Mail-Adresse bestätigt,
@@ -207,7 +208,7 @@ OAuth2-Fehlern (`invalid_grant`, `invalid_client`, …) nach RFC 6749. Jede Rout
 | `GET app-connect/discovery` | keine | Öffentliche Instanzdaten, mit denen die Apps starten: Name, Adressen, Client-ID und Endpunkte des OAuth2-Clients, eingeschaltete Funktionen und – falls gesetzt – Gestaltung, Links, Mensa-Quelle. Aus einer festen Feldliste; enthält nie Geheimnisse. `ETag`/`304`, 5 Minuten cachebar. Schema: [`contract/discovery.schema.json`](../../contract/discovery.schema.json) |
 | `GET app-connect/logo` | keine | Die Kopie des Logos (siehe [Logo](#logo)) mit dem geprüften `Content-Type`, `ETag`/`304`, einen Tag cachebar; `404 app-connect-no-logo` ohne gültige Kopie. In der Discovery als `branding.logoUrl` |
 | `POST app-connect/token` | keine (Client-ID der App) | Token-Endpunkt des App-Clients: `authorization_code` (Browser-Anmeldung mit PKCE), `refresh_token` (behält die Gerätebindung) und der Kopplungs-Grant (QR-Code, `urn:studip:app-connect:pairing`). Andere Clients werden abgewiesen. Fehlgeschlagene Kopplungen sind begrenzt (`429 slow_down`) |
-| `POST app-connect/revoke` | keine (Client-ID der App) | Widerruf nach RFC 7009 beim Abmelden in der App: `token` (Refresh- oder Access-Token) und `client_id`. Widerruft das Token, das andere Token seines Paars und das gebundene Gerät. Antwortet `200` auch für unbekannte, abgelaufene oder fremde Tokens, damit sich Tokens damit nicht prüfen lassen. Höchstens 300 Anfragen je Adresse in 10 Minuten und 300 je Minute insgesamt (`503`, `Retry-After`). In der Discovery als `oauth2.revocationEndpoint`. [`contract/token-revocation.md`](../../contract/token-revocation.md) |
+| `POST app-connect/revoke` | keine (Client-ID der App) | Widerruf nach RFC 7009 beim Abmelden in der App: `token` (Refresh- oder Access-Token) und `client_id`. Widerruft das Token, das andere Token seines Paars und das gebundene Gerät. Antwortet `200` auch für unbekannte, abgelaufene oder fremde Tokens, damit sich Tokens damit nicht prüfen lassen. Höchstens 300 Anfragen je Adresse in 10 Minuten und 1200 je Minute insgesamt (`503`, `Retry-After`). In der Discovery als `oauth2.revocationEndpoint`. [`contract/token-revocation.md`](../../contract/token-revocation.md) |
 | `POST app-connect/devices` | App-Token | Registriert das Gerät nach einer Browser-Anmeldung und schickt die Verbindungsmail. `201`; `409 app-connect-already-registered`, wenn die Anmeldung schon gebunden ist; `401`/`403` für andere Tokens |
 | `GET app-connect/course-dates/places?filter[ids]=…` | ja | Wo bis zu 50 Termine stattfinden: gebuchte Räume mit Koordinaten (Raum, Gebäude oder Standort) und Raumfinder-Link, sonst die Freitext-Raumangabe. Termine, die die Person nicht sehen darf, fehlen. Funktion `eventPlaces`. [`contract/course-date-places.md`](../../contract/course-date-places.md) |
 | `GET app-connect/user-language` | ja | Die Sprache, in der die Person Stud.IP nutzt (Profil, sonst die Vorgabe der Instanz). Funktion `userLanguage`. [`contract/user-language.md`](../../contract/user-language.md) |
@@ -512,8 +513,9 @@ through the browser sign-in), and set the App Store and Google Play links shown 
 public page `plugins.php/appconnect/get`, which the QR code opens when the app is not
 installed.
 
-Failed pairing attempts are limited to 10 per address in 10 minutes and 100 per minute
-overall.
+Failed pairing attempts are limited to 10 per address in 10 minutes and 1000 per minute
+overall. A code has 130 bits, so guessing is hopeless; the overall limit only caps the
+load.
 
 Pairing, token refresh and the web login check the account like the core's password login:
 not locked, not expired, e-mail address confirmed, status `autor` or higher. A locked or
@@ -564,7 +566,7 @@ errors (`invalid_grant`, `invalid_client`, …) as RFC 6749 describes. Every rou
 | `GET app-connect/discovery` | none | Public instance data the apps start with: name, addresses, OAuth2 client id and endpoints, enabled features, and – if you set them – branding, links, mensa source. Built from a fixed list of fields; never contains secrets. `ETag`/`304`, cacheable for 5 minutes. Schema: [`contract/discovery.schema.json`](../../contract/discovery.schema.json) |
 | `GET app-connect/logo` | none | The copy of the logo (see [Logo](#logo-1)) with the checked `Content-Type`, `ETag`/`304`, cacheable for a day; `404 app-connect-no-logo` without a valid copy. Announced in the discovery as `branding.logoUrl` |
 | `POST app-connect/token` | none (app client id) | Token endpoint of the app client: `authorization_code` (browser sign-in with PKCE), `refresh_token` (keeps the device binding) and the pairing grant (QR code, `urn:studip:app-connect:pairing`). Other clients are refused. Failed pairing attempts are rate limited (`429 slow_down`) |
-| `POST app-connect/revoke` | none (app client id) | Revocation per RFC 7009 when someone signs out in the app: `token` (refresh or access token) and `client_id`. Revokes the token, the other token of its pair and the bound device. Answers `200` for unknown, expired or foreign tokens as well, so it cannot be used to test tokens. At most 300 requests per address in 10 minutes and 300 per minute overall (`503`, `Retry-After`). Announced in the discovery as `oauth2.revocationEndpoint`. [`contract/token-revocation.md`](../../contract/token-revocation.md) |
+| `POST app-connect/revoke` | none (app client id) | Revocation per RFC 7009 when someone signs out in the app: `token` (refresh or access token) and `client_id`. Revokes the token, the other token of its pair and the bound device. Answers `200` for unknown, expired or foreign tokens as well, so it cannot be used to test tokens. At most 300 requests per address in 10 minutes and 1200 per minute overall (`503`, `Retry-After`). Announced in the discovery as `oauth2.revocationEndpoint`. [`contract/token-revocation.md`](../../contract/token-revocation.md) |
 | `POST app-connect/devices` | app token | Registers the device after a browser sign-in and sends the connection mail. `201`; `409 app-connect-already-registered` when the sign-in is bound already; `401`/`403` for other tokens |
 | `GET app-connect/course-dates/places?filter[ids]=…` | yes | Where up to 50 course dates take place: booked rooms with coordinates (room, building or site) and the room finder link, else the free-text room. Dates the person may not see are left out. Feature `eventPlaces`. [`contract/course-date-places.md`](../../contract/course-date-places.md) |
 | `GET app-connect/user-language` | yes | The language the person uses Stud.IP in (profile, else the site default). Feature `userLanguage`. [`contract/user-language.md`](../../contract/user-language.md) |

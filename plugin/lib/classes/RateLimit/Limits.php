@@ -23,20 +23,28 @@ final class Limits
     ) {
     }
 
-    /** Failed pairing attempts: 10 per address in 10 minutes, 100 per minute overall. */
+    /**
+     * Failed pairing attempts: 10 per address in 10 minutes, 1000 per minute
+     * overall. A pairing code has 130 bits, so guessing is hopeless anyway;
+     * the overall limit only caps the load, and set low it would let one
+     * client block pairing for everyone.
+     */
     public static function pairingFailures(): self
     {
-        return new self('pairing-failures', 10, 600, 100, 60);
+        return new self('pairing-failures', 10, 600, 1000, 60);
     }
 
     /**
-     * Revocation requests: 300 per address in 10 minutes, 300 per minute
+     * Revocation requests: 300 per address in 10 minutes, 1200 per minute
      * overall. Every request counts, because opening a refresh token costs
-     * a key derivation whether or not the token turns out to be valid.
+     * a key derivation whether or not the token turns out to be valid. The
+     * overall limit protects the server from that cost; it is set well above
+     * the sign-outs of a busy instance, so one client cannot make every
+     * sign-out fail with 503.
      */
     public static function revocations(): self
     {
-        return new self('revocations', 300, 600, 300, 60);
+        return new self('revocations', 300, 600, 1200, 60);
     }
 
     /**

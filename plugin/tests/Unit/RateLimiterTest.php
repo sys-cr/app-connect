@@ -99,6 +99,15 @@ final class RateLimiterTest extends TestCase
         self::assertFalse($limiter->isBlocked('user-a'));
     }
 
+    public function testTheLimitsAreTheDocumentedOnes(): void
+    {
+        $pairing = Limits::pairingFailures();
+        $revocations = Limits::revocations();
+
+        self::assertSame([10, 600, 1000, 60], [$pairing->perAddress, $pairing->perAddressWindow, $pairing->global, $pairing->globalWindow]);
+        self::assertSame([300, 600, 1200, 60], [$revocations->perAddress, $revocations->perAddressWindow, $revocations->global, $revocations->globalWindow]);
+    }
+
     public function testLimitSetsCountSeparately(): void
     {
         $store = new InMemoryCounterStore();
