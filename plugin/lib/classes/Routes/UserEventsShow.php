@@ -9,7 +9,6 @@ namespace AppConnect\Routes;
 
 use AppConnect\Calendar\UserEvents;
 use AppConnect\Runtime;
-use AppConnect\Settings\Settings;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
@@ -28,7 +27,7 @@ final class UserEventsShow extends \JsonApi\NonJsonApiController
         if (!$settings->isEnabled()) {
             return JsonErrors::write($response, 404, 'app-connect-disabled', 'App connection is switched off');
         }
-        if (($settings->arrayValue(Settings::FEATURES)['userEvents'] ?? true) === false) {
+        if (!$settings->isFeatureOn('userEvents')) {
             return JsonErrors::write($response, 404, 'app-connect-feature-off', 'The calendar route is switched off');
         }
         $user = $this->getUser($request);

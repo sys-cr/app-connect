@@ -15,19 +15,6 @@ namespace AppConnect\Settings;
  */
 final class ConfigBackedSettingsStore implements SettingsStore
 {
-    /** Setting keys that live in the configuration. */
-    public const OPERATOR_KEYS = [
-        Settings::ENABLED,
-        Settings::PAIRING_ENABLED,
-        Settings::PROFILE_ENTRY,
-        Settings::INSTANCE,
-        Settings::PRIVACY_POLICY_URL,
-        Settings::STORE_LINKS,
-        Settings::FEATURES,
-        Settings::BRANDING,
-        Settings::LINKS,
-    ];
-
     public function __construct(
         private readonly ConfigAccess $config,
         private readonly SettingsStore $table,

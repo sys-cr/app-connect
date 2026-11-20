@@ -29,24 +29,6 @@ final class ClientProvisioner
     }
 
     /**
-     * Switches the app connection on: provides the client and sets the switch.
-     * Returns the client id.
-     */
-    public function enable(string $baseUrl): string
-    {
-        $clientId = $this->provision($baseUrl);
-        $this->settings->set(Settings::ENABLED, true);
-        return $clientId;
-    }
-
-    /** Switches the app connection off: revokes the client and clears the switch. */
-    public function disable(): void
-    {
-        $this->revoke();
-        $this->settings->set(Settings::ENABLED, false);
-    }
-
-    /**
      * Reuses the stored client (lifting a revocation, bringing name, owner,
      * homepage and description up to date) or creates a new public PKCE
      * client. Leaves the switch alone: it runs when root switched it on in

@@ -9,6 +9,7 @@ use AppConnect\Attribution;
 use AppConnect\Connect\ConnectLink;
 use AppConnect\Help;
 use AppConnect\Runtime;
+use AppConnect\Settings\OperatorConfig;
 use AppConnect\Settings\Settings;
 
 /**
@@ -30,7 +31,7 @@ class GetController extends PluginController
     public function index_action()
     {
         $settings = Runtime::settings();
-        $this->enabled = $settings->isEnabled() && $settings->clientId() !== null;
+        $this->enabled = $settings->isConnected();
         PageLayout::setTitle($this->_('App holen'));
         Help::addToHelpbar(Help::GET);
         Attribution::addToHelpbar();
@@ -52,7 +53,7 @@ class GetController extends PluginController
         $this->store_links = array_filter([
             'appStore' => $links['appStore'] ?? null,
             'googlePlay' => $links['googlePlay'] ?? null,
-        ], static fn ($url): bool => is_string($url) && preg_match('~^https://[^\s/?#@]+(/\S*)?$~', $url) === 1);
+        ], static fn ($url): bool => is_string($url) && preg_match(OperatorConfig::HTTPS_URL_PATTERN, $url) === 1);
         $privacy = $settings->stringValue(Settings::PRIVACY_POLICY_URL);
         $this->privacy_url = $privacy !== null && str_starts_with($privacy, 'https://') ? $privacy : null;
     }

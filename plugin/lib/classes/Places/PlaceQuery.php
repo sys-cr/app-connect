@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace AppConnect\Places;
 
+use AppConnect\Settings\OperatorConfig;
+
 /**
  * Input and output rules of the place route: which date ids a request may
  * ask for, and what a place entry may carry.
@@ -69,7 +71,7 @@ final class PlaceQuery
             $place['coordinates'] = $coordinates;
         }
         $link = trim((string) $link);
-        if (preg_match('~^https://[^\s/?#@]+(/\S*)?$~', $link) === 1) {
+        if (preg_match(OperatorConfig::HTTPS_URL_PATTERN, $link) === 1) {
             $place['link'] = $link;
         }
         return $place;

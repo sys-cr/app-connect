@@ -23,17 +23,32 @@ final class AppToken
     /** Null when the request carries the app's token for $userId, else the error response. */
     public static function refusal(Request $request, Response $response, string $clientId, string $userId): ?Response
     {
+        $validated = self::validated($request, $response, $clientId);
+        if ($validated instanceof Response) {
+            return $validated;
+        }
+        return (string) $validated->getAttribute('oauth_user_id') === $userId ? null : self::tokenRequired($response);
+    }
+
+    /**
+     * The request with the attributes of a valid token of the app client
+     * (`oauth_user_id`, `oauth_access_token_id`), else the error response.
+     */
+    public static function validated(Request $request, Response $response, string $clientId): Request|Response
+    {
         try {
             $validated = (new \Studip\OAuth2\Container())->get(ResourceServer::class)->validateAuthenticatedRequest($request);
         } catch (OAuthServerException $exception) {
-            return JsonErrors::write($response, 401, 'app-connect-token-required', 'An OAuth2 token of the app is required');
+            return self::tokenRequired($response);
         }
         if ((string) $validated->getAttribute('oauth_client_id') !== $clientId) {
             return JsonErrors::write($response, 403, 'app-connect-wrong-client', 'The token does not belong to the app');
         }
-        if ((string) $validated->getAttribute('oauth_user_id') !== $userId) {
-            return JsonErrors::write($response, 401, 'app-connect-token-required', 'An OAuth2 token of the app is required');
-        }
-        return null;
+        return $validated;
+    }
+
+    public static function tokenRequired(Response $response): Response
+    {
+        return JsonErrors::write($response, 401, 'app-connect-token-required', 'An OAuth2 token of the app is required');
     }
 }

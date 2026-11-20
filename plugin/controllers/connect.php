@@ -40,7 +40,7 @@ class ConnectController extends PluginController
         $this->response->add_header('Content-Security-Policy', "frame-ancestors 'none'");
         $GLOBALS['perm']->check('autor');
         $this->settings = Runtime::settings();
-        if (!$this->settings->isEnabled() || !$this->settings->isProfileEntryEnabled() || $this->settings->clientId() === null) {
+        if (!$this->settings->isConnected() || !$this->settings->isProfileEntryEnabled()) {
             throw new AccessDeniedException($this->_('Die Verbindung mit der App ist an dieser Hochschule nicht eingeschaltet.'));
         }
         $this->userId = (string) $GLOBALS['user']->id;
@@ -64,7 +64,7 @@ class ConnectController extends PluginController
         $this->new_code = $this->new_code ?? null;
         $supportEmail = $this->settings->arrayValue(Settings::INSTANCE)['supportEmail'] ?? null;
         if ($GLOBALS['perm']->have_perm('root') && !is_string($supportEmail)) {
-            PageLayout::postInfo($this->_('Ohne Support-Adresse (APP_CONNECT_SUPPORT_EMAIL) gehen Meldungen von Inhalten aus der App an support@studapp2.de, den Support des Projekts Stud.App. Tragen Sie unter Admin → System → Konfiguration, Sektion „Stud.App“, die Support-Adresse Ihrer Hochschule ein, damit Meldungen dort ankommen.'));
+            PageLayout::postInfo(htmlReady(Help::missingSupportAddress()));
         }
         $this->logo = null;
         if ($GLOBALS['perm']->have_perm('root')) {

@@ -74,6 +74,18 @@ final class Settings
         return $this->store->get(self::ENABLED) === true;
     }
 
+    /** The app connection is switched on and the app client exists. */
+    public function isConnected(): bool
+    {
+        return $this->isEnabled() && $this->clientId() !== null;
+    }
+
+    /** A feature of the section "Stud.App" is on unless the operator switched it off. */
+    public function isFeatureOn(string $feature): bool
+    {
+        return ($this->arrayValue(self::FEATURES)[$feature] ?? true) !== false;
+    }
+
     public function isPairingEnabled(): bool
     {
         return $this->store->get(self::PAIRING_ENABLED) === true;
@@ -91,8 +103,7 @@ final class Settings
      */
     public function isWebLoginEnabled(): bool
     {
-        return $this->isEnabled() && $this->clientId() !== null
-            && ($this->arrayValue(self::FEATURES)['webLogin'] ?? true) !== false;
+        return $this->isConnected() && $this->isFeatureOn('webLogin');
     }
 
     public function clientId(): ?string
