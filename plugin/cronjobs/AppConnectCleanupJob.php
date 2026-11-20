@@ -41,6 +41,8 @@ class AppConnectCleanupJob extends CronJob
 
     public function execute($last_result, $parameters = [])
     {
+        // The cron worker runs on; another process may have changed the table.
+        Runtime::forgetSettings();
         (new PairingService())->purge();
         (new WebLoginService(new DatabaseTicketStore()))->purge();
         DatabaseCounterStore::purge(time());

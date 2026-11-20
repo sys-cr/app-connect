@@ -13,6 +13,7 @@ use AppConnect\Logo\DatabaseLogoStore;
 use AppConnect\Logo\LogoFetch;
 use AppConnect\Logo\LogoService;
 use AppConnect\OAuth2\ClientProvisioner;
+use AppConnect\Settings\CachedSettingsStore;
 use AppConnect\Settings\ConfigBackedSettingsStore;
 use AppConnect\Settings\DatabaseSettingsStore;
 use AppConnect\Settings\Settings;
@@ -25,9 +26,25 @@ use AppConnect\Settings\StudipConfigAccess;
  */
 final class Runtime
 {
+    private static ?Settings $settings = null;
+
+    /**
+     * The settings, built once per request. The plugin table is read once
+     * per key; the configuration is read on every access, so a change there
+     * shows at once.
+     */
     public static function settings(): Settings
     {
-        return new Settings(new ConfigBackedSettingsStore(new StudipConfigAccess(), new DatabaseSettingsStore()));
+        return self::$settings ??= new Settings(new ConfigBackedSettingsStore(
+            new StudipConfigAccess(),
+            new CachedSettingsStore(new DatabaseSettingsStore())
+        ));
+    }
+
+    /** Drops the settings of {@see settings()}, for processes that run longer than a request. */
+    public static function forgetSettings(): void
+    {
+        self::$settings = null;
     }
 
     /** Base URL of the instance without trailing slash. */
