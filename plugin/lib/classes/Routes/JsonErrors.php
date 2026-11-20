@@ -16,13 +16,11 @@ final class JsonErrors
 {
     public static function write(Response $response, int $status, string $code, string $title): Response
     {
-        $body = json_encode(
+        return JsonResponse::write(
+            $response,
             ['errors' => [['status' => (string) $status, 'code' => $code, 'title' => $title]]],
-            JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES
+            $status,
+            JsonResponse::JSON_API
         );
-        $response->getBody()->write($body);
-        return $response
-            ->withStatus($status)
-            ->withHeader('Content-Type', 'application/vnd.api+json');
     }
 }

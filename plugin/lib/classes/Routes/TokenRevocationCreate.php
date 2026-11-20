@@ -67,11 +67,11 @@ final class TokenRevocationCreate extends \JsonApi\NonJsonApiController
         if (!isset($result['error'])) {
             return $response;
         }
-        $response->getBody()->write(json_encode(
+        $response = JsonResponse::write(
+            $response,
             ['error' => $result['error'], 'error_description' => $result['description'] ?? ''],
-            JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES
-        ));
-        $response = $response->withHeader('Content-Type', 'application/json; charset=utf-8');
+            $result['status']
+        );
         if (isset($result['retryAfter'])) {
             $response = $response->withHeader('Retry-After', (string) $result['retryAfter']);
         }

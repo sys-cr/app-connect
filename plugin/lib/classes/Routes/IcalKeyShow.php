@@ -76,10 +76,7 @@ final class IcalKeyShow extends \JsonApi\NonJsonApiController
         }
 
         $payload = IcalSubscription::payload(Runtime::baseUrl(), (string) $key);
-        $response->getBody()->write(json_encode(['data' => $payload], JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES));
-
-        return $response
-            ->withHeader('Content-Type', 'application/json; charset=utf-8')
+        return JsonResponse::write($response, ['data' => $payload])
             ->withHeader('Cache-Control', 'no-store')
             ->withHeader('Pragma', 'no-cache');
     }

@@ -51,9 +51,7 @@ final class UserEventsShow extends \JsonApi\NonJsonApiController
         );
 
         $document = UserEvents::document($items, $page[0], $page[1]);
-        $response->getBody()->write(json_encode($document, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-        return $response
-            ->withHeader('Content-Type', 'application/vnd.api+json')
+        return JsonResponse::write($response, $document, 200, JsonResponse::JSON_API, JSON_UNESCAPED_UNICODE)
             ->withHeader('Cache-Control', 'private, no-store');
     }
 

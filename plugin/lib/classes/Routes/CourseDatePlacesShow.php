@@ -59,9 +59,7 @@ final class CourseDatePlacesShow extends \JsonApi\NonJsonApiController
             $data[] = ['dateId' => (string) $date->id, 'places' => $this->places($date, $linkProperty)];
         }
 
-        $response->getBody()->write(json_encode(['data' => $data], JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-        return $response
-            ->withHeader('Content-Type', 'application/json; charset=utf-8')
+        return JsonResponse::write($response, ['data' => $data], 200, JsonResponse::JSON, JSON_UNESCAPED_UNICODE)
             ->withHeader('Cache-Control', 'private, no-store');
     }
 
