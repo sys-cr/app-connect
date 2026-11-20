@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace AppConnect\RateLimit;
 
+use AppConnect\Clock;
 use InvalidArgumentException;
 
 /**
@@ -53,18 +54,13 @@ final class RateLimiter
     /** The counter key of $address (or of a person's id) in the current window. */
     public function addressKey(string $address): string
     {
-        $window = intdiv($this->now(), $this->limits->perAddressWindow);
+        $window = intdiv(Clock::now($this->clock), $this->limits->perAddressWindow);
         $digest = substr(hash_hmac('sha256', $address, $this->secret), 0, 32);
         return self::PREFIX . $this->limits->name . '/' . $digest . '/' . $window;
     }
 
     private function globalKey(): string
     {
-        return self::PREFIX . $this->limits->name . '/all/' . intdiv($this->now(), (int) $this->limits->globalWindow);
-    }
-
-    private function now(): int
-    {
-        return $this->clock !== null ? ($this->clock)() : time();
+        return self::PREFIX . $this->limits->name . '/all/' . intdiv(Clock::now($this->clock), (int) $this->limits->globalWindow);
     }
 }
