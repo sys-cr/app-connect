@@ -6,7 +6,47 @@ Alle nennenswerten Änderungen an diesem Projekt stehen in dieser Datei. Das For
 [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), die Versionen folgen
 [Semantic Versioning](https://semver.org/lang/de/).
 
-## [1.2.1] – 2026-11-13
+## [1.2.1] – 2026-11-20
+
+Version 1.2.1 setzt außerdem die Befunde eines zweiten externen Audits von Version 1.2.1
+(Stand 13.11.) um.
+
+### Sicherheit
+
+- Die Sperre des Refresh am Token-Endpunkt des Kerns erkennt den App-Client auch im
+  `Authorization`-Header. Unter PHP-FPM ließ sie sich umgehen, wenn der Client nur dort
+  stand (GHSA-89w3-2cc5-878m).
+- Falsche Passwörter bei der Anmeldung im Web per HTTP Basic sind auf 5 je Person in
+  15 Minuten begrenzt; wer eine Sitzung der Person hat, kann das Passwort nicht mehr
+  durchprobieren (#23).
+- Der Datenexport nennt seine Spalten; die Hashes von Kopplungscodes und Links fallen weg
+  (#24).
+- Die Grenzen für alle Anfragen zusammen liegen bei 1000 fehlgeschlagenen Kopplungen und
+  1200 Widerrufen je Minute. Ein einzelner Client konnte bisher die Kopplung für alle
+  sperren oder jede Abmeldung scheitern lassen (#25).
+- Der Abruf des Logos über einen Proxy geht an die geprüfte Adresse; bisher löste der Proxy
+  den Namen selbst noch einmal auf (#26).
+- Alle Routen verlangen, dass die App-Verbindung an ist und der App-Client existiert. Wer
+  welche Route aufrufen darf, steht in `contract/route-access.md` (#29).
+
+### Änderungen
+
+- Parameter eines unerwarteten Typs (etwa `client_id[]`) ergeben den dokumentierten
+  Fehler statt einer Warnung mit Status 200 (#20).
+- Die Controller sind für PHP 8.2 und neuer vorbereitet (`#[\AllowDynamicProperties]`)
+  (#22).
+- Die Einstellungen werden je Anfrage einmal gelesen, die Discovery bleibt eine Minute im
+  Cache des Kerns; Änderungen in der Sektion „Stud.App“ und am Logo gelten sofort (#27,
+  #34).
+- Die Mail „Gerät verbunden“ geht nach der Antwort hinaus; die Kopplung wartet nicht mehr
+  auf den Mailserver (#28).
+- Die Seiten laden ihre Skripte aus eigenen Dateien statt inline, für eine strenge Content
+  Security Policy (#32).
+- Weiterleitungen beim Abruf des Logos werden wie im Browser aufgelöst, Termine und
+  Turnusse des Kalenders gesammelt geladen (#34).
+- Innerer Umbau ohne Verhaltensänderung: gemeinsame Prüfungen, ein Antwortaufbau, Logik
+  aus den Views, eigener Controller für das Logo, `TokenLineage`, `OperatorConfigListener`,
+  Einstellungen der Routen über den Konstruktor (#21, #30, #31, #33, #34).
 
 ### Funktionen
 
@@ -19,6 +59,8 @@ Alle nennenswerten Änderungen an diesem Projekt stehen in dieser Datei. Das For
 
 ### Entwicklung
 
+- Die Unit-Tests laufen in GitHub Actions auch mit PHP 8.4, Deprecations im eigenen Code
+  lassen sie scheitern (#22). Neue End-to-End-Tests für die Punkte oben.
 - End-to-End-Tests gegen ein echtes Stud.IP in Docker (`make test-e2e STUDIP=6.0` bis
   `6.3`), an der Wurzel und unter `/studip`: Discovery, Landing-Page, Kopplung, Erneuern
   und Widerruf, die Sperre des Refresh am Kern-Endpunkt, gesperrtes Konto, Ausschalten der
@@ -214,7 +256,44 @@ All notable changes to this project are documented in this file. The format foll
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/).
 
-### [1.2.1] – 2026-11-13
+### [1.2.1] – 2026-11-20
+
+Version 1.2.1 also addresses the findings of a second external audit of version 1.2.1 (as
+of 13 November).
+
+#### Security
+
+- The refused refresh at the core's token endpoint also recognises the app client in the
+  `Authorization` header. Under PHP-FPM it could be bypassed when the client was named
+  only there (GHSA-89w3-2cc5-878m).
+- Wrong passwords at the web login with HTTP Basic are limited to 5 per person in 15
+  minutes; whoever holds a session of the person can no longer guess the password (#23).
+- The data export names its columns; the hashes of pairing codes and links are left out
+  (#24).
+- The overall limits are 1000 failed pairings and 1200 revocations per minute. So far a
+  single client could block pairing for everyone or make every sign-out fail (#25).
+- Fetching the logo through a proxy goes to the checked address; so far the proxy resolved
+  the name again itself (#26).
+- Every route requires the app connection to be on and the app client to exist. Who may
+  call which route is in `contract/route-access.md` (#29).
+
+#### Changes
+
+- Parameters of an unexpected type (such as `client_id[]`) get the documented error
+  instead of a warning with status 200 (#20).
+- The controllers are ready for PHP 8.2 and later (`#[\AllowDynamicProperties]`) (#22).
+- The settings are read once per request, the discovery stays in the core's cache for a
+  minute; changes in the section "Stud.App" and to the logo apply at once (#27, #34).
+- The mail "Gerät verbunden" goes out after the response; pairing no longer waits for the
+  mail server (#28).
+- The pages load their scripts from files instead of inline, for a strict Content Security
+  Policy (#32).
+- Redirects when fetching the logo are resolved like a browser does, the dates and cycles
+  of the calendar are loaded together (#34).
+- Internal restructuring without a change in behaviour: shared checks, one way to write
+  answers, logic out of the views, a controller of its own for the logo, `TokenLineage`,
+  `OperatorConfigListener`, settings of the routes through the constructor (#21, #30, #31,
+  #33, #34).
 
 #### Features
 
@@ -226,6 +305,8 @@ All notable changes to this project are documented in this file. The format foll
 
 #### Development
 
+- The unit tests run with PHP 8.4 in GitHub Actions as well, and deprecations in the
+  plugin's own code fail them (#22). New end-to-end tests for the points above.
 - End-to-end tests against a real Stud.IP in Docker (`make test-e2e STUDIP=6.0` to `6.3`),
   at the root and below `/studip`: discovery, landing page, pairing, refresh and
   revocation, the refused refresh at the core endpoint, a locked account, switching the
