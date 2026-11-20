@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace AppConnect\Discovery;
 
+use AppConnect\Settings\OperatorConfig;
 use AppConnect\Settings\Settings;
 
 /**
@@ -266,11 +267,11 @@ final class DiscoveryBuilder
 
     private static function isHexColor(mixed $value): bool
     {
-        return is_string($value) && preg_match('/^#[0-9A-Fa-f]{6}$/', $value) === 1;
+        return is_string($value) && preg_match(OperatorConfig::HEX_COLOR_PATTERN, $value) === 1;
     }
 
     private static function isHttpsUrl(mixed $value): bool
     {
-        return is_string($value) && preg_match('~^https://[^\s/?#@]+(/\S*)?$~', $value) === 1;
+        return is_string($value) && preg_match(OperatorConfig::HTTPS_URL_PATTERN, $value) === 1;
     }
 }

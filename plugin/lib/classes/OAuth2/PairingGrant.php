@@ -33,8 +33,6 @@ final class PairingGrant extends AbstractGrant
 {
     public const IDENTIFIER = 'urn:studip:app-connect:pairing';
 
-    /** Accounts that may connect the app. */
-
     /** @var \Closure(string, DeviceRecord): void|null */
     private ?\Closure $onConnected;
 

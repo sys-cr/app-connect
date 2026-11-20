@@ -14,6 +14,12 @@ namespace AppConnect\Settings;
  */
 final class OperatorConfig
 {
+    /** An https address with a host and no user part. */
+    public const HTTPS_URL_PATTERN = '~^https://[^\s/?#@]+(/\S*)?$~';
+
+    /** A colour as #RRGGBB. */
+    public const HEX_COLOR_PATTERN = '/^#[0-9A-Fa-f]{6}$/';
+
     public const SECTION = 'Stud.App';
 
     public const ENABLED = 'APP_CONNECT_ENABLED';
@@ -154,7 +160,7 @@ final class OperatorConfig
 
     public static function isHexColor(mixed $value): bool
     {
-        return is_string($value) && preg_match('/^#[0-9A-Fa-f]{6}$/', trim($value)) === 1;
+        return is_string($value) && preg_match(self::HEX_COLOR_PATTERN, trim($value)) === 1;
     }
 
     /**
@@ -180,6 +186,6 @@ final class OperatorConfig
 
     public static function isHttpsUrl(mixed $value): bool
     {
-        return is_string($value) && preg_match('~^https://[^\s/?#@]+(/\S*)?$~', trim($value)) === 1;
+        return is_string($value) && preg_match(self::HTTPS_URL_PATTERN, trim($value)) === 1;
     }
 }

@@ -32,7 +32,7 @@ final class TokenRevocationCreate extends \JsonApi\NonJsonApiController
     {
         $settings = Runtime::settings();
         $clientId = $settings->clientId();
-        if (!$settings->isEnabled() || $clientId === null) {
+        if (!$settings->isConnected() || $clientId === null) {
             return JsonErrors::write($response, 404, 'app-connect-disabled', 'App connection is switched off');
         }
         $limits = Limits::revocations();

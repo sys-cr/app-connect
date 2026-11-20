@@ -13,8 +13,6 @@ use AppConnect\Devices\DeviceService;
 use AppConnect\Devices\TokenLedger;
 use AppConnect\Mail\ConnectedMail;
 use AppConnect\Runtime;
-use League\OAuth2\Server\Exception\OAuthServerException;
-use League\OAuth2\Server\ResourceServer;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
@@ -30,20 +28,16 @@ final class DevicesCreate extends \JsonApi\NonJsonApiController
     public function __invoke(Request $request, Response $response, $args): Response
     {
         $settings = Runtime::settings();
-        if (!$settings->isEnabled() || $settings->clientId() === null) {
+        if (!$settings->isConnected()) {
             return JsonErrors::write($response, 404, 'app-connect-disabled', 'App connection is switched off');
         }
 
         // The route only works with an OAuth2 token of the app client: the
         // authentication middleware also accepts sessions and basic auth, which
         // have no token lineage to bind.
-        try {
-            $validated = (new \Studip\OAuth2\Container())->get(ResourceServer::class)->validateAuthenticatedRequest($request);
-        } catch (OAuthServerException $exception) {
-            return JsonErrors::write($response, 401, 'app-connect-token-required', 'An OAuth2 token of the app is required');
-        }
-        if ((string) $validated->getAttribute('oauth_client_id') !== $settings->clientId()) {
-            return JsonErrors::write($response, 403, 'app-connect-wrong-client', 'The token does not belong to the app');
+        $validated = AppToken::validated($request, $response, (string) $settings->clientId());
+        if ($validated instanceof Response) {
+            return $validated;
         }
         $userId = (string) $validated->getAttribute('oauth_user_id');
         $accessTokenId = (string) $validated->getAttribute('oauth_access_token_id');

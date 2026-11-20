@@ -12,6 +12,7 @@ use AppConnect\Connect\ConnectLink;
 use AppConnect\Devices\DeviceRetention;
 use AppConnect\Devices\DeviceService;
 use AppConnect\Devices\TokenLedger;
+use AppConnect\Help;
 use AppConnect\Logo\LogoStatusText;
 use AppConnect\OAuth2\ClientProvisioner;
 use AppConnect\OAuth2\CoreRefreshGuard;
@@ -101,7 +102,7 @@ class AppConnect extends StudIPPlugin implements SystemPlugin, JsonApiPlugin, Pr
     public static function onEnable($plugin_id)
     {
         $settings = Runtime::settings();
-        if ($settings->isEnabled() && $settings->clientId() !== null) {
+        if ($settings->isConnected()) {
             (new ClientProvisioner($settings))->provision(Runtime::baseUrl() . '/');
         }
     }
@@ -139,7 +140,7 @@ class AppConnect extends StudIPPlugin implements SystemPlugin, JsonApiPlugin, Pr
     private function profileEntryIsOn(): bool
     {
         $settings = Runtime::settings();
-        return $settings->isEnabled() && $settings->isProfileEntryEnabled() && $settings->clientId() !== null;
+        return $settings->isConnected() && $settings->isProfileEntryEnabled();
     }
 
     /** @param array{field?: string, new_value?: mixed} $change */
@@ -150,30 +151,7 @@ class AppConnect extends StudIPPlugin implements SystemPlugin, JsonApiPlugin, Pr
             return;
         }
         if ($field === OperatorConfig::ENABLED) {
-            $provisioner = new ClientProvisioner(Runtime::settings());
-            if (in_array((string) ($change['new_value'] ?? ''), ['1', 'true'], true)) {
-                if (ConnectLink::basePathOf(Runtime::baseUrl()) === null) {
-                    // Switching back off calls this hook again, which revokes.
-                    Config::get()->store(OperatorConfig::ENABLED, false);
-                    PageLayout::postError($this->_('Die App-Verbindung bleibt aus: Der Pfad von Stud.IP in ABSOLUTE_URI_STUDIP lässt sich nicht in den Verbindungslink übernehmen. Erlaubt sind bis zu acht Abschnitte aus Buchstaben, Ziffern und den Zeichen - . _ ~, etwa https://example.org/studip/.'));
-                    return;
-                }
-                $provisioner->provision(Runtime::baseUrl() . '/');
-                $this->allowRequestsWithoutSession();
-            } else {
-                $provisioner->revoke();
-                // Switching off ends every connection for good: switching on
-                // again must not bring old tokens back. Disabling the plugin
-                // only pauses (onDisable).
-                $clientId = Runtime::settings()->clientId();
-                if ($clientId !== null) {
-                    $count = (new DeviceService(new TokenLedger(), $clientId))->endAll();
-                    EventLog::record(EventLog::DISABLE, 'connections ended: ' . $count);
-                    if ($count > 0) {
-                        PageLayout::postInfo(htmlReady($this->_('Alle Verbindungen der App sind beendet. Nach dem Einschalten muss jede Person die App neu verbinden.')));
-                    }
-                }
-            }
+            in_array((string) ($change['new_value'] ?? ''), ['1', 'true'], true) ? $this->switchedOn() : $this->switchedOff();
             return;
         }
         EventLog::record(EventLog::SETTINGS_CHANGE, $field);
@@ -183,12 +161,50 @@ class AppConnect extends StudIPPlugin implements SystemPlugin, JsonApiPlugin, Pr
         }
         if ($field === OperatorConfig::SUPPORT_EMAIL && !OperatorConfig::isEmail($value)) {
             // The apps then send content reports to the project's own address.
-            PageLayout::postInfo($this->_('Ohne Support-Adresse (APP_CONNECT_SUPPORT_EMAIL) gehen Meldungen von Inhalten aus der App an support@studapp2.de, den Support des Projekts Stud.App. Tragen Sie unter Admin → System → Konfiguration, Sektion „Stud.App“, die Support-Adresse Ihrer Hochschule ein, damit Meldungen dort ankommen.'));
+            PageLayout::postInfo(htmlReady(Help::missingSupportAddress()));
         }
-        if ($value === '') {
+        $problem = $value === '' ? null : $this->fieldProblem($field, $value);
+        if ($problem !== null) {
+            PageLayout::postWarning(sprintf($this->_('%s wird nicht verwendet: %s'), htmlReady($field), $problem));
+        }
+    }
+
+    /** Provides the app client, unless the base path cannot go into the connect link. */
+    private function switchedOn(): void
+    {
+        if (ConnectLink::basePathOf(Runtime::baseUrl()) === null) {
+            // Switching back off calls the hook again, which revokes.
+            Config::get()->store(OperatorConfig::ENABLED, false);
+            PageLayout::postError($this->_('Die App-Verbindung bleibt aus: Der Pfad von Stud.IP in ABSOLUTE_URI_STUDIP lässt sich nicht in den Verbindungslink übernehmen. Erlaubt sind bis zu acht Abschnitte aus Buchstaben, Ziffern und den Zeichen - . _ ~, etwa https://example.org/studip/.'));
             return;
         }
-        $problem = match (true) {
+        (new ClientProvisioner(Runtime::settings()))->provision(Runtime::baseUrl() . '/');
+        $this->allowRequestsWithoutSession();
+    }
+
+    /**
+     * Revokes the app client and ends every connection for good: switching
+     * on again must not bring old tokens back. Disabling the plugin only
+     * pauses (onDisable).
+     */
+    private function switchedOff(): void
+    {
+        (new ClientProvisioner(Runtime::settings()))->revoke();
+        $clientId = Runtime::settings()->clientId();
+        if ($clientId === null) {
+            return;
+        }
+        $count = (new DeviceService(new TokenLedger(), $clientId))->endAll();
+        EventLog::record(EventLog::DISABLE, 'connections ended: ' . $count);
+        if ($count > 0) {
+            PageLayout::postInfo(htmlReady($this->_('Alle Verbindungen der App sind beendet. Nach dem Einschalten muss jede Person die App neu verbinden.')));
+        }
+    }
+
+    /** Why a non-empty value of $field is not used, or null when it is fine. */
+    private function fieldProblem(string $field, string $value): ?string
+    {
+        return match (true) {
             in_array($field, OperatorConfig::URL_FIELDS, true) && !OperatorConfig::isHttpsUrl($value)
                 => $this->_('Die Adresse muss mit https:// beginnen.'),
             $field === OperatorConfig::SUPPORT_EMAIL && !OperatorConfig::isEmail($value)
@@ -199,9 +215,6 @@ class AppConnect extends StudIPPlugin implements SystemPlugin, JsonApiPlugin, Pr
                 => $this->_('Erwartet werden OpenMensa-IDs (Zahlen), durch Komma getrennt.'),
             default => null,
         };
-        if ($problem !== null) {
-            PageLayout::postWarning(sprintf($this->_('%s wird nicht verwendet: %s'), htmlReady($field), $problem));
-        }
     }
 
     /**

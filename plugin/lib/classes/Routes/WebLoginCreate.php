@@ -14,8 +14,6 @@ use AppConnect\Settings\Settings;
 use AppConnect\WebLogin\DatabaseTicketStore;
 use AppConnect\WebLogin\ReturnPath;
 use AppConnect\WebLogin\WebLoginService;
-use League\OAuth2\Server\Exception\OAuthServerException;
-use League\OAuth2\Server\ResourceServer;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
@@ -33,7 +31,7 @@ final class WebLoginCreate extends \JsonApi\NonJsonApiController
     public function __invoke(Request $request, Response $response, $args): Response
     {
         $settings = Runtime::settings();
-        if (!$settings->isEnabled() || $settings->clientId() === null) {
+        if (!$settings->isConnected()) {
             return JsonErrors::write($response, 404, 'app-connect-disabled', 'App connection is switched off');
         }
         if (!$settings->isWebLoginEnabled()) {
@@ -92,16 +90,12 @@ final class WebLoginCreate extends \JsonApi\NonJsonApiController
     {
         $authorization = $request->getHeaderLine('Authorization');
         if (preg_match('/^Bearer\s/i', $authorization) === 1) {
-            try {
-                $validated = (new \Studip\OAuth2\Container())->get(ResourceServer::class)->validateAuthenticatedRequest($request);
-            } catch (OAuthServerException $exception) {
-                return JsonErrors::write($response, 401, 'app-connect-token-required', 'An OAuth2 token of the app is required');
-            }
-            if ((string) $validated->getAttribute('oauth_client_id') !== $settings->clientId()) {
-                return JsonErrors::write($response, 403, 'app-connect-wrong-client', 'The token does not belong to the app');
+            $validated = AppToken::validated($request, $response, (string) $settings->clientId());
+            if ($validated instanceof Response) {
+                return $validated;
             }
             if ((string) $validated->getAttribute('oauth_user_id') !== $userId) {
-                return JsonErrors::write($response, 401, 'app-connect-token-required', 'An OAuth2 token of the app is required');
+                return AppToken::tokenRequired($response);
             }
             $accessTokenId = (string) $validated->getAttribute('oauth_access_token_id');
             $device = DeviceRecord::findOneBySQL(
@@ -120,7 +114,7 @@ final class WebLoginCreate extends \JsonApi\NonJsonApiController
             && (\StudipAuthAbstract::CheckAuthentication($basicUser, $basicPassword)['uid'] ?? null) === $userId) {
             return [null, null];
         }
-        return JsonErrors::write($response, 401, 'app-connect-token-required', 'An OAuth2 token of the app is required');
+        return AppToken::tokenRequired($response);
     }
 
     /** @return array<string, mixed>|null the JSON object of the body; [] for an empty body */

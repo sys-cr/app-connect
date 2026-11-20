@@ -35,6 +35,12 @@ final class Help
         return $texts;
     }
 
+    /** Notice for root while the support address is missing: where reports from the app go instead. */
+    public static function missingSupportAddress(): string
+    {
+        return Translation::text('Ohne Support-Adresse (APP_CONNECT_SUPPORT_EMAIL) gehen Meldungen von Inhalten aus der App an support@studapp2.de, den Support des Projekts Stud.App. Tragen Sie unter Admin → System → Konfiguration, Sektion „Stud.App“, die Support-Adresse Ihrer Hochschule ein, damit Meldungen dort ankommen.');
+    }
+
     public static function addToHelpbar(string $page, bool $pairingEnabled = true): void
     {
         foreach (self::texts($page, $pairingEnabled) as $text) {

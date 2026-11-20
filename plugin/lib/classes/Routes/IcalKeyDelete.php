@@ -9,7 +9,6 @@ namespace AppConnect\Routes;
 
 use AppConnect\Audit\EventLog;
 use AppConnect\Runtime;
-use AppConnect\Settings\Settings;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
@@ -29,10 +28,10 @@ final class IcalKeyDelete extends \JsonApi\NonJsonApiController
     public function __invoke(Request $request, Response $response, $args): Response
     {
         $settings = Runtime::settings();
-        if (!$settings->isEnabled() || $settings->clientId() === null) {
+        if (!$settings->isConnected()) {
             return JsonErrors::write($response, 404, 'app-connect-disabled', 'App connection is switched off');
         }
-        if (($settings->arrayValue(Settings::FEATURES)['icalKey'] ?? true) === false) {
+        if (!$settings->isFeatureOn('icalKey')) {
             return JsonErrors::write($response, 404, 'app-connect-ical-key-disabled', 'The calendar key is switched off');
         }
         $user = $this->getUser($request);

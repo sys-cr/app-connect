@@ -11,7 +11,6 @@ use AppConnect\Places\GeoCoordinates;
 use AppConnect\Places\PlaceQuery;
 use AppConnect\Runtime;
 use AppConnect\Settings\OperatorConfig;
-use AppConnect\Settings\Settings;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
@@ -33,7 +32,7 @@ final class CourseDatePlacesShow extends \JsonApi\NonJsonApiController
         if (!$settings->isEnabled()) {
             return JsonErrors::write($response, 404, 'app-connect-disabled', 'App connection is switched off');
         }
-        if (($settings->arrayValue(Settings::FEATURES)['eventPlaces'] ?? true) === false) {
+        if (!$settings->isFeatureOn('eventPlaces')) {
             return JsonErrors::write($response, 404, 'app-connect-feature-off', 'Places of course dates are switched off');
         }
         $user = $this->getUser($request);

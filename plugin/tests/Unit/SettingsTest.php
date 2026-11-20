@@ -44,6 +44,23 @@ final class SettingsTest extends TestCase
         self::assertFalse($settings->isProfileEntryEnabled());
     }
 
+    public function testConnectedNeedsTheSwitchAndTheClient(): void
+    {
+        self::assertFalse((new Settings(new InMemorySettingsStore([Settings::ENABLED => true])))->isConnected());
+        self::assertFalse((new Settings(new InMemorySettingsStore([Settings::OAUTH_CLIENT_ID => '7'])))->isConnected());
+        self::assertTrue((new Settings(new InMemorySettingsStore([Settings::ENABLED => true, Settings::OAUTH_CLIENT_ID => '7'])))->isConnected());
+    }
+
+    public function testAFeatureIsOnUnlessSwitchedOff(): void
+    {
+        $settings = new Settings(new InMemorySettingsStore([Settings::FEATURES => ['icalKey' => false, 'userEvents' => 0]]));
+
+        self::assertFalse($settings->isFeatureOn('icalKey'));
+        self::assertTrue($settings->isFeatureOn('userEvents'), 'only false switches off');
+        self::assertTrue($settings->isFeatureOn('eventPlaces'));
+        self::assertTrue((new Settings(new InMemorySettingsStore()))->isFeatureOn('icalKey'));
+    }
+
     public function testTheRateLimitKeyIsCreatedOnceAndKept(): void
     {
         $store = new InMemorySettingsStore();

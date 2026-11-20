@@ -24,7 +24,7 @@ final class TokenCreate extends \JsonApi\NonJsonApiController
     public function __invoke(Request $request, Response $response, $args): Response
     {
         $settings = Runtime::settings();
-        if (!$settings->isEnabled() || $settings->clientId() === null) {
+        if (!$settings->isConnected()) {
             return JsonErrors::write($response, 404, 'app-connect-disabled', 'App connection is switched off');
         }
         $response = $response->withHeader('Cache-Control', 'no-store')->withHeader('Pragma', 'no-cache');
