@@ -84,6 +84,20 @@ final class TokenLifecycleTest extends E2ETestCase
         self::assertSame(200, self::refresh($tokens['refresh_token'])->status, 'the refresh token stays usable at the plugin');
     }
 
+    public function testTheCoreTokenEndpointRefusesTheAppClientNamedInBasicAuth(): void
+    {
+        $tokens = self::pair(self::AUTOR);
+
+        $response = self::request('POST', self::url('dispatch.php/api/oauth2/token'), [
+            'grant_type' => 'refresh_token',
+            'refresh_token' => $tokens['refresh_token'],
+        ], ['Authorization: Basic ' . base64_encode(self::clientId() . ':')]);
+
+        self::assertSame(400, $response->status, $response->body);
+        self::assertSame('invalid_grant', $response->json()['error'] ?? null);
+        self::assertSame(200, self::refresh($tokens['refresh_token'])->status, 'the refresh token stays usable at the plugin');
+    }
+
     public function testRevokingTheRefreshTokenEndsThePairAndTheDevice(): void
     {
         $tokens = self::pair(self::AUTOR);
