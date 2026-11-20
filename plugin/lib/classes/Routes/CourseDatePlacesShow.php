@@ -29,7 +29,7 @@ final class CourseDatePlacesShow extends \JsonApi\NonJsonApiController
     public function __invoke(Request $request, Response $response, $args): Response
     {
         $settings = Runtime::settings();
-        if (!$settings->isEnabled()) {
+        if (!$settings->isConnected()) {
             return JsonErrors::write($response, 404, 'app-connect-disabled', 'App connection is switched off');
         }
         if (!$settings->isFeatureOn('eventPlaces')) {
