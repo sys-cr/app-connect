@@ -107,6 +107,15 @@ class AppConnect extends StudIPPlugin implements SystemPlugin, JsonApiPlugin, Pr
         }
     }
 
+    /**
+     * Loads one of the plugin's scripts (assets/js) on the current page,
+     * deferred until the page is parsed. The pages carry no inline script.
+     */
+    public function addPageScript(string $file): void
+    {
+        $this->addScript('assets/js/' . $file, ['defer' => '']);
+    }
+
     public function registerAuthenticatedRoutes(RouteCollectorProxy $group)
     {
         $group->post('/app-connect/devices', DevicesCreate::class);

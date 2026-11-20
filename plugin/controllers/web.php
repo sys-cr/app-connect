@@ -45,6 +45,7 @@ class WebController extends PluginController
 
     public function enter_action()
     {
+        $this->plugin->addPageScript('web-enter.js');
         $this->redeem_url = $this->url_for('web/redeem');
     }
 
