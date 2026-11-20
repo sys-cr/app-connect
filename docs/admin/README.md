@@ -212,7 +212,7 @@ OAuth2-Fehlern (`invalid_grant`, `invalid_client`, …) nach RFC 6749. Jede Rout
 | `GET app-connect/course-dates/places?filter[ids]=…` | ja | Wo bis zu 50 Termine stattfinden: gebuchte Räume mit Koordinaten (Raum, Gebäude oder Standort) und Raumfinder-Link, sonst die Freitext-Raumangabe. Termine, die die Person nicht sehen darf, fehlen. Funktion `eventPlaces`. [`contract/course-date-places.md`](../../contract/course-date-places.md) |
 | `GET app-connect/user-language` | ja | Die Sprache, in der die Person Stud.IP nutzt (Profil, sonst die Vorgabe der Instanz). Funktion `userLanguage`. [`contract/user-language.md`](../../contract/user-language.md) |
 | `GET app-connect/user-events?filter[timestamp]=…` | ja | Der Kalender der Person für zwei Wochen wie im Web-Kalender: eigene Termine, Termine der im Kalender angezeigten Veranstaltungen und Ausfälle, jeder Veranstaltungstermin mit der Farbgruppe der Person (`color`, 0–8). Dieselben Ressourcen wie die Kern-Route `users/{id}/events`. Funktion `userEvents`. [`contract/user-events.md`](../../contract/user-events.md) |
-| `POST app-connect/web-login` | App-Token oder Passwort | Einmaliger Link für die Anmeldung im Web (oben). `429` nach 10 Links in 5 Minuten. [`contract/web-login.md`](../../contract/web-login.md) |
+| `POST app-connect/web-login` | App-Token oder Passwort | Einmaliger Link für die Anmeldung im Web (oben). `429` nach 10 Links in 5 Minuten und nach 5 falschen Passwörtern je Person in 15 Minuten. [`contract/web-login.md`](../../contract/web-login.md) |
 | `GET`/`DELETE app-connect/me/ical-key` | App-Token | Der Kalender-Schlüssel der Person und die `webcal://`-Adresse; der erste Aufruf legt einen Schlüssel an (höchstens fünf pro Stunde, sonst `429`), `DELETE` setzt ihn zurück und beendet jedes Abo darauf. `401`/`403` für andere Anmeldungen. Funktion `icalKey`. [`contract/ical-key.md`](../../contract/ical-key.md) |
 
 Seiten des Plugins (`plugins.php/appconnect/…`):
@@ -271,6 +271,7 @@ Ereignisprotokolls.
 | Einstellungen | `config` (Sektion „Stud.App“), `app_connect_settings` | eure Einstellungen, Client-ID, gespeicherte Adresse, zufälliger Schlüssel für die Zähler der Grenzen |
 | Fehlversuche beim Koppeln | `app_connect_counters` | Zähler je Adresse, 10 Minuten |
 | Widerrufe von Tokens | `app_connect_counters` | Zähler je Adresse, 10 Minuten |
+| Falsche Passwörter bei der Anmeldung im Web | `app_connect_counters` | Zähler je Person (verschlüsselte Kennung), 15 Minuten |
 
 Die Zähler liegen in der Datenbank, damit gleichzeitige Anfragen alle gezählt werden und
 alle Webserver dieselben Werte sehen; der Aufräum-Cronjob löscht abgelaufene. Sie enthalten
@@ -568,7 +569,7 @@ errors (`invalid_grant`, `invalid_client`, …) as RFC 6749 describes. Every rou
 | `GET app-connect/course-dates/places?filter[ids]=…` | yes | Where up to 50 course dates take place: booked rooms with coordinates (room, building or site) and the room finder link, else the free-text room. Dates the person may not see are left out. Feature `eventPlaces`. [`contract/course-date-places.md`](../../contract/course-date-places.md) |
 | `GET app-connect/user-language` | yes | The language the person uses Stud.IP in (profile, else the site default). Feature `userLanguage`. [`contract/user-language.md`](../../contract/user-language.md) |
 | `GET app-connect/user-events?filter[timestamp]=…` | yes | The person's calendar for two weeks as the web calendar shows it: personal entries, dates of courses shown in the calendar and cancelled dates, each course date with the person's colour group of the course (`color`, 0–8). Same resource shapes as the core route `users/{id}/events`. Feature `userEvents`. [`contract/user-events.md`](../../contract/user-events.md) |
-| `POST app-connect/web-login` | app token or password | One-time link for the web login (above). `429` after 10 links in 5 minutes. [`contract/web-login.md`](../../contract/web-login.md) |
+| `POST app-connect/web-login` | app token or password | One-time link for the web login (above). `429` after 10 links in 5 minutes and after 5 wrong passwords per person in 15 minutes. [`contract/web-login.md`](../../contract/web-login.md) |
 | `GET`/`DELETE app-connect/me/ical-key` | app token | The person's calendar key and the `webcal://` address; the first call creates a key (at most five an hour, otherwise `429`), `DELETE` resets it and stops every subscription built on it. `401`/`403` for other sign-ins. Feature `icalKey`. [`contract/ical-key.md`](../../contract/ical-key.md) |
 
 Pages of the plugin (`plugins.php/appconnect/…`):
@@ -624,6 +625,7 @@ days; the other entries of the plugin follow your event log settings.
 | settings | `config` (section "Stud.App"), `app_connect_settings` | your settings, client id, recorded address, random key for the limit counters |
 | failed pairing attempts | `app_connect_counters` | counter per address, 10 minutes |
 | token revocations | `app_connect_counters` | counter per address, 10 minutes |
+| wrong passwords at the web login | `app_connect_counters` | counter per person (keyed id), 15 minutes |
 
 The counters live in the database, so concurrent requests are all counted and every web
 server sees the same values; the cleanup cronjob deletes expired ones. They hold no IP

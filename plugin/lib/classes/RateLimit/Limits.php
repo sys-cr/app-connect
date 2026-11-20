@@ -7,15 +7,19 @@ declare(strict_types=1);
 
 namespace AppConnect\RateLimit;
 
-/** One set of fixed-window limits for {@see RateLimiter}: per client address and for the whole instance. */
+/**
+ * One set of fixed-window limits for {@see RateLimiter}: per key (a client
+ * address or a person) and, where it makes sense, for the whole instance.
+ */
 final class Limits
 {
     private function __construct(
         public readonly string $name,
         public readonly int $perAddress,
         public readonly int $perAddressWindow,
-        public readonly int $global,
-        public readonly int $globalWindow,
+        /** Null: no overall limit. */
+        public readonly ?int $global,
+        public readonly ?int $globalWindow,
     ) {
     }
 
@@ -33,5 +37,15 @@ final class Limits
     public static function revocations(): self
     {
         return new self('revocations', 300, 600, 300, 60);
+    }
+
+    /**
+     * Failed password checks of the web login with HTTP Basic: 5 per person
+     * in 15 minutes, keyed by the person, without an overall limit. Only
+     * someone who already holds a session of the person gets that far.
+     */
+    public static function webLoginPasswords(): self
+    {
+        return new self('web-login-passwords', 5, 900, null, null);
     }
 }

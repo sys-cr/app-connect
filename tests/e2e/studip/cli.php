@@ -34,6 +34,7 @@ const E2E_USERS = [
     'e2e_autor' => ['autor', 'Anna', 'Autorin'],
     'e2e_locked' => ['autor', 'Lars', 'Gesperrt'],
     'e2e_web' => ['autor', 'Wiebke', 'Weblogin'],
+    'e2e_password' => ['autor', 'Paul', 'Passwort'],
 ];
 
 /** The hash of the password "testing", as for root@studip in db/studip-root-user.sql. */

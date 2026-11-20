@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace AppConnect\Tests\Unit;
 
+use AppConnect\RateLimit\CounterStore;
 use AppConnect\RateLimit\InMemoryCounterStore;
 use AppConnect\RateLimit\Limits;
 use AppConnect\RateLimit\RateLimiter;
@@ -60,6 +61,42 @@ final class RateLimiterTest extends TestCase
         }
 
         self::assertTrue($limiter->isBlocked('203.0.113.9'));
+    }
+
+    public function testFailedWebLoginPasswordsAreLimitedPerPersonOnly(): void
+    {
+        $limits = Limits::webLoginPasswords();
+        $now = 1_000_000;
+        $store = new class () implements CounterStore {
+            /** @var array<string, int> */
+            public array $values = [];
+
+            public function read(string $key): int
+            {
+                return $this->values[$key] ?? 0;
+            }
+
+            public function increment(string $key, int $ttlSeconds): int
+            {
+                return $this->values[$key] = ($this->values[$key] ?? 0) + 1;
+            }
+        };
+        $limiter = new RateLimiter($store, $limits, self::SECRET, function () use (&$now): int {
+            return $now;
+        });
+        self::assertSame(5, $limits->perAddress);
+        self::assertSame(900, $limits->perAddressWindow);
+
+        for ($i = 0; $i < 5; $i++) {
+            self::assertFalse($limiter->isBlocked('user-a'));
+            $limiter->record('user-a');
+        }
+
+        self::assertTrue($limiter->isBlocked('user-a'));
+        self::assertFalse($limiter->isBlocked('user-b'));
+        self::assertCount(1, $store->values, 'no overall counter');
+        $now += 900;
+        self::assertFalse($limiter->isBlocked('user-a'));
     }
 
     public function testLimitSetsCountSeparately(): void
