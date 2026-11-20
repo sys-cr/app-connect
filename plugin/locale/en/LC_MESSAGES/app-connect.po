@@ -205,6 +205,12 @@ msgstr ""
 msgid "d.m.Y, H:i T"
 msgstr "Y-m-d, H:i T"
 
+msgid "d.m.Y H:i"
+msgstr "Y-m-d H:i"
+
+msgid "d.m.Y"
+msgstr "Y-m-d"
+
 msgid "app-connect wurde von %1$s (© %2$s) entwickelt. Das Plugin ist freie Software unter der GNU GPL 3.0 oder neuer mit Zusatzbedingungen nach Abschnitt 7."
 msgstr "app-connect was developed by %1$s (© %2$s). The plugin is free software under the GNU GPL 3.0 or later with additional terms under section 7."
 

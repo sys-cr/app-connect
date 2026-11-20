@@ -99,6 +99,11 @@ switch ($args[0] ?? '') {
             $account->store();
             UserConfig::get($account->id)->store('TERMS_ACCEPTED', 1);
         }
+        // root opens plugin pages in the tests as well.
+        $root = user('root@studip');
+        $root->visible = 'yes';
+        $root->store();
+        UserConfig::get($root->id)->store('TERMS_ACCEPTED', 1);
         store(OperatorConfig::PAIRING_ENABLED, true);
         if (!Runtime::settings()->isEnabled()) {
             store(OperatorConfig::ENABLED, true);

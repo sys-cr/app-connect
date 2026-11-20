@@ -73,21 +73,28 @@ final class Attribution
      */
     public static function html(string $linkIcon = '', bool $inHelpbar = true): string
     {
-        $icon = $linkIcon !== '' ? $linkIcon . ' ' : '';
-        return sprintf(
-            '<div class="app-connect-attribution" style="%s color: %s;">'
-            . '%s<br>'
-            . '%s<br>'
-            . '<a href="%s" target="_blank" rel="noopener noreferrer" style="color: inherit; white-space: nowrap;">%s%s</a>'
-            . '</div>',
-            $inHelpbar ? self::HELPBAR_FONT : self::PAGE_FONT,
-            $inHelpbar ? self::HELPBAR_COLOR : self::PAGE_COLOR,
-            htmlReady(self::text()),
-            htmlReady(self::termsText()),
-            htmlReady(self::LICENSE_URL),
-            $icon,
-            htmlReady(Translation::text('Lizenz (GPLv3)'))
-        );
+        return self::render(dirname(__DIR__, 2) . '/views/_attribution.php', [
+            'style' => sprintf('%s color: %s;', $inHelpbar ? self::HELPBAR_FONT : self::PAGE_FONT, $inHelpbar ? self::HELPBAR_COLOR : self::PAGE_COLOR),
+            'text' => self::text(),
+            'terms' => self::termsText(),
+            'license_url' => self::LICENSE_URL,
+            'license_label' => Translation::text('Lizenz (GPLv3)'),
+            'link_icon' => $linkIcon !== '' ? $linkIcon . ' ' : '',
+        ]);
+    }
+
+    /**
+     * Renders a plain PHP template with $variables. The notice also goes into
+     * the help bar, where no controller and no template factory is at hand.
+     *
+     * @param array<string, string> $variables
+     */
+    private static function render(string $template, array $variables): string
+    {
+        extract($variables, EXTR_SKIP);
+        ob_start();
+        include $template;
+        return trim((string) ob_get_clean());
     }
 
     /**

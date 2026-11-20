@@ -62,6 +62,17 @@ final class LogoImage
      * Short content version for the address in the discovery: it changes
      * with every new picture, so the apps' caches never hold an old one.
      */
+    /** The image type for people: PNG, JPEG or WebP. */
+    public function typeLabel(): string
+    {
+        return match ($this->mimeType) {
+            'image/png' => 'PNG',
+            'image/jpeg' => 'JPEG',
+            'image/webp' => 'WebP',
+            default => '',
+        };
+    }
+
     public function version(): string
     {
         return substr($this->hash, 0, 16);

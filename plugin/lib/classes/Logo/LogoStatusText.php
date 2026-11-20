@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace AppConnect\Logo;
 
+use AppConnect\Format;
 use AppConnect\Translation;
 
 /** Texts for the operator about the logo, shared by the configuration hook and "Stud.App Verbindung". */
@@ -49,10 +50,47 @@ final class LogoStatusText
             return ['warning', sprintf(
                 Translation::text('Das Logo konnte nicht neu geladen werden: %s Die Apps erhalten weiter die Fassung vom %s.'),
                 $reason,
-                date('d.m.Y H:i', (int) $logo->fetchedAt)
+                Format::dateTime((int) $logo->fetchedAt)
             )];
         }
         return ['error', sprintf(Translation::text('Das Logo (APP_CONNECT_LOGO_URL) wird nicht verwendet: %s'), $reason)];
+    }
+
+    /**
+     * The messages of the logo box on "Stud.App Verbindung": what the apps
+     * get, and what went wrong at the last fetch.
+     *
+     * @return list<array{0: 'success'|'info'|'warning'|'error', 1: string}> kind and plain text
+     */
+    public static function describe(?StoredLogo $logo): array
+    {
+        if ($logo === null) {
+            return [['info', Translation::text('Das Logo wurde noch nicht abgerufen.')]];
+        }
+        if ($logo->image === null) {
+            return [['error', sprintf(
+                Translation::text('Die Apps erhalten kein Logo. Der Abruf am %s ist fehlgeschlagen: %s'),
+                Format::dateTime($logo->checkedAt),
+                self::reason((string) $logo->problem)
+            )]];
+        }
+        $messages = [['success', sprintf(
+            $logo->isUpload()
+                ? Translation::text('Hochgeladen am %s (%s, %u × %u Pixel). Die Apps erhalten es von diesem Server.')
+                : Translation::text('Abgerufen am %s (%s, %u × %u Pixel). Die Apps erhalten es von diesem Server.'),
+            Format::dateTime((int) $logo->fetchedAt),
+            $logo->image->typeLabel(),
+            $logo->image->width,
+            $logo->image->height
+        )]];
+        if ($logo->problem !== null && !$logo->isUpload()) {
+            $messages[] = ['warning', sprintf(
+                Translation::text('Der letzte Abruf am %s ist fehlgeschlagen: %s Die Apps erhalten weiter die Fassung oben.'),
+                Format::dateTime($logo->checkedAt),
+                self::reason($logo->problem)
+            )];
+        }
+        return $messages;
     }
 
     /** Shows {@see self::outcome()} as a message on the next page. */
