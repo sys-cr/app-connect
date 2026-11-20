@@ -57,7 +57,9 @@ final class ConnectPageTest extends E2ETestCase
 
         self::assertSame(200, $created->status, $created->body);
         self::assertMatchesRegularExpression('/data-expires-in="(29\d|300)"/', $created->body);
-        self::assertStringContainsString('"Wartet auf die App \u2026 noch %s"', $created->body);
+        self::assertStringContainsString('data-text-waiting="Wartet auf die App … noch %s"', $created->body);
+        self::assertMatchesRegularExpression('~<script defer="" src="[^"]+/assets/js/connect\.js\?v=[^"]+">~', $created->body);
+        self::assertDoesNotMatchRegularExpression('~<script>\s*\(function~', $created->body, 'no inline script of the plugin');
     }
 
     private function page(): Response

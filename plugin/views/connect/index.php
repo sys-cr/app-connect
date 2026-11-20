@@ -25,7 +25,11 @@
             </div>
             <p class="app-connect-status" data-status-url="<?= htmlReady($status_url) ?>"
                data-index-url="<?= htmlReady($index_url) ?>"
-               data-expires-in="<?= (int) $new_code['expires_in'] ?>" aria-live="polite">
+               data-expires-in="<?= (int) $new_code['expires_in'] ?>"
+               data-text-waiting="<?= htmlReady($_('Wartet auf die App … noch %s')) ?>"
+               data-text-expired="<?= htmlReady($_('Der Code ist abgelaufen. Erzeugen Sie bei Bedarf einen neuen.')) ?>"
+               data-text-connected="<?= htmlReady($_('Verbunden: %s · %s · %s Uhr. Waren Sie das nicht? Entfernen Sie das Gerät unten.')) ?>"
+               aria-live="polite">
                 <?= $_('Wartet auf die App …') ?>
             </p>
             <p><?= $_('Zeigen Sie den QR-Code niemandem und fotografieren Sie ihn nicht ab: Wer ihn zuerst scannt, ist mit Ihrem Konto verbunden.') ?></p>
@@ -154,68 +158,4 @@
         </form>
     </section>
 </section>
-<? endif ?>
-
-<? if ($new_code) : ?>
-<? $jsonFlags = JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ?>
-<script>
-(function () {
-    const status = document.querySelector('.app-connect-status');
-    if (!status) {
-        return;
-    }
-    const deadline = Date.now() + Number(status.dataset.expiresIn) * 1000;
-    const texts = {
-        waiting: <?= json_encode($_('Wartet auf die App … noch %s'), $jsonFlags) ?>,
-        expired: <?= json_encode($_('Der Code ist abgelaufen. Erzeugen Sie bei Bedarf einen neuen.'), $jsonFlags) ?>,
-        connected: <?= json_encode($_('Verbunden: %s · %s · %s Uhr. Waren Sie das nicht? Entfernen Sie das Gerät unten.'), $jsonFlags) ?>
-    };
-    function format(text, values) {
-        return values.reduce((result, value) => result.replace('%s', value), text);
-    }
-    function remaining() {
-        const seconds = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
-        return Math.floor(seconds / 60) + ':' + String(seconds % 60).padStart(2, '0');
-    }
-    function done(text, reload) {
-        clearInterval(timer);
-        clearInterval(poller);
-        document.querySelectorAll('.app-connect-pairing code.qr, .app-connect-pairing canvas').forEach((node) => node.remove());
-        status.textContent = text;
-        if (reload) {
-            setTimeout(() => window.location.assign(status.dataset.indexUrl), 4000);
-        }
-    }
-    // The time counts every second in its own element; a timer is not read
-    // out by screen readers, unlike the live status around it.
-    const clock = document.createElement('span');
-    clock.setAttribute('role', 'timer');
-    const [before, after = ''] = texts.waiting.split('%s');
-    function tick() {
-        if (Date.now() >= deadline) {
-            done(texts.expired, false);
-            return;
-        }
-        clock.textContent = remaining();
-        if (!clock.isConnected) {
-            status.replaceChildren(before, clock, after);
-        }
-    }
-    function poll() {
-        fetch(status.dataset.statusUrl, { credentials: 'same-origin', headers: { 'Accept': 'application/json' } })
-            .then((response) => response.ok ? response.json() : null)
-            .then((data) => {
-                if (data && data.state === 'connected') {
-                    done(format(texts.connected, [data.device.name, data.device.platform, data.device.time]), true);
-                } else if (data && data.state === 'expired') {
-                    done(texts.expired, false);
-                }
-            })
-            .catch(() => {});
-    }
-    const timer = setInterval(tick, 1000);
-    const poller = setInterval(poll, 3000);
-    tick();
-}());
-</script>
 <? endif ?>

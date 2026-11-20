@@ -61,6 +61,7 @@ class ConnectController extends PluginController
 
     public function index_action()
     {
+        $this->plugin->addPageScript('connect.js');
         $this->pairing_enabled = $this->settings->isPairingEnabled();
         $this->device_list = $this->devices->activeDevices($this->userId);
         $this->unassigned_count = count($this->devices->unassignedTokens($this->userId));

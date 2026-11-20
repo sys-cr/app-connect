@@ -23,21 +23,3 @@
     <p><?= $_('Sie werden mit Ihrer Anmeldung aus der App angemeldet.') ?></p>
     <?= Studip\Button::createAccept($_('Weiter'), 'redeem') ?>
 </form>
-
-<script>
-(function () {
-    const form = document.querySelector('form.app-connect-web-login');
-    const ticket = window.location.hash.slice(1);
-    // The ticket leaves the address bar and the history before anything else.
-    if (window.location.hash) {
-        history.replaceState(null, '', window.location.pathname + window.location.search);
-    }
-    if (!form || !/^[A-Za-z0-9_-]{43}$/.test(ticket)) {
-        document.querySelector('.app-connect-web-failed').hidden = false;
-        return;
-    }
-    form.elements.ticket.value = ticket;
-    form.hidden = false;
-    form.submit();
-}());
-</script>

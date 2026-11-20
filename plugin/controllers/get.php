@@ -35,6 +35,7 @@ class GetController extends PluginController
 
     public function index_action()
     {
+        $this->plugin->addPageScript('get.js');
         $settings = Runtime::settings();
         $this->enabled = $settings->isConnected();
         PageLayout::setTitle($this->_('App holen'));
