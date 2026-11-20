@@ -44,32 +44,70 @@ final class CoreRefreshGuard
     }
 
     /**
-     * Answers like an OAuth2 error and ends the request when {@see refuses()}
-     * holds. The client id is looked up only for a refresh at the core path.
+     * Whether the request described by the server and form parameters is a
+     * refresh of the app client at the core endpoint. The client counts as
+     * named wherever league/oauth2-server would find it: `client_id` in the
+     * body, or the user of HTTP Basic, which PHP passes as PHP_AUTH_USER
+     * under mod_php and only as the raw header under FastCGI.
+     *
+     * @param array<mixed> $server
+     * @param array<mixed> $post
+     * @param \Closure(): ?string $appClientId looked up only for a refresh at the core path
+     */
+    public static function check(array $server, array $post, \Closure $appClientId): bool
+    {
+        $path = parse_url(is_string($server['REQUEST_URI'] ?? null) ? $server['REQUEST_URI'] : '', PHP_URL_PATH);
+        $path = is_string($path) ? $path : '';
+        if (($post['grant_type'] ?? null) !== 'refresh_token'
+            || !str_ends_with(rtrim($path, '/'), self::CORE_TOKEN_PATH)) {
+            return false;
+        }
+        return self::refuses(
+            is_string($server['REQUEST_METHOD'] ?? null) ? $server['REQUEST_METHOD'] : '',
+            $path,
+            'refresh_token',
+            [
+                is_string($post['client_id'] ?? null) ? $post['client_id'] : null,
+                is_string($server['PHP_AUTH_USER'] ?? null) ? $server['PHP_AUTH_USER'] : null,
+                self::basicUser($server['HTTP_AUTHORIZATION'] ?? null),
+                self::basicUser($server['REDIRECT_HTTP_AUTHORIZATION'] ?? null),
+            ],
+            $appClientId()
+        );
+    }
+
+    /**
+     * The user of an `Authorization: Basic` header, split as
+     * league/oauth2-server splits it; null for anything else. The scheme is
+     * matched case-insensitively, which refuses at least what league accepts.
+     */
+    public static function basicUser(mixed $header): ?string
+    {
+        if (!is_string($header) || preg_match('/^Basic\s+(\S+)/i', $header, $match) !== 1) {
+            return null;
+        }
+        $decoded = base64_decode($match[1], true);
+        if ($decoded === false || !str_contains($decoded, ':')) {
+            return null;
+        }
+        return explode(':', $decoded, 2)[0];
+    }
+
+    /**
+     * Answers like an OAuth2 error and ends the request when {@see check()}
+     * holds for the current request.
      *
      * @param \Closure(): ?string $appClientId
      */
     public static function apply(\Closure $appClientId): void
     {
-        $path = parse_url((string) ($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH);
-        $path = is_string($path) ? $path : '';
-        if (($_POST['grant_type'] ?? null) !== 'refresh_token'
-            || !str_ends_with(rtrim($path, '/'), self::CORE_TOKEN_PATH)) {
-            return;
+        if (self::check($_SERVER, $_POST, $appClientId)) {
+            self::respondAndExit();
         }
-        $refuses = self::refuses(
-            (string) ($_SERVER['REQUEST_METHOD'] ?? ''),
-            $path,
-            'refresh_token',
-            [
-                is_string($_POST['client_id'] ?? null) ? $_POST['client_id'] : null,
-                is_string($_SERVER['PHP_AUTH_USER'] ?? null) ? $_SERVER['PHP_AUTH_USER'] : null,
-            ],
-            $appClientId()
-        );
-        if (!$refuses) {
-            return;
-        }
+    }
+
+    private static function respondAndExit(): never
+    {
         http_response_code(400);
         header('Content-Type: application/json');
         header('Cache-Control: no-store');
