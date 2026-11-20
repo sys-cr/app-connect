@@ -45,6 +45,23 @@ final class DiscoveryTest extends E2ETestCase
         self::assertSame(304, $again->status);
     }
 
+    public function testAChangeInTheSectionShowsAtOnceThoughTheDiscoveryIsCached(): void
+    {
+        foreach (['', self::BELOW] as $basePath) {
+            self::assertIsArray(self::discovery($basePath)['features']['messages'], 'cached with messages on');
+        }
+
+        self::helper('config', 'APP_CONNECT_FEATURE_MESSAGES', 'false');
+        try {
+            foreach (['', self::BELOW] as $basePath) {
+                self::assertFalse(self::discovery($basePath)['features']['messages'], 'below "' . $basePath . '"');
+            }
+        } finally {
+            self::helper('config', 'APP_CONNECT_FEATURE_MESSAGES', 'true');
+        }
+        self::assertIsArray(self::discovery()['features']['messages']);
+    }
+
     public function testTheLandingPageAtTheRootHasNoPathInTheConnectLink(): void
     {
         $page = self::request('GET', self::url('plugins.php/appconnect/get'));

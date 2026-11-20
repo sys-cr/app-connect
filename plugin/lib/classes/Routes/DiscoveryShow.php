@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace AppConnect\Routes;
 
 use AppConnect\Discovery\DiscoveryBuilder;
+use AppConnect\Discovery\DiscoveryCache;
 use AppConnect\Discovery\DiscoveryResponse;
 use AppConnect\Runtime;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -27,7 +28,10 @@ final class DiscoveryShow extends Route
             return JsonErrors::write($response, 404, 'app-connect-disabled', 'App connection is switched off');
         }
 
-        $discovery = new DiscoveryResponse((new DiscoveryBuilder())->build($settings, Runtime::instanceInfo()));
+        $discovery = DiscoveryCache::response(
+            Runtime::baseUrl(),
+            static fn (): array => (new DiscoveryBuilder())->build($settings, Runtime::instanceInfo())
+        );
         $response = $response
             ->withHeader('ETag', $discovery->etag)
             ->withHeader('Cache-Control', DiscoveryResponse::CACHE_CONTROL);
