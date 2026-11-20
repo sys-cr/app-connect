@@ -48,11 +48,7 @@ final class DevicesCreate extends \JsonApi\NonJsonApiController
         $userId = (string) $validated->getAttribute('oauth_user_id');
         $accessTokenId = (string) $validated->getAttribute('oauth_access_token_id');
 
-        $attributes = ((array) $request->getParsedBody())['data']['attributes'] ?? null;
-        $type = ((array) $request->getParsedBody())['data']['type'] ?? null;
-        $device = $type === self::TYPE && is_array($attributes)
-            ? DeviceInput::fromValues($attributes['device-id'] ?? null, $attributes['device-name'] ?? null, $attributes['platform'] ?? null)
-            : null;
+        $device = self::device($request->getParsedBody());
         if ($device === null) {
             return JsonErrors::write($response, 422, 'app-connect-invalid-device', 'device-id, device-name and platform are required');
         }
@@ -68,6 +64,17 @@ final class DevicesCreate extends \JsonApi\NonJsonApiController
         return $response
             ->withStatus(201)
             ->withHeader('Content-Type', 'application/vnd.api+json');
+    }
+
+    /** The device of a JSON:API document of type {@see self::TYPE}, null for anything else. */
+    private static function device(mixed $body): ?DeviceInput
+    {
+        $data = is_array($body) ? ($body['data'] ?? null) : null;
+        if (!is_array($data) || ($data['type'] ?? null) !== self::TYPE || !is_array($data['attributes'] ?? null)) {
+            return null;
+        }
+        $attributes = $data['attributes'];
+        return DeviceInput::fromValues($attributes['device-id'] ?? null, $attributes['device-name'] ?? null, $attributes['platform'] ?? null);
     }
 
     /** @return array<string, mixed> */

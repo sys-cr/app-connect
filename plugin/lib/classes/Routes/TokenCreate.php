@@ -30,7 +30,7 @@ final class TokenCreate extends \JsonApi\NonJsonApiController
         $response = $response->withHeader('Cache-Control', 'no-store')->withHeader('Pragma', 'no-cache');
 
         $params = (array) $request->getParsedBody();
-        if ((string) ($params['client_id'] ?? '') !== $settings->clientId()) {
+        if (($params['client_id'] ?? null) !== $settings->clientId()) {
             return OAuthServerException::invalidClient($request)->generateHttpResponse($response);
         }
 

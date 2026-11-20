@@ -36,7 +36,7 @@ final class TokenRevocation
      */
     public function handle(array $params, string $clientAddress): array
     {
-        if ((string) ($params['client_id'] ?? '') !== $this->clientId) {
+        if (($params['client_id'] ?? null) !== $this->clientId) {
             return ['status' => 401, 'error' => 'invalid_client', 'description' => 'Client authentication failed'];
         }
         $token = $params['token'] ?? null;
