@@ -140,8 +140,9 @@ final class Runtime
     private static function resolver(): \Closure
     {
         return static function (string $host): array {
-            $addresses = @gethostbynamel($host) ?: [];
-            foreach (@dns_get_record($host, DNS_AAAA) ?: [] as $record) {
+            $addresses = gethostbynamel($host) ?: [];
+            // A failing DNS server raises a warning besides returning false.
+            foreach (Quietly::call(static fn () => dns_get_record($host, DNS_AAAA)) ?: [] as $record) {
                 if (isset($record['ipv6']) && is_string($record['ipv6'])) {
                     $addresses[] = $record['ipv6'];
                 }
@@ -163,7 +164,8 @@ final class Runtime
     /** Version from plugin.manifest. */
     public static function pluginVersion(): string
     {
-        $manifest = @file(dirname(__DIR__, 2) . '/plugin.manifest', FILE_IGNORE_NEW_LINES) ?: [];
+        $file = dirname(__DIR__, 2) . '/plugin.manifest';
+        $manifest = is_readable($file) ? (file($file, FILE_IGNORE_NEW_LINES) ?: []) : [];
         foreach ($manifest as $line) {
             if (str_starts_with($line, 'version=')) {
                 return trim(substr($line, strlen('version=')));
