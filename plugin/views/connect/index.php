@@ -10,7 +10,7 @@
  * @var string $status_url
  * @var string $index_url
  * @var array{landing_url: string, expires_in: int}|null $new_code
- * @var array{configured: ?string, status: ?\AppConnect\Logo\StoredLogo, messages: list<array{0: string, 1: string}>, preview: ?string}|null $logo
+ * @var array{configured: ?string, status: ?\AppConnect\Logo\StoredLogo, messages: list<array{0: string, 1: string}>, preview: ?string}|null $logo for root, see views/logo/_box.php
  */
 ?>
 <? if ($pairing_enabled) : ?>
@@ -107,55 +107,5 @@
 </section>
 
 <? if ($logo) : ?>
-<section class="contentbox">
-    <header><h2 style="<?= \AppConnect\ContentBox::HEADING_STYLE ?>"><?= $_('Logo für die App') ?></h2></header>
-    <section>
-        <? if ($logo['status'] !== null && $logo['status']->isUpload()) : ?>
-            <p>
-                <img src="<?= htmlReady($logo['preview']) ?>" alt="<?= htmlReady($_('Logo der Hochschule')) ?>" height="64">
-            </p>
-            <?= $this->render_partial('connect/_logo_messages', ['messages' => $logo['messages']]) ?>
-            <? if ($logo['configured'] !== null) : ?>
-                <p>
-                    <?= $_('Das hochgeladene Logo hat Vorrang. Diese Adresse aus der Konfiguration verwenden die Apps erst, wenn Sie es entfernen:') ?>
-                    <?= htmlReady($logo['configured']) ?>
-                </p>
-            <? endif ?>
-            <form method="post" action="<?= $controller->link_for('connect/remove_logo') ?>">
-                <?= CSRFProtection::tokenTag() ?>
-                <?= Studip\Button::create($_('Hochgeladenes Logo entfernen'), 'remove_logo', [
-                    'data-confirm' => $logo['configured'] !== null
-                        ? $_('Die Apps erhalten dann das Logo von der Adresse aus der Konfiguration. Fortfahren?')
-                        : $_('Die Apps zeigen dann ein allgemeines Symbol. Fortfahren?'),
-                ]) ?>
-            </form>
-        <? elseif ($logo['configured'] === null) : ?>
-            <?= MessageBox::info(htmlReady($_('Es ist kein Logo hinterlegt. Die Apps zeigen dann ein allgemeines Symbol. Laden Sie unten eine Bilddatei hoch oder tragen Sie eine Adresse unter Admin → System → Konfiguration, Sektion „Stud.App“, bei APP_CONNECT_LOGO_URL ein.'))) ?>
-        <? else : ?>
-            <p>
-                <?= $_('Das Plugin ruft das Logo von dieser Adresse ab und liefert es den Apps von diesem Server aus:') ?>
-                <?= htmlReady($logo['configured']) ?>
-            </p>
-            <? if ($logo['preview'] !== null) : ?>
-                <p>
-                    <img src="<?= htmlReady($logo['preview']) ?>" alt="<?= htmlReady($_('Logo der Hochschule')) ?>" height="64">
-                </p>
-            <? endif ?>
-            <?= $this->render_partial('connect/_logo_messages', ['messages' => $logo['messages']]) ?>
-            <form method="post" action="<?= $controller->link_for('connect/reload_logo') ?>">
-                <?= CSRFProtection::tokenTag() ?>
-                <?= Studip\Button::create($_('Logo neu laden'), 'reload_logo') ?>
-            </form>
-        <? endif ?>
-        <form class="default" method="post" enctype="multipart/form-data" action="<?= $controller->link_for('connect/upload_logo') ?>">
-            <?= CSRFProtection::tokenTag() ?>
-            <label>
-                <?= $logo['status'] !== null && $logo['status']->isUpload() ? $_('Anderes Logo hochladen') : $_('Logo hochladen') ?>
-                <input type="file" name="logo" accept="image/png,image/jpeg,image/webp" required>
-            </label>
-            <p><?= $_('PNG, JPEG oder WebP, höchstens 512 KB, 32 bis 2048 Pixel je Seite. Ein hochgeladenes Logo hat Vorrang vor der Adresse in der Konfiguration.') ?></p>
-            <?= Studip\Button::createAccept($_('Hochladen'), 'upload_logo') ?>
-        </form>
-    </section>
-</section>
+    <?= $this->render_partial('logo/_box', ['logo' => $logo, 'controller' => $controller]) ?>
 <? endif ?>

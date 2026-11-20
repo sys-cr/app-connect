@@ -18,11 +18,11 @@ use Psr\Http\Message\ServerRequestInterface as Request;
  * JSON, with ETag and 304. Answers 404 `app-connect-disabled` while the app
  * connection is switched off.
  */
-final class DiscoveryShow extends \JsonApi\NonJsonApiController
+final class DiscoveryShow extends Route
 {
     public function __invoke(Request $request, Response $response, $args): Response
     {
-        $settings = Runtime::settings();
+        $settings = $this->settings;
         if (!$settings->isConnected()) {
             return JsonErrors::write($response, 404, 'app-connect-disabled', 'App connection is switched off');
         }

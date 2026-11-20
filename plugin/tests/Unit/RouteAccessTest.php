@@ -18,7 +18,7 @@ final class RouteAccessTest extends TestCase
         self::assertNotEmpty($routes);
         foreach ($routes as $file) {
             $source = (string) file_get_contents($file);
-            if (!str_contains($source, 'extends \JsonApi\NonJsonApiController')) {
+            if (!str_contains($source, 'extends Route')) {
                 continue;
             }
             self::assertStringContainsString('->isConnected()', $source, basename($file));

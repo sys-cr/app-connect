@@ -8,8 +8,9 @@ declare(strict_types=1);
 namespace AppConnect\Devices;
 
 /**
- * Connected devices and their token lineages. Every operation is limited to
- * one user; revoking one device never touches the lineage of another.
+ * Connected devices: connect, list, remove, end. Every operation is limited
+ * to one user; revoking one device never touches the lineage of another.
+ * Moving a device along its lineage on refresh is {@see TokenLineage}.
  */
 final class DeviceService
 {
@@ -69,61 +70,6 @@ final class DeviceService
             return null;
         }
         return $this->connect($userId, $device, self::VIA_BROWSER, $accessTokenId, $refreshTokenId);
-    }
-
-    /**
-     * Locks the lineage step of a refresh, inside the refresh's transaction:
-     * first the device row bound to $refreshTokenId (if any), then the
-     * refresh token row. Removal and revocation lock in the same order, so a
-     * refresh either finishes before them or sees their result. Returns the
-     * id of the bound device row, null when the token belongs to no device.
-     *
-     * @throws LineageEnded when the refresh token was revoked meanwhile
-     */
-    public function lockLineage(string $refreshTokenId): ?int
-    {
-        $rowId = $this->ledger->lockDeviceRowByRefreshToken($refreshTokenId);
-        if ($this->ledger->lockRefreshTokenIsRevoked($refreshTokenId)) {
-            throw new LineageEnded();
-        }
-        return $rowId;
-    }
-
-    /**
-     * Moves the binding of the locked device row $rowId to the new pair.
-     *
-     * @throws LineageEnded when the row is no longer active, so the new pair
-     *                      must not be handed out
-     */
-    public function rebind(int $rowId, string $accessTokenId, ?string $refreshTokenId): void
-    {
-        $row = DeviceRecord::findOneBySQL('`id` = ? AND `revoked_at` IS NULL', [$rowId]);
-        if ($row === null) {
-            throw new LineageEnded();
-        }
-        $row->access_token_id = $accessTokenId;
-        $row->refresh_token_id = $refreshTokenId;
-        $row->bound_at = time();
-        $row->store();
-    }
-
-    public function isAccessTokenRevoked(string $accessTokenId): bool
-    {
-        return $this->ledger->isAccessTokenRevoked($accessTokenId);
-    }
-
-    /**
-     * Ends a lineage whose access token was revoked on the core page: revokes
-     * the refresh token and marks the bound device, if any, as removed.
-     */
-    public function endRevokedLineage(string $refreshTokenId): void
-    {
-        $this->ledger->revokeRefreshToken($refreshTokenId);
-        $row = DeviceRecord::findOneBySQL('`refresh_token_id` = ? AND `revoked_at` IS NULL', [$refreshTokenId]);
-        if ($row !== null) {
-            $row->revoked_at = time();
-            $row->store();
-        }
     }
 
     /**

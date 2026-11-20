@@ -11,6 +11,7 @@ use AppConnect\AfterResponse;
 use AppConnect\Devices\DeviceRecord;
 use AppConnect\Devices\DeviceService;
 use AppConnect\Devices\TokenLedger;
+use AppConnect\Devices\TokenLineage;
 use AppConnect\Mail\ConnectedMail;
 use AppConnect\Pairing\PairingService;
 use AppConnect\RateLimit\Limits;
@@ -34,9 +35,10 @@ final class TokenServer
         $container = new \Studip\OAuth2\Container();
         $server = $container->get(AuthorizationServer::class);
         $refreshTokens = $container->get(RefreshTokenRepositoryInterface::class);
-        $devices = new DeviceService(new TokenLedger(), (string) $settings->clientId());
+        $ledger = new TokenLedger();
+        $devices = new DeviceService($ledger, (string) $settings->clientId());
 
-        $refresh = new LineageRefreshTokenGrant($refreshTokens, $devices);
+        $refresh = new LineageRefreshTokenGrant($refreshTokens, new TokenLineage($ledger), $devices);
         $refresh->setRefreshTokenTTL(new DateInterval('P1M'));
         $server->enableGrantType($refresh, new DateInterval('PT1H'));
 

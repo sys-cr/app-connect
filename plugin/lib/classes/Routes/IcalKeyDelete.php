@@ -8,7 +8,6 @@ declare(strict_types=1);
 namespace AppConnect\Routes;
 
 use AppConnect\Audit\EventLog;
-use AppConnect\Runtime;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
@@ -23,11 +22,11 @@ use Psr\Http\Message\ServerRequestInterface as Request;
  * Idempotent: a person without a key gets the same `204`, so the app does
  * not have to know whether one existed.
  */
-final class IcalKeyDelete extends \JsonApi\NonJsonApiController
+final class IcalKeyDelete extends Route
 {
     public function __invoke(Request $request, Response $response, $args): Response
     {
-        $settings = Runtime::settings();
+        $settings = $this->settings;
         if (!$settings->isConnected()) {
             return JsonErrors::write($response, 404, 'app-connect-disabled', 'App connection is switched off');
         }

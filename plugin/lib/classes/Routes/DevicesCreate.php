@@ -13,7 +13,6 @@ use AppConnect\Devices\DeviceRecord;
 use AppConnect\Devices\DeviceService;
 use AppConnect\Devices\TokenLedger;
 use AppConnect\Mail\ConnectedMail;
-use AppConnect\Runtime;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
@@ -22,13 +21,13 @@ use Psr\Http\Message\ServerRequestInterface as Request;
  * sign-in. Binds the lineage of the calling OAuth2 token of the app client to
  * a new device of the signed-in person. 409 when the token is already bound.
  */
-final class DevicesCreate extends \JsonApi\NonJsonApiController
+final class DevicesCreate extends Route
 {
     public const TYPE = 'app-connect-devices';
 
     public function __invoke(Request $request, Response $response, $args): Response
     {
-        $settings = Runtime::settings();
+        $settings = $this->settings;
         if (!$settings->isConnected()) {
             return JsonErrors::write($response, 404, 'app-connect-disabled', 'App connection is switched off');
         }

@@ -19,21 +19,21 @@ Komponenten in `plugin/lib/classes/`:
 
 | Namensraum | Aufgabe |
 |---|---|
-| `Settings` | Betreiber-Einstellungen (Konfigurationssektion „Stud.App“) und die eigene Einstellungstabelle; Prüfung von Adressen, Farben, IDs |
+| `Settings` | Betreiber-Einstellungen (Konfigurationssektion „Stud.App“) und die eigene Einstellungstabelle, je Anfrage einmal gelesen (`CachedSettingsStore`); Prüfung von Adressen, Farben, IDs; Reaktion auf Änderungen in der Sektion (`OperatorConfigListener`) |
 | `Discovery` | die öffentliche Discovery aus einer Feld-Allowlist, `ETag`/`304` |
 | `Logo` | das Logo der Hochschule auf dem eigenen Server: Abruf mit SSRF-Schutz (`LogoFetch`, `AddressGuard`, `CurlHttpFetcher` mit festgelegter Adresse), Prüfung an den Bytes (`LogoImage`: PNG, JPEG, WebP, 512 KB, 32 bis 2048 Pixel), Kopie in `app_connect_logo` (`DatabaseLogoStore`), letzte gute Kopie bei Fehlern und hochgeladenes Logo mit Vorrang (`LogoService`), Antwort der Route (`LogoResponse`) |
 | `OAuth2` | der eine öffentliche App-Client (`ClientProvisioner`), der Token-Endpunkt (`TokenServer`), der Kopplungs-Grant und der Refresh-Grant, der die Gerätebindung mitführt; der Widerruf nach RFC 7009 (`TokenRevocation`, `TokenInspector` prüft Access-Tokens gegen den öffentlichen Schlüssel des Kerns, `RefreshTokenCipher` entschlüsselt Refresh-Tokens mit dem Schlüssel des Kerns) |
 | `Pairing`, `Connect` | Kopplungscodes (nur Hash, fünf Minuten, die erste Einlösung gewinnt) und der Verbindungslink des QR-Codes |
-| `Devices` | Gerätezeilen, gebunden an eine Token-Kette; Entfernen und Widerruf in den Token-Tabellen des Kerns (`TokenLedger`), Aufbewahrung |
+| `Devices` | Gerätezeilen, gebunden an eine Token-Kette (`DeviceService`); die Kette beim Erneuern sperren und weiterführen (`TokenLineage`); Entfernen und Widerruf in den Token-Tabellen des Kerns (`TokenLedger`), Aufbewahrung |
 | `WebLogin` | einmalige Tickets für die Anmeldung im Web, Prüfung von `return_to`, die Anmeldung wie im Kern-Login |
 | `Calendar` | der Kalender der Person in den Ressourcen der Kern-Route `users/{id}/events` mit Kursfarben (`UserEvents`); Abo-Adresse des Kalender-Schlüssels (`IcalSubscription`), neue Schlüssel und ihre Grenze (`IcalKey`, `IcalKeyLimit`) |
 | `Places`, `Profile` | Orte von Terminen mit Koordinaten, die Profilsprache |
 | `RateLimit`, `Audit`, `Mail` | Grenzen je Adresse und für die Instanz (`Limits`; Adressen als HMAC mit dem Schlüssel der Installation; atomare Zähler in `app_connect_counters`, `DatabaseCounterStore`), Aktionen des Ereignisprotokolls, die Verbindungsmail |
-| `Routes` | schlanke JSON:API-Controller der Routen unten; `AppToken` lässt nur das Token des App-Clients zu |
+| `Routes` | schlanke JSON:API-Controller der Routen unten auf der Basis `Route` (Einstellungen über den Konstruktor); `AppToken` lässt nur das Token des App-Clients zu, `JsonResponse` schreibt die Antworten |
 | `Help` | kurze Hilfetexte für die Hilfelasche von `connect` und `get` |
 | `ContentBox` | Stil der h2-Überschriften in den Inhaltskästen, mit den Werten des Kerns |
 | `Attribution` | rechtliche Hinweise im Sinne der GPL (Nennung, Copyright, Lizenz mit Zusatzbedingungen, Weitergabe, keine Gewährleistung) mit Link zur Lizenz; setzt sie ans Ende der Hilfelasche von `connect` und `get` |
-| `Runtime` | Verbindung zum laufenden Stud.IP (Einstellungen, Basis-Adresse, Instanzdaten) |
+| `Runtime` | Verbindung zum laufenden Stud.IP (Einstellungen, Basis-Adresse, Instanzdaten); baut die Objekte, die Routen und Controller brauchen |
 
 Klassen ohne Abhängigkeit von Stud.IP (`Discovery\DiscoveryBuilder`,
 `Discovery\DiscoveryResponse`, `Connect\*`, `Settings\Settings`, `Calendar\UserEvents`,
@@ -176,7 +176,8 @@ Wann die Routen antworten und wer sie aufrufen darf: [`contract/route-access.md`
 | `POST /jsonapi.php/v1/app-connect/web-login` | OAuth2-Token des App-Clients oder HTTP Basic (Passwort prüft das Plugin) | einmaliger Link (60 s), der die Person im Web anmeldet und `return_to` öffnet ([`contract/web-login.md`](../../contract/web-login.md)); Discovery-Funktion `webLogin`; `201`, `400`, `401`, `403`, `404`, `429` |
 | `GET`/`DELETE /jsonapi.php/v1/app-connect/me/ical-key` | OAuth2-Token des App-Clients | der eigene Kalender-Schlüssel der Person, beim ersten Abruf angelegt, und das Zurücksetzen ([`contract/ical-key.md`](../../contract/ical-key.md)); Discovery-Funktion `icalKey`; `200`, `204`, `401`, `403`, `404`, `429` |
 | `plugins.php/appconnect/web/enter`, `…/web/redeem`, `…/web/confirm` | keine | der Link von `web-login`: Das Skript schickt das Ticket aus dem Fragment an `redeem`, das es einlöst; ist dieselbe Person angemeldet, wird weitergeleitet, sonst bestätigt die Person „Als … anmelden?“, und `confirm` meldet an |
-| `plugins.php/appconnect/connect` | Sitzung, `autor` | „Stud.App Verbindung“ unter Profil → Einstellungen, über Drittanwendungen: Kopplungscode, Geräteliste |
+| `plugins.php/appconnect/connect` | Sitzung, `autor` | „Stud.App Verbindung“ unter Profil → Einstellungen, über Drittanwendungen: Kopplungscode, Geräteliste; für root der Kasten zum Logo |
+| `plugins.php/appconnect/logo/reload`, `…/logo/upload`, `…/logo/remove` | Sitzung, `root` | Logo neu laden, hochladen, Hochgeladenes entfernen; zurück zu `connect` |
 | `plugins.php/appconnect/get` | keine | Landing-Page des QR-Codes; Code im Fragment `#p=` |
 
 ### Kopplungs-Grant
@@ -239,21 +240,21 @@ Components in `plugin/lib/classes/`:
 
 | Namespace | Responsibility |
 |---|---|
-| `Settings` | operator settings (configuration section "Stud.App") and the plugin's own settings table; validation of addresses, colours, ids |
+| `Settings` | operator settings (configuration section "Stud.App") and the plugin's own settings table, read once per request (`CachedSettingsStore`); validation of addresses, colours, ids; reacting to changes in the section (`OperatorConfigListener`) |
 | `Discovery` | the public discovery payload from a field allowlist, `ETag`/`304` |
 | `Logo` | the institution logo on the instance's own server: fetch with SSRF protection (`LogoFetch`, `AddressGuard`, `CurlHttpFetcher` pinned to the checked address), checks on the bytes (`LogoImage`: PNG, JPEG, WebP, 512 KB, 32 to 2048 pixels), the copy in `app_connect_logo` (`DatabaseLogoStore`), the last good copy on failure and an uploaded logo that takes precedence (`LogoService`), the route's answer (`LogoResponse`) |
 | `OAuth2` | the one public app client (`ClientProvisioner`), the token endpoint (`TokenServer`), the pairing grant and the refresh grant that keeps the device binding; revocation per RFC 7009 (`TokenRevocation`; `TokenInspector` checks access tokens against the core's public key, `RefreshTokenCipher` decrypts refresh tokens with the core's key) |
 | `Pairing`, `Connect` | pairing codes (hash only, five minutes, first redemption wins) and the connect link of the QR code |
-| `Devices` | device rows bound to a token lineage, removal and revocation in the core token tables (`TokenLedger`), retention |
+| `Devices` | device rows bound to a token lineage (`DeviceService`); locking and moving the lineage on refresh (`TokenLineage`); removal and revocation in the core token tables (`TokenLedger`), retention |
 | `WebLogin` | one-time tickets for the web login, `return_to` checks, the sign-in like the core login |
 | `Calendar` | the person's calendar in the shapes of the core route `users/{id}/events`, with course colours (`UserEvents`); the subscription address of the calendar key (`IcalSubscription`), new keys and their limit (`IcalKey`, `IcalKeyLimit`) |
 | `Places`, `Profile` | places of course dates with coordinates, the profile language |
 | `RateLimit`, `Audit`, `Mail` | limits per address and for the instance (`Limits`; addresses as an HMAC with the installation's key; atomic counters in `app_connect_counters`, `DatabaseCounterStore`), event log actions, the connection mail |
-| `Routes` | thin JSON:API controllers of the routes below; `AppToken` admits only the app client's token |
+| `Routes` | thin JSON:API controllers of the routes below, based on `Route` (settings through the constructor); `AppToken` admits only the app client's token, `JsonResponse` writes the answers |
 | `Help` | short help texts for the help bar of `connect` and `get` |
 | `ContentBox` | style of the h2 headings in the content boxes, with the core's values |
 | `Attribution` | the legal notices in the GPL's sense (attribution, copyright, license with additional terms, conveying, no warranty) with a link to the license; adds them to the end of the help bar of `connect` and `get` |
-| `Runtime` | wiring to the running Stud.IP (settings, base URL, instance data) |
+| `Runtime` | wiring to the running Stud.IP (settings, base URL, instance data); builds what routes and controllers need |
 
 Classes without a Stud.IP dependency (`Discovery\DiscoveryBuilder`,
 `Discovery\DiscoveryResponse`, `Connect\*`, `Settings\Settings`, `Calendar\UserEvents`,
@@ -396,7 +397,8 @@ When the routes answer and who may call them: [`contract/route-access.md`](../..
 | `POST /jsonapi.php/v1/app-connect/web-login` | OAuth2 token of the app client, or HTTP Basic (password checked by the plugin) | one-time link (60 s) that signs the person in on the web and opens `return_to` ([`contract/web-login.md`](../../contract/web-login.md)); discovery feature `webLogin`; `201`, `400`, `401`, `403`, `404`, `429` |
 | `GET`/`DELETE /jsonapi.php/v1/app-connect/me/ical-key` | OAuth2 token of the app client | the person's own calendar key, created on first ask, and the reset ([`contract/ical-key.md`](../../contract/ical-key.md)); discovery feature `icalKey`; `200`, `204`, `401`, `403`, `404`, `429` |
 | `plugins.php/appconnect/web/enter`, `…/web/redeem`, `…/web/confirm` | none | the link of `web-login`: the script posts the ticket from the fragment to `redeem`, which claims it; the same person signed in is redirected, anyone else confirms "Als … anmelden?" and `confirm` signs in |
-| `plugins.php/appconnect/connect` | session, `autor` | "Stud.App connection" under Profile → Settings, above Drittanwendungen: pairing code, device list |
+| `plugins.php/appconnect/connect` | session, `autor` | "Stud.App connection" under Profile → Settings, above Drittanwendungen: pairing code, device list; for root the logo box |
+| `plugins.php/appconnect/logo/reload`, `…/logo/upload`, `…/logo/remove` | session, `root` | fetch the logo again, upload one, remove the upload; back to `connect` |
 | `plugins.php/appconnect/get` | none | landing page of the QR code; code in the fragment `#p=` |
 
 #### Pairing grant

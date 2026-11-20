@@ -10,6 +10,7 @@ namespace AppConnect\OAuth2;
 use AppConnect\Account\AccountGate;
 use AppConnect\Devices\DeviceService;
 use AppConnect\Devices\LineageEnded;
+use AppConnect\Devices\TokenLineage;
 use DateInterval;
 use League\OAuth2\Server\Entities\AccessTokenEntityInterface;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
@@ -43,7 +44,11 @@ final class LineageRefreshTokenGrant extends RefreshTokenGrant
     /** @var array{0: string, 1: string}|null access and refresh token id of an account that may no longer use the app */
     private ?array $accountEnded = null;
 
-    public function __construct(RefreshTokenRepositoryInterface $refreshTokenRepository, private readonly DeviceService $devices)
+    public function __construct(
+        RefreshTokenRepositoryInterface $refreshTokenRepository,
+        private readonly TokenLineage $lineage,
+        private readonly DeviceService $devices
+    )
     {
         parent::__construct($refreshTokenRepository);
     }
@@ -58,7 +63,7 @@ final class LineageRefreshTokenGrant extends RefreshTokenGrant
         try {
             $response = parent::respondToAccessTokenRequest($request, $responseType, $accessTokenTTL);
             if ($this->boundRowId !== null && $this->newAccessTokenId !== null) {
-                $this->devices->rebind($this->boundRowId, $this->newAccessTokenId, $this->newRefreshTokenId);
+                $this->lineage->rebind($this->boundRowId, $this->newAccessTokenId, $this->newRefreshTokenId);
             }
             $db->commit();
             return $response;
@@ -68,7 +73,7 @@ final class LineageRefreshTokenGrant extends RefreshTokenGrant
         } catch (Throwable $exception) {
             $db->rollBack();
             if ($this->revokedInCore !== null) {
-                $this->devices->endRevokedLineage($this->revokedInCore);
+                $this->lineage->endRevoked($this->revokedInCore);
             }
             if ($this->accountEnded !== null) {
                 $this->devices->revokePair($this->accountEnded[0], $this->accountEnded[1]);
@@ -82,7 +87,7 @@ final class LineageRefreshTokenGrant extends RefreshTokenGrant
         $data = parent::validateOldRefreshToken($request, $clientId);
         // A normal refresh revokes both tokens, so a revoked access token with
         // a valid refresh token means a revocation in the core.
-        if ($this->devices->isAccessTokenRevoked((string) $data['access_token_id'])) {
+        if ($this->lineage->isAccessTokenRevoked((string) $data['access_token_id'])) {
             $this->revokedInCore = (string) $data['refresh_token_id'];
             throw OAuthServerException::invalidRefreshToken('Token has been revoked');
         }
@@ -93,7 +98,7 @@ final class LineageRefreshTokenGrant extends RefreshTokenGrant
         // Locks the device row and the refresh token row, then checks the
         // refresh token again: a removal or a parallel refresh that came
         // first has revoked it by now.
-        $this->boundRowId = $this->devices->lockLineage((string) $data['refresh_token_id']);
+        $this->boundRowId = $this->lineage->lock((string) $data['refresh_token_id']);
         return $data;
     }
 

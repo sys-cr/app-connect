@@ -19,11 +19,11 @@ use Psr\Http\Message\ServerRequestInterface as Request;
  * there is no valid copy for the configured address, and 404
  * `app-connect-disabled` while the app connection is switched off.
  */
-final class LogoShow extends \JsonApi\NonJsonApiController
+final class LogoShow extends Route
 {
     public function __invoke(Request $request, Response $response, $args): Response
     {
-        $settings = Runtime::settings();
+        $settings = $this->settings;
         if (!$settings->isConnected()) {
             return JsonErrors::write($response, 404, 'app-connect-disabled', 'App connection is switched off');
         }

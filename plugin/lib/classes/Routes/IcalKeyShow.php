@@ -36,11 +36,11 @@ use Psr\Http\Message\ServerRequestInterface as Request;
  * person already has stays, since replacing it would end their
  * subscriptions; a reset gives them a new one.
  */
-final class IcalKeyShow extends \JsonApi\NonJsonApiController
+final class IcalKeyShow extends Route
 {
     public function __invoke(Request $request, Response $response, $args): Response
     {
-        $settings = Runtime::settings();
+        $settings = $this->settings;
         if (!$settings->isConnected()) {
             return JsonErrors::write($response, 404, 'app-connect-disabled', 'App connection is switched off');
         }

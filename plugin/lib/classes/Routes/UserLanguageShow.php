@@ -8,7 +8,6 @@ declare(strict_types=1);
 namespace AppConnect\Routes;
 
 use AppConnect\Profile\UserLanguage;
-use AppConnect\Runtime;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
@@ -17,11 +16,11 @@ use Psr\Http\Message\ServerRequestInterface as Request;
  * person uses Stud.IP in, so the apps can follow it. The core API does not
  * carry the profile language.
  */
-final class UserLanguageShow extends \JsonApi\NonJsonApiController
+final class UserLanguageShow extends Route
 {
     public function __invoke(Request $request, Response $response, $args): Response
     {
-        if (!Runtime::settings()->isConnected()) {
+        if (!$this->settings->isConnected()) {
             return JsonErrors::write($response, 404, 'app-connect-disabled', 'App connection is switched off');
         }
         $user = $this->getUser($request);

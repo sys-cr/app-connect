@@ -40,7 +40,7 @@ final class ConnectPageTest extends E2ETestCase
         self::assertMatchesRegularExpression('/Hochgeladen am \d\d\.\d\d\.\d{4} \d\d:\d\d \(PNG, 64 × 48 Pixel\)/', $page->body);
         self::assertStringContainsString('messagebox_success', $page->body);
 
-        $removed = self::request('POST', self::url('plugins.php/appconnect/connect/remove_logo'), [
+        $removed = self::request('POST', self::url('plugins.php/appconnect/logo/remove'), [
             'security_token' => $page->csrfToken(),
             'remove_logo' => '',
         ], [], $this->cookieJar);
@@ -71,7 +71,7 @@ final class ConnectPageTest extends E2ETestCase
 
     private function upload(string $token, string $file): Response
     {
-        $curl = curl_init(self::url('plugins.php/appconnect/connect/upload_logo'));
+        $curl = curl_init(self::url('plugins.php/appconnect/logo/upload'));
         curl_setopt_array($curl, [
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => [
