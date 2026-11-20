@@ -121,6 +121,24 @@ final class TokenRevocationContractTest extends TestCase
         self::assertSame(200, $revocation->handle(['client_id' => '7', 'token' => 'x'], '192.0.2.2')['status']);
     }
 
+    public function testAClientIdOfAnotherTypeIsAnUnknownClient(): void
+    {
+        $revocation = new TokenRevocation(
+            '7',
+            new RateLimiter(new InMemoryCounterStore(), Limits::revocations(), self::SECRET),
+            600,
+            static fn (): ?RevocableToken => null,
+            static function (): void {
+            }
+        );
+
+        foreach ([['7'], 7, null] as $clientId) {
+            $result = $revocation->handle(['client_id' => $clientId, 'token' => 'x'], self::ADDRESS);
+            self::assertSame(401, $result['status']);
+            self::assertSame('invalid_client', $result['error'] ?? null);
+        }
+    }
+
     /** @return array<string, mixed> */
     private static function document(): array
     {
