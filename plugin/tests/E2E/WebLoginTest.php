@@ -19,6 +19,9 @@ final class WebLoginTest extends E2ETestCase
     /** An account of its own: the profile page allows ten codes per hour. */
     private const WEB = 'e2e_web';
 
+    /** Its own account, so its wrong passwords and codes leave the other tests alone. */
+    private const PASSWORD = 'e2e_password';
+
     private string $cookieJar = '';
 
     protected function setUp(): void
@@ -82,6 +85,39 @@ final class WebLoginTest extends E2ETestCase
         ]);
 
         self::assertSame(401, $response->status, $response->body);
+    }
+
+    public function testWrongPasswordsWithASessionAreLimitedPerPerson(): void
+    {
+        // A web session of the person, as someone at an unlocked computer
+        // would have. With a session the core does not look at HTTP Basic.
+        $confirm = $this->openLink(self::pair(self::PASSWORD)['access_token']);
+        $signedIn = $this->post(self::url('plugins.php/appconnect/web/confirm'), [
+            'security_token' => $confirm->csrfToken(),
+            'confirm' => '',
+        ]);
+        self::assertSame(303, $signedIn->status, $signedIn->body);
+        $basic = fn (string $password): Response => self::request(
+            'POST',
+            self::url('jsonapi.php/v1/app-connect/web-login'),
+            '{}',
+            ['Content-Type: application/json', 'Authorization: Basic ' . base64_encode(self::PASSWORD . ':' . $password)],
+            $this->cookieJar
+        );
+
+        for ($i = 0; $i < 5; $i++) {
+            $refused = $basic('wrong-' . $i);
+            self::assertSame(401, $refused->status, $refused->body);
+            self::assertSame('app-connect-token-required', $refused->json()['errors'][0]['code'] ?? null, 'refused by the plugin');
+        }
+        $limited = $basic('testing');
+
+        self::assertSame(429, $limited->status, $limited->body);
+        self::assertSame('app-connect-too-many-requests', $limited->json()['errors'][0]['code'] ?? null);
+        self::assertSame('900', $limited->headers['retry-after'] ?? null);
+
+        self::helper('reset-limits');
+        self::assertSame(201, $basic('testing')->status, 'the right password works once the window is over');
     }
 
     /**

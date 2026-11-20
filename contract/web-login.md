@@ -27,7 +27,8 @@ the browser).
 
 - Authenticated with the OAuth2 token of the app client. HTTP Basic is also
   accepted for the same person; the plugin checks the password itself, also
-  when the request carries a web session. Tokens of other OAuth2 clients and
+  when the request carries a web session, and counts wrong passwords per
+  person (5 in 15 minutes). Tokens of other OAuth2 clients and
   web sessions are refused, so a third-party token never turns into a web
   session.
 - Body (optional), `Content-Type: application/json`:
@@ -68,6 +69,7 @@ Errors (JSON:API error documents):
 | `400` | `app-connect-invalid-return-to` | `return_to` refused |
 | `400` | `app-connect-invalid-body` | body is not a JSON object |
 | `429` | `app-connect-too-many-requests` | more than 10 tickets for the person in 5 minutes; `Retry-After: 300` |
+| `429` | `app-connect-too-many-requests` | HTTP Basic after 5 wrong passwords for the person in 15 minutes; `Retry-After: 900` |
 
 ## The browser side
 

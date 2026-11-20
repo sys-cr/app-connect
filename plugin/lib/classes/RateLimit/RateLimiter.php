@@ -38,17 +38,19 @@ final class RateLimiter
     public function isBlocked(string $address): bool
     {
         return $this->store->read($this->addressKey($address)) >= $this->limits->perAddress
-            || $this->store->read($this->globalKey()) >= $this->limits->global;
+            || ($this->limits->global !== null && $this->store->read($this->globalKey()) >= $this->limits->global);
     }
 
     /** Counts one event from $address; each counter goes up in one atomic step. */
     public function record(string $address): void
     {
         $this->store->increment($this->addressKey($address), $this->limits->perAddressWindow);
-        $this->store->increment($this->globalKey(), $this->limits->globalWindow);
+        if ($this->limits->globalWindow !== null) {
+            $this->store->increment($this->globalKey(), $this->limits->globalWindow);
+        }
     }
 
-    /** The cache key of $address in the current window. */
+    /** The counter key of $address (or of a person's id) in the current window. */
     public function addressKey(string $address): string
     {
         $window = intdiv($this->now(), $this->limits->perAddressWindow);
@@ -58,7 +60,7 @@ final class RateLimiter
 
     private function globalKey(): string
     {
-        return self::PREFIX . $this->limits->name . '/all/' . intdiv($this->now(), $this->limits->globalWindow);
+        return self::PREFIX . $this->limits->name . '/all/' . intdiv($this->now(), (int) $this->limits->globalWindow);
     }
 
     private function now(): int

@@ -9,6 +9,9 @@ namespace AppConnect\Routes;
 
 use AppConnect\Audit\EventLog;
 use AppConnect\Devices\DeviceRecord;
+use AppConnect\RateLimit\DatabaseCounterStore;
+use AppConnect\RateLimit\Limits;
+use AppConnect\RateLimit\RateLimiter;
 use AppConnect\Runtime;
 use AppConnect\Settings\Settings;
 use AppConnect\WebLogin\DatabaseTicketStore;
@@ -105,15 +108,26 @@ final class WebLoginCreate extends \JsonApi\NonJsonApiController
             return [$accessTokenId, $device !== null ? (int) $device->id : null];
         }
         // With HTTP Basic the password is checked here as well: when a web
-        // session came first, the core never looked at it.
+        // session came first, the core never looked at it. Failed checks are
+        // counted per person, so a session alone does not allow guessing the
+        // password.
         $server = $request->getServerParams();
         $basicUser = $server['PHP_AUTH_USER'] ?? null;
         $basicPassword = $server['PHP_AUTH_PW'] ?? null;
-        if (preg_match('/^Basic\s/i', $authorization) === 1 && is_string($basicUser) && is_string($basicPassword)
-            && strcasecmp($basicUser, $username) === 0
-            && (\StudipAuthAbstract::CheckAuthentication($basicUser, $basicPassword)['uid'] ?? null) === $userId) {
+        if (preg_match('/^Basic\s/i', $authorization) !== 1 || !is_string($basicUser) || !is_string($basicPassword)
+            || strcasecmp($basicUser, $username) !== 0) {
+            return AppToken::tokenRequired($response);
+        }
+        $limits = Limits::webLoginPasswords();
+        $limiter = new RateLimiter(new DatabaseCounterStore(), $limits, $settings->rateLimitKey());
+        if ($limiter->isBlocked($userId)) {
+            return JsonErrors::write($response, 429, 'app-connect-too-many-requests', 'Too many failed password checks, try again later')
+                ->withHeader('Retry-After', (string) $limits->perAddressWindow);
+        }
+        if ((\StudipAuthAbstract::CheckAuthentication($basicUser, $basicPassword)['uid'] ?? null) === $userId) {
             return [null, null];
         }
+        $limiter->record($userId);
         return AppToken::tokenRequired($response);
     }
 
