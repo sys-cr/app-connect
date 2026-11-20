@@ -55,10 +55,7 @@ final class DevicesCreate extends \JsonApi\NonJsonApiController
         }
         AfterResponse::run(static fn () => ConnectedMail::send($userId, $row));
 
-        $response->getBody()->write(json_encode(['data' => self::resource($row)], JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES));
-        return $response
-            ->withStatus(201)
-            ->withHeader('Content-Type', 'application/vnd.api+json');
+        return JsonResponse::write($response, ['data' => self::resource($row)], 201, JsonResponse::JSON_API);
     }
 
     /** The device of a JSON:API document of type {@see self::TYPE}, null for anything else. */

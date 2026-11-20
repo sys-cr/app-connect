@@ -37,9 +37,7 @@ final class UserLanguageShow extends \JsonApi\NonJsonApiController
             $default
         );
 
-        $response->getBody()->write(json_encode(['data' => $data], JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES));
-        return $response
-            ->withHeader('Content-Type', 'application/json; charset=utf-8')
+        return JsonResponse::write($response, ['data' => $data])
             ->withHeader('Cache-Control', 'private, no-store');
     }
 }

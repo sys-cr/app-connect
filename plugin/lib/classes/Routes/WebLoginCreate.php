@@ -74,10 +74,7 @@ final class WebLoginCreate extends \JsonApi\NonJsonApiController
             'url' => ReturnPath::absoluteUrl(Runtime::baseUrl(), self::ENTER_PATH) . '#' . $ticket,
             'expiresIn' => WebLoginService::TTL_SECONDS,
         ];
-        $response->getBody()->write(json_encode(['data' => $data], JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES));
-        return $response
-            ->withStatus(201)
-            ->withHeader('Content-Type', 'application/json; charset=utf-8')
+        return JsonResponse::write($response, ['data' => $data], 201)
             ->withHeader('Cache-Control', 'no-store')
             ->withHeader('Pragma', 'no-cache');
     }
