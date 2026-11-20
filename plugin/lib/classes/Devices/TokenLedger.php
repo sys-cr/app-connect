@@ -69,6 +69,7 @@ final class TokenLedger
         return $revoked === false || (int) $revoked === 1;
     }
 
+    /** Contract only: the integration tests read the state of a refresh token with it. */
     public function isRefreshTokenRevoked(string $refreshTokenId): bool
     {
         $revoked = \DBManager::get()->fetchColumn(
