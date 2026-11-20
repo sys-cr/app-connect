@@ -78,7 +78,7 @@ class ConnectController extends PluginController
             $this->logo = [
                 'configured' => $url,
                 'status' => $status,
-                'problem' => $status?->problem !== null ? LogoStatusText::reason($status->problem) : null,
+                'messages' => LogoStatusText::describe($status),
                 'preview' => $status?->image !== null
                     ? Runtime::baseUrl() . '/jsonapi.php/v1/' . DiscoveryBuilder::LOGO_ROUTE . '?v=' . $status->image->version()
                     : null,
@@ -154,7 +154,7 @@ class ConnectController extends PluginController
         // The code exists only in this response; the database keeps its hash.
         $this->new_code = [
             'landing_url' => ConnectLink::landingUrl(Runtime::baseUrl(), $created['code']),
-            'expires_at' => $created['expires_at'],
+            'expires_in' => max(0, $created['expires_at'] - time()),
         ];
         $this->response->add_header('Cache-Control', 'no-store');
         $this->index_action();

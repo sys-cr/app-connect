@@ -9,8 +9,8 @@
  * @var int $unassigned_count
  * @var string $status_url
  * @var string $index_url
- * @var array{landing_url: string, expires_at: int}|null $new_code
- * @var array{configured: ?string, status: ?\AppConnect\Logo\StoredLogo, problem: ?string, preview: ?string}|null $logo
+ * @var array{landing_url: string, expires_in: int}|null $new_code
+ * @var array{configured: ?string, status: ?\AppConnect\Logo\StoredLogo, messages: list<array{0: string, 1: string}>, preview: ?string}|null $logo
  */
 ?>
 <? if ($pairing_enabled) : ?>
@@ -25,7 +25,7 @@
             </div>
             <p class="app-connect-status" data-status-url="<?= htmlReady($status_url) ?>"
                data-index-url="<?= htmlReady($index_url) ?>"
-               data-expires-in="<?= max(0, $new_code['expires_at'] - time()) ?>" aria-live="polite">
+               data-expires-in="<?= (int) $new_code['expires_in'] ?>" aria-live="polite">
                 <?= $_('Wartet auf die App …') ?>
             </p>
             <p><?= $_('Zeigen Sie den QR-Code niemandem und fotografieren Sie ihn nicht ab: Wer ihn zuerst scannt, ist mit Ihrem Konto verbunden.') ?></p>
@@ -69,10 +69,10 @@
                                 (<?= $device->platform === 'ios' ? 'iOS' : 'Android' ?>)
                             </td>
                             <td>
-                                <?= date('d.m.Y H:i', (int) $device->paired_at) ?>,
+                                <?= htmlReady(\AppConnect\Format::dateTime((int) $device->paired_at)) ?>,
                                 <?= $device->paired_via === 'pairing' ? $_('per QR-Code') : $_('per Browser-Anmeldung') ?>
                             </td>
-                            <td><?= date('d.m.Y', (int) $device->bound_at) ?></td>
+                            <td><?= htmlReady(\AppConnect\Format::date((int) $device->bound_at)) ?></td>
                             <td class="actions">
                                 <?= ActionMenu::get()->setContext($device->name)->addButton(
                                     'remove',
@@ -110,13 +110,7 @@
             <p>
                 <img src="<?= htmlReady($logo['preview']) ?>" alt="<?= htmlReady($_('Logo der Hochschule')) ?>" height="64">
             </p>
-            <?= MessageBox::success(htmlReady(sprintf(
-                $_('Hochgeladen am %s (%s, %u × %u Pixel). Die Apps erhalten es von diesem Server.'),
-                date('d.m.Y H:i', (int) $logo['status']->fetchedAt),
-                ['image/png' => 'PNG', 'image/jpeg' => 'JPEG', 'image/webp' => 'WebP'][$logo['status']->image->mimeType] ?? '',
-                $logo['status']->image->width,
-                $logo['status']->image->height
-            ))) ?>
+            <?= $this->render_partial('connect/_logo_messages', ['messages' => $logo['messages']]) ?>
             <? if ($logo['configured'] !== null) : ?>
                 <p>
                     <?= $_('Das hochgeladene Logo hat Vorrang. Diese Adresse aus der Konfiguration verwenden die Apps erst, wenn Sie es entfernen:') ?>
@@ -138,33 +132,12 @@
                 <?= $_('Das Plugin ruft das Logo von dieser Adresse ab und liefert es den Apps von diesem Server aus:') ?>
                 <?= htmlReady($logo['configured']) ?>
             </p>
-            <? if ($logo['status'] === null) : ?>
-                <?= MessageBox::info(htmlReady($_('Das Logo wurde noch nicht abgerufen.'))) ?>
-            <? elseif ($logo['status']->image !== null) : ?>
+            <? if ($logo['preview'] !== null) : ?>
                 <p>
                     <img src="<?= htmlReady($logo['preview']) ?>" alt="<?= htmlReady($_('Logo der Hochschule')) ?>" height="64">
                 </p>
-                <?= MessageBox::success(htmlReady(sprintf(
-                    $_('Abgerufen am %s (%s, %u × %u Pixel). Die Apps erhalten es von diesem Server.'),
-                    date('d.m.Y H:i', (int) $logo['status']->fetchedAt),
-                    ['image/png' => 'PNG', 'image/jpeg' => 'JPEG', 'image/webp' => 'WebP'][$logo['status']->image->mimeType] ?? '',
-                    $logo['status']->image->width,
-                    $logo['status']->image->height
-                ))) ?>
-                <? if ($logo['problem'] !== null) : ?>
-                    <?= MessageBox::warning(htmlReady(sprintf(
-                        $_('Der letzte Abruf am %s ist fehlgeschlagen: %s Die Apps erhalten weiter die Fassung oben.'),
-                        date('d.m.Y H:i', $logo['status']->checkedAt),
-                        $logo['problem']
-                    ))) ?>
-                <? endif ?>
-            <? else : ?>
-                <?= MessageBox::error(htmlReady(sprintf(
-                    $_('Die Apps erhalten kein Logo. Der Abruf am %s ist fehlgeschlagen: %s'),
-                    date('d.m.Y H:i', $logo['status']->checkedAt),
-                    (string) $logo['problem']
-                ))) ?>
             <? endif ?>
+            <?= $this->render_partial('connect/_logo_messages', ['messages' => $logo['messages']]) ?>
             <form method="post" action="<?= $controller->link_for('connect/reload_logo') ?>">
                 <?= CSRFProtection::tokenTag() ?>
                 <?= Studip\Button::create($_('Logo neu laden'), 'reload_logo') ?>
@@ -184,6 +157,7 @@
 <? endif ?>
 
 <? if ($new_code) : ?>
+<? $jsonFlags = JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ?>
 <script>
 (function () {
     const status = document.querySelector('.app-connect-status');
@@ -192,9 +166,9 @@
     }
     const deadline = Date.now() + Number(status.dataset.expiresIn) * 1000;
     const texts = {
-        waiting: <?= json_encode($_('Wartet auf die App … noch %s')) ?>,
-        expired: <?= json_encode($_('Der Code ist abgelaufen. Erzeugen Sie bei Bedarf einen neuen.')) ?>,
-        connected: <?= json_encode($_('Verbunden: %s · %s · %s Uhr. Waren Sie das nicht? Entfernen Sie das Gerät unten.')) ?>
+        waiting: <?= json_encode($_('Wartet auf die App … noch %s'), $jsonFlags) ?>,
+        expired: <?= json_encode($_('Der Code ist abgelaufen. Erzeugen Sie bei Bedarf einen neuen.'), $jsonFlags) ?>,
+        connected: <?= json_encode($_('Verbunden: %s · %s · %s Uhr. Waren Sie das nicht? Entfernen Sie das Gerät unten.'), $jsonFlags) ?>
     };
     function format(text, values) {
         return values.reduce((result, value) => result.replace('%s', value), text);
