@@ -16,7 +16,12 @@ use AppConnect\Settings\Settings;
  * Public landing page "App holen", the target of the QR code on the profile
  * page. It renders no QR code and never consumes the pairing code: a script
  * reads the code from the URL fragment and builds "Open in the app".
+ *
+ * Trails passes the undeclared properties to the view. The core's
+ * Trails\Controller does not allow them, so from PHP 8.2 on the attribute
+ * is needed here; declaring them instead would hide them from the view.
  */
+#[\AllowDynamicProperties]
 class GetController extends PluginController
 {
     public function before_filter(&$action, &$args)

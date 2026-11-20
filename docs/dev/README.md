@@ -59,7 +59,7 @@ seine eigenen Migrationen an, von den OAuth2-Tabellen des Kerns nur die Spalten,
 Plugin liest. Gleichzeitige Anfragen erzeugen sie mit mehreren Prozessen (`pcntl`), jeder
 mit eigener Verbindung. Ohne `APP_CONNECT_TEST_DB` (PDO-DSN, dazu `…_USER` und
 `…_PASSWORD`) überspringt `make test` sie. GitHub Actions führt `make lint` und `make test`
-mit PHP 8.1 bis 8.3 aus und die Integrationstests mit einer MariaDB als Dienst.
+mit PHP 8.1 bis 8.4 aus und die Integrationstests mit einer MariaDB als Dienst.
 
 Die End-to-End-Tests (`plugin/tests/E2E`) laufen gegen ein echtes Stud.IP mit dem Plugin.
 `tests/e2e/run.sh` baut dafür ein Image aus den Quellen des Kerns mit dem Dockerfile, das
@@ -276,7 +276,7 @@ The integration tests run against a real database. The plugin's own migrations c
 tables; of the core's OAuth2 tables only the columns the plugin reads are created.
 Concurrent requests come from several processes (`pcntl`), each with its own connection.
 Without `APP_CONNECT_TEST_DB` (a PDO DSN, plus `…_USER` and `…_PASSWORD`) `make test`
-skips them. GitHub Actions runs `make lint` and `make test` with PHP 8.1 to 8.3 and the
+skips them. GitHub Actions runs `make lint` and `make test` with PHP 8.1 to 8.4 and the
 integration tests with MariaDB as a service.
 
 The end-to-end tests (`plugin/tests/E2E`) run against a real Stud.IP with the plugin.
