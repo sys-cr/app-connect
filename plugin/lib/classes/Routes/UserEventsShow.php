@@ -93,7 +93,11 @@ final class UserEventsShow extends Route
             array_values(\CalendarCourseDate::getEvents(self::time($window[0]), self::time($window[1]), $userId)),
             array_values(\CalendarCourseExDate::getEvents(self::time($window[0]), self::time($window[1]), $userId))
         );
-        $colors = $this->colorGroups($userId, array_map(static fn ($date): string => (string) $date->range_id, $dates));
+        $courseIds = array_map(static fn ($date): string => (string) $date->range_id, $dates);
+        $colors = $this->colorGroups($userId, $courseIds);
+        // Courses and cycles once for all dates, not once per date.
+        $titles = self::titles($courseIds);
+        $cycles = self::cycles(array_map(static fn ($date): string => (string) $date->metadate_id, $dates));
 
         $items = [];
         foreach ($dates as $date) {
@@ -101,7 +105,7 @@ final class UserEventsShow extends Route
             $items[] = [(int) $date->date, UserEvents::courseEvent([
                 'id' => (string) $date->id,
                 'courseId' => $courseId !== '' ? $courseId : null,
-                'title' => $date->course ? (string) $date->course->getFullName() : '',
+                'title' => $titles[$courseId] ?? '',
                 'description' => (string) $date->getDescription(),
                 'start' => (int) $date->date,
                 'end' => (int) $date->end_time,
@@ -112,10 +116,38 @@ final class UserEventsShow extends Route
                 'color' => $colors[$courseId] ?? 0,
                 'mkdate' => (int) $date->mkdate,
                 'chdate' => (int) $date->chdate,
-                'recurrence' => $date->cycle ? (string) $date->cycle->toString() : '',
+                'recurrence' => $cycles[(string) $date->metadate_id] ?? '',
             ])];
         }
         return $items;
+    }
+
+    /**
+     * @param list<string> $courseIds
+     * @return array<string, string> full course name per course id
+     */
+    private static function titles(array $courseIds): array
+    {
+        $courseIds = array_values(array_unique(array_filter($courseIds)));
+        $titles = [];
+        foreach ($courseIds === [] ? [] : \Course::findMany($courseIds) as $course) {
+            $titles[(string) $course->id] = (string) $course->getFullName();
+        }
+        return $titles;
+    }
+
+    /**
+     * @param list<string> $cycleIds
+     * @return array<string, string> the cycle as text per metadate id
+     */
+    private static function cycles(array $cycleIds): array
+    {
+        $cycleIds = array_values(array_unique(array_filter($cycleIds)));
+        $cycles = [];
+        foreach ($cycleIds === [] ? [] : \SeminarCycleDate::findMany($cycleIds) as $cycle) {
+            $cycles[(string) $cycle->id] = (string) $cycle->toString();
+        }
+        return $cycles;
     }
 
     /**
