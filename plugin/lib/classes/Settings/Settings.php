@@ -28,7 +28,6 @@ final class Settings
     public const INTERVALS = 'intervals';
     public const STATISTICS = 'statistics';
     public const FEATURES = 'features';
-    public const PRIVACY_SNIPPET = 'privacy_snippet';
     /** Base URL recorded when root switched the app connection on. */
     public const BASE_URL = 'base_url';
     /** Secret of this installation that keys client addresses in the rate limit counters. */
@@ -48,7 +47,6 @@ final class Settings
         self::INTERVALS,
         self::STATISTICS,
         self::FEATURES,
-        self::PRIVACY_SNIPPET,
         self::BASE_URL,
         self::RATE_LIMIT_KEY,
     ];

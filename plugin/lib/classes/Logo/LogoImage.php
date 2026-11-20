@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace AppConnect\Logo;
 
+use AppConnect\Quietly;
+
 /**
  * A logo the plugin serves: PNG, JPEG or WebP, recognised by its bytes and
  * never by a header, at most 512 KB and between 32 and 2048 pixels per side.
@@ -45,7 +47,8 @@ final class LogoImage
         if ($mimeType === null) {
             throw new LogoRejected(LogoRejected::TYPE);
         }
-        $info = @getimagesizefromstring($bytes);
+        // Damaged data can raise a warning besides returning false.
+        $info = Quietly::call(static fn () => getimagesizefromstring($bytes));
         if (!is_array($info) || ($info[2] ?? null) !== self::TYPES[$mimeType]) {
             throw new LogoRejected(LogoRejected::BROKEN);
         }

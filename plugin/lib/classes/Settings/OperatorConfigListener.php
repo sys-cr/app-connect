@@ -10,6 +10,7 @@ namespace AppConnect\Settings;
 use AppConnect\Audit\EventLog;
 use AppConnect\Connect\ConnectLink;
 use AppConnect\Devices\DeviceService;
+use AppConnect\Discovery\DiscoveryCache;
 use AppConnect\Devices\TokenLedger;
 use AppConnect\Help;
 use AppConnect\Logo\LogoStatusText;
@@ -37,6 +38,7 @@ final class OperatorConfigListener
         if (!array_key_exists($field, OperatorConfig::definitions())) {
             return;
         }
+        DiscoveryCache::forget();
         if ($field === OperatorConfig::ENABLED) {
             in_array((string) ($change['new_value'] ?? ''), ['1', 'true'], true) ? $this->switchedOn() : $this->switchedOff();
             return;

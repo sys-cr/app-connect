@@ -69,7 +69,7 @@ class WebController extends PluginController
             // Only a ticket that exists names a person; unknown values are not logged.
             $owner = $service->ownerOf($ticket);
             if ($owner !== null) {
-                EventLog::recordWebLogin(EventLog::WEB_LOGIN_REJECT, $owner);
+                EventLog::recordForUser(EventLog::WEB_LOGIN_REJECT, $owner);
             }
             $this->fail();
             return;
@@ -128,7 +128,7 @@ class WebController extends PluginController
             return;
         }
         $location = WebSignIn::signIn($user, $grant->returnTo);
-        EventLog::recordWebLogin(EventLog::WEB_LOGIN_REDEEM, $user->id);
+        EventLog::recordForUser(EventLog::WEB_LOGIN_REDEEM, $user->id);
         $this->seeOther($location);
     }
 
@@ -138,7 +138,7 @@ class WebController extends PluginController
         $user = User::find($grant->userId);
         if (!$user instanceof User || !Runtime::settings()->isWebLoginEnabled()
             || !WebSignIn::isAllowed($user) || !WebSignIn::appSignInIsActive($grant)) {
-            EventLog::recordWebLogin(EventLog::WEB_LOGIN_REJECT, $grant->userId);
+            EventLog::recordForUser(EventLog::WEB_LOGIN_REJECT, $grant->userId);
             $this->fail();
             return null;
         }
@@ -161,9 +161,8 @@ class WebController extends PluginController
 
     private static function signedInPerson(): ?User
     {
-        $current = $GLOBALS['user'] ?? null;
-        $id = is_object($current) && isset($current->id) ? (string) $current->id : '';
-        return $id !== '' && $id !== 'nobody' ? User::find($id) : null;
+        $current = User::findCurrent();
+        return $current !== null && $current->id !== 'nobody' ? $current : null;
     }
 
     private function seeOther(string $location): void

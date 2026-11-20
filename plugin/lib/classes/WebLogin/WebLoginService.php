@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace AppConnect\WebLogin;
 
+use AppConnect\Clock;
+
 /**
  * Issues and redeems web-login tickets. A ticket is valid for
  * {@see TTL_SECONDS} and once; a person gets at most {@see MAX_PER_WINDOW}
@@ -32,7 +34,7 @@ final class WebLoginService
         if ($returnTo !== null && ReturnPath::parse($returnTo) !== $returnTo) {
             throw new \InvalidArgumentException('Invalid return path');
         }
-        $now = $this->now();
+        $now = Clock::now($this->clock);
         if ($this->store->countIssuedSince($userId, $now - self::WINDOW_SECONDS) >= self::MAX_PER_WINDOW) {
             return null;
         }
@@ -57,7 +59,7 @@ final class WebLoginService
         if (!WebLoginTicket::isWellFormed($ticket)) {
             return null;
         }
-        $row = $this->store->claim(WebLoginTicket::hash($ticket), $this->now());
+        $row = $this->store->claim(WebLoginTicket::hash($ticket), Clock::now($this->clock));
         if ($row === null) {
             return null;
         }
@@ -82,11 +84,6 @@ final class WebLoginService
     /** Deletes tickets issued more than a day ago. */
     public function purge(): int
     {
-        return $this->store->deleteCreatedBefore($this->now() - self::RETENTION_SECONDS);
-    }
-
-    private function now(): int
-    {
-        return $this->clock !== null ? ($this->clock)() : time();
+        return $this->store->deleteCreatedBefore(Clock::now($this->clock) - self::RETENTION_SECONDS);
     }
 }

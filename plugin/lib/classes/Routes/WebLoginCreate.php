@@ -68,7 +68,7 @@ final class WebLoginCreate extends Route
             return JsonErrors::write($response, 429, 'app-connect-too-many-requests', 'Too many web logins, try again later')
                 ->withHeader('Retry-After', (string) WebLoginService::WINDOW_SECONDS);
         }
-        EventLog::recordWebLogin(EventLog::WEB_LOGIN_ISSUE, (string) $user->id);
+        EventLog::recordForUser(EventLog::WEB_LOGIN_ISSUE, (string) $user->id);
 
         $data = [
             'url' => ReturnPath::absoluteUrl(Runtime::baseUrl(), self::ENTER_PATH) . '#' . $ticket,

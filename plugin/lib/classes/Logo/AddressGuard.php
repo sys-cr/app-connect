@@ -27,7 +27,10 @@ final class AddressGuard
 
     public static function isPublic(string $address): bool
     {
-        $packed = @inet_pton($address);
+        if (filter_var($address, FILTER_VALIDATE_IP) === false) {
+            return false;
+        }
+        $packed = inet_pton($address);
         if ($packed === false) {
             return false;
         }

@@ -19,6 +19,8 @@
  *   reset-limits              clears the counters of the rate limits
  *   export USERNAME           the plugin's part of the data export of the account
  *   mails TO                  the subjects of the mails to TO in the debug mail log
+ *   course USERNAME           a course of the account in its calendar: two dates of a
+ *                             weekly cycle, one single date and one cancelled date
  */
 
 declare(strict_types=1);
@@ -166,6 +168,47 @@ switch ($args[0] ?? '') {
             }
         }
         out($subjects);
+        break;
+    case 'course':
+        $account = user((string) $args[1]);
+        $course = Course::build([
+            'name' => 'E2E Kurs ' . bin2hex(random_bytes(3)),
+            'status' => 1,
+            'Institut_id' => (string) Institute::findOneBySQL('1 ORDER BY `Name`')?->id,
+            'start_time' => (int) (Semester::findCurrent()?->beginn ?? time()),
+            'visible' => 1,
+        ]);
+        $course->store();
+        CourseMember::build([
+            'seminar_id' => $course->id, 'user_id' => $account->id, 'status' => 'autor',
+            'gruppe' => 3, 'bind_calendar' => 1, 'visible' => 'yes',
+        ])->store();
+        $tomorrow = strtotime('tomorrow 10:00');
+        $cycle = SeminarCycleDate::build([
+            'seminar_id' => $course->id, 'start_time' => '10:00:00', 'end_time' => '12:00:00',
+            'weekday' => (int) date('w', $tomorrow), 'description' => '', 'sws' => 2, 'cycle' => 0,
+            'week_offset' => 0, 'end_offset' => null,
+        ]);
+        $cycle->store();
+        // Some versions create the dates of a new cycle themselves; the test
+        // wants exactly the dates below.
+        CourseDate::deleteBySQL('`range_id` = ?', [$course->id]);
+        CourseExDate::deleteBySQL('`range_id` = ?', [$course->id]);
+        $dates = [];
+        foreach ([[0, $cycle->id], [7, $cycle->id], [3, null]] as [$days, $metadate]) {
+            $date = CourseDate::build([
+                'range_id' => $course->id, 'autor_id' => $account->id, 'date' => $tomorrow + $days * 86400,
+                'end_time' => $tomorrow + $days * 86400 + 7200, 'date_typ' => 1, 'metadate_id' => $metadate,
+            ]);
+            $date->store();
+            $dates[] = $date->id;
+        }
+        CourseExDate::build([
+            'range_id' => $course->id, 'autor_id' => $account->id, 'date' => $tomorrow + 10 * 86400,
+            'end_time' => $tomorrow + 10 * 86400 + 7200, 'date_typ' => 1, 'metadate_id' => $cycle->id,
+            'content' => 'Ausfall',
+        ])->store();
+        out(['course' => $course->id, 'name' => (string) $course->getFullName(), 'cycle' => (string) $cycle->toString()]);
         break;
     case 'reset-limits':
         DBManager::get()->exec('DELETE FROM `app_connect_counters`');

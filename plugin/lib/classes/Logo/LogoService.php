@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace AppConnect\Logo;
 
+use AppConnect\Clock;
 use Closure;
 
 /**
@@ -47,7 +48,7 @@ final class LogoService
             $this->store->delete();
             return null;
         }
-        $now = $this->now();
+        $now = Clock::now($this->clock);
         try {
             $logo = new StoredLogo($url, $this->fetch->fetch($url), $now, $now, null);
         } catch (LogoRejected $rejected) {
@@ -67,7 +68,7 @@ final class LogoService
      */
     public function upload(string $bytes): StoredLogo
     {
-        $now = $this->now();
+        $now = Clock::now($this->clock);
         $logo = new StoredLogo(StoredLogo::UPLOAD, LogoImage::fromBytes($bytes), $now, $now, null);
         $this->store->save($logo);
         return $logo;
@@ -103,10 +104,5 @@ final class LogoService
     public function current(?string $url): ?LogoImage
     {
         return $this->status($url)?->image;
-    }
-
-    private function now(): int
-    {
-        return $this->clock !== null ? ($this->clock)() : time();
     }
 }

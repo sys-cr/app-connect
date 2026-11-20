@@ -65,10 +65,4 @@ final class EventLog
     {
         \StudipLog::log($action, $userId, null, null, null, $userId);
     }
-
-    /** Writes one web-login entry with $userId as the acting and affected person. */
-    public static function recordWebLogin(string $action, string $userId): void
-    {
-        self::recordForUser($action, $userId);
-    }
 }

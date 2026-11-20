@@ -45,7 +45,7 @@ class ConnectController extends PluginController
         if (!$this->settings->isConnected() || !$this->settings->isProfileEntryEnabled()) {
             throw new AccessDeniedException($this->_('Die Verbindung mit der App ist an dieser Hochschule nicht eingeschaltet.'));
         }
-        $this->userId = (string) $GLOBALS['user']->id;
+        $this->userId = (string) User::findCurrent()?->id;
         $this->devices = new DeviceService(new TokenLedger(), (string) $this->settings->clientId());
         $this->pairing = new PairingService();
         if (Navigation::hasItem(AppConnect::NAVIGATION_PATH)) {

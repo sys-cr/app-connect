@@ -63,6 +63,9 @@ final class ConnectLink
 
     /**
      * Parses a connect link. $debug enables the loopback exception.
+     *
+     * Contract only: the apps parse the link themselves; this mirror of their
+     * rules runs in the contract tests against the shared test vectors.
      */
     public static function parseConnectLink(string $input, bool $debug): ConnectLinkResult
     {
@@ -116,6 +119,9 @@ final class ConnectLink
     /**
      * Parses a landing page URL (the QR content). $debug enables the loopback
      * exception with plain http.
+     *
+     * Contract only: the apps parse the URL themselves; this mirror of their
+     * rules runs in the contract tests against the shared test vectors.
      */
     public static function parseLandingUrl(string $input, bool $debug): ConnectLinkResult
     {

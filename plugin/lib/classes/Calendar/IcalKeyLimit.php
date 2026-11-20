@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace AppConnect\Calendar;
 
+use AppConnect\Clock;
 use AppConnect\RateLimit\CounterStore;
 
 /**
@@ -42,16 +43,11 @@ final class IcalKeyLimit
     /** Seconds until the current window ends. */
     public function retryAfter(): int
     {
-        return self::WINDOW - $this->now() % self::WINDOW;
+        return self::WINDOW - Clock::now($this->clock) % self::WINDOW;
     }
 
     private function key(string $userId): string
     {
-        return self::PREFIX . $userId . '/' . intdiv($this->now(), self::WINDOW);
-    }
-
-    private function now(): int
-    {
-        return $this->clock !== null ? ($this->clock)() : time();
+        return self::PREFIX . $userId . '/' . intdiv(Clock::now($this->clock), self::WINDOW);
     }
 }

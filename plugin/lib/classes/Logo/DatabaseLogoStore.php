@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace AppConnect\Logo;
 
+use AppConnect\Discovery\DiscoveryCache;
+
 /**
  * {@see LogoStore} in the plugin table `app_connect_logo`, a single row.
  * The database, not a file, holds the copy: it survives clearing the cache,
@@ -47,6 +49,8 @@ final class DatabaseLogoStore implements LogoStore
 
     public function save(StoredLogo $logo): void
     {
+        // The discovery names the logo's version.
+        DiscoveryCache::forget();
         $statement = \DBManager::get()->prepare(
             'REPLACE INTO `app_connect_logo`
                 (`id`, `source_url`, `content`, `mime_type`, `content_hash`, `fetched_at`, `checked_at`, `problem`)
@@ -73,6 +77,8 @@ final class DatabaseLogoStore implements LogoStore
 
     public function delete(): void
     {
+        // The discovery names the logo's version.
+        DiscoveryCache::forget();
         \DBManager::get()->execute('DELETE FROM `app_connect_logo` WHERE `id` = ?', [self::ROW]);
     }
 }
