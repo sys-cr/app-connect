@@ -18,6 +18,7 @@
  *   devices USERNAME          the device rows of the account
  *   reset-limits              clears the counters of the rate limits
  *   export USERNAME           the plugin's part of the data export of the account
+ *   mails TO                  the subjects of the mails to TO in the debug mail log
  */
 
 declare(strict_types=1);
@@ -144,6 +145,22 @@ switch ($args[0] ?? '') {
             static fn (array $table): array => ['key' => $table['key'], 'rows' => $table['value']],
             $storage->getTabularData()
         ));
+        break;
+    case 'mails':
+        // The debug transport writes each mail as a block that starts with "-- <time>".
+        $log = rtrim((string) $GLOBALS['TMP_PATH'], '/') . '/' . ($GLOBALS['DEBUG_MAIL_LOG_FILE_NAME'] ?? 'studip-mail-debug.log');
+        $subjects = [];
+        foreach (preg_split('/^-- /m', is_readable($log) ? (string) file_get_contents($log) : '') ?: [] as $block) {
+            // 6.0 writes "To:  <address>" and an encoded subject, 6.3 both plain.
+            if (preg_match('/^To:\s*<?' . preg_quote((string) $args[1], '/') . '>?\s*$/m', $block) === 1
+                && preg_match('/^Subject: (.*)$/m', $block, $match) === 1) {
+                $subject = trim($match[1]);
+                $subjects[] = str_contains($subject, '=?')
+                    ? (string) iconv_mime_decode($subject, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, 'UTF-8')
+                    : $subject;
+            }
+        }
+        out($subjects);
         break;
     case 'reset-limits':
         DBManager::get()->exec('DELETE FROM `app_connect_counters`');

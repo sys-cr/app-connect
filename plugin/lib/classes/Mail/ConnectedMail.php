@@ -16,6 +16,8 @@ use Throwable;
  * "Device connected" mail, sent after every successful connection – pairing
  * and browser sign-in alike – to the account's address in its language. No IP
  * address, no code, no one-click removal: the link leads to the profile page.
+ * The callers send it after the response ({@see \AppConnect\AfterResponse}),
+ * so the connection does not wait for the mail server.
  */
 final class ConnectedMail
 {

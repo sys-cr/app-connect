@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace AppConnect\OAuth2;
 
+use AppConnect\AfterResponse;
 use AppConnect\Devices\DeviceRecord;
 use AppConnect\Devices\DeviceService;
 use AppConnect\Devices\TokenLedger;
@@ -48,7 +49,7 @@ final class TokenServer
                 new RateLimiter(new DatabaseCounterStore(), Limits::pairingFailures(), $settings->rateLimitKey()),
                 $clientAddress,
                 static function (string $userId, DeviceRecord $device): void {
-                    ConnectedMail::send($userId, $device);
+                    AfterResponse::run(static fn () => ConnectedMail::send($userId, $device));
                 }
             ),
             new DateInterval('PT1H')

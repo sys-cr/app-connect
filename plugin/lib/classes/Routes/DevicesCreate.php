@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace AppConnect\Routes;
 
+use AppConnect\AfterResponse;
 use AppConnect\Devices\DeviceInput;
 use AppConnect\Devices\DeviceRecord;
 use AppConnect\Devices\DeviceService;
@@ -52,7 +53,7 @@ final class DevicesCreate extends \JsonApi\NonJsonApiController
         if ($row === null) {
             return JsonErrors::write($response, 409, 'app-connect-already-registered', 'This sign-in is already registered');
         }
-        ConnectedMail::send($userId, $row);
+        AfterResponse::run(static fn () => ConnectedMail::send($userId, $row));
 
         $response->getBody()->write(json_encode(['data' => self::resource($row)], JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES));
         return $response
