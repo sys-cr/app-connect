@@ -25,7 +25,12 @@ use AppConnect\Settings\Settings;
  * remove connected devices. Acts only for the signed-in person; a `username`
  * parameter is ignored. For root the page also shows the state of the
  * institution logo the plugin serves to the apps.
+ *
+ * Trails passes the undeclared properties to the view. The core's
+ * Trails\Controller does not allow them, so from PHP 8.2 on the attribute
+ * is needed here; declaring them instead would hide them from the view.
  */
+#[\AllowDynamicProperties]
 class ConnectController extends PluginController
 {
     private Settings $settings;

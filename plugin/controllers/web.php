@@ -19,7 +19,12 @@ use AppConnect\WebLogin\WebSignIn;
  * signed in already, "redeem" only redirects; otherwise it asks "sign in as
  * …?" and "confirm" signs in. A link from someone else can therefore not
  * sign a browser into a foreign account unnoticed. Reachable without a session.
+ *
+ * Trails passes the undeclared properties to the view. The core's
+ * Trails\Controller does not allow them, so from PHP 8.2 on the attribute
+ * is needed here; declaring them instead would hide them from the view.
  */
+#[\AllowDynamicProperties]
 class WebController extends PluginController
 {
     /** Session key of a redeemed ticket that waits for the confirmation. */
