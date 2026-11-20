@@ -161,6 +161,8 @@ auf `localhost` oder `127.0.0.1`.
 
 ## Routen
 
+Wann die Routen antworten und wer sie aufrufen darf: [`contract/route-access.md`](../../contract/route-access.md).
+
 | Route | Anmeldung | Zweck |
 |---|---|---|
 | `GET /jsonapi.php/v1/app-connect/discovery` | keine | öffentliche Instanzdaten, `ETag`/`304`; `404 app-connect-disabled`, solange ausgeschaltet |
@@ -378,6 +380,8 @@ A local instance over plain `http` is accepted by the apps only in DEBUG builds 
 `localhost` or `127.0.0.1`.
 
 ### Routes
+
+When the routes answer and who may call them: [`contract/route-access.md`](../../contract/route-access.md).
 
 | Route | Authentication | Purpose |
 |---|---|---|

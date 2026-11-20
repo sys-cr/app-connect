@@ -21,7 +21,7 @@ final class UserLanguageShow extends \JsonApi\NonJsonApiController
 {
     public function __invoke(Request $request, Response $response, $args): Response
     {
-        if (!Runtime::settings()->isEnabled()) {
+        if (!Runtime::settings()->isConnected()) {
             return JsonErrors::write($response, 404, 'app-connect-disabled', 'App connection is switched off');
         }
         $user = $this->getUser($request);
