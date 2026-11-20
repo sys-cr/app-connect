@@ -117,7 +117,8 @@ gilt auch, wenn das Logo schon auf dem Stud.IP-Server liegt.
   jede wieder auf `https://`. Adressen, deren Server in ein internes Netz zeigt (Loopback,
   private Netze, Link-Local, reservierte Bereiche), ruft das Plugin nicht ab; ausgenommen
   ist der Server eurer Instanz selbst. Ist `HTTP_PROXY` gesetzt, geht der Abruf wie die
-  Anfragen des Kerns über den Proxy (außer für Server in `HTTP_PROXY_IGNORE`).
+  Anfragen des Kerns über den Proxy (außer für Server in `HTTP_PROXY_IGNORE`). Der Tunnel
+  geht dann zur geprüften Adresse, nicht zu dem Namen, den der Proxy selbst auflösen würde.
 - Scheitert ein späterer Abruf derselben Adresse, liefert das Plugin weiter das zuletzt
   geladene Bild aus und zeigt den Fehler. Eine neue Adresse ersetzt das alte Bild; gelingt
   ihr Abruf nicht, bekommen die Apps kein Logo, bis er gelingt.
@@ -478,7 +479,8 @@ already lives on the Stud.IP server.
   to `https://` again. Addresses whose server points into an internal network (loopback,
   private networks, link-local, reserved ranges) are not fetched; your instance's own server
   is the exception. With `HTTP_PROXY` set, the fetch goes through the proxy like the core's
-  own requests (except for servers in `HTTP_PROXY_IGNORE`).
+  own requests (except for servers in `HTTP_PROXY_IGNORE`). The tunnel then goes to the
+  checked address, not to the name the proxy would resolve itself.
 - If a later fetch of the same address fails, the plugin keeps serving the last good picture
   and shows the error. A new address replaces the old picture; if it cannot be fetched, the
   apps get no logo until it can.
