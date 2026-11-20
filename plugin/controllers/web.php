@@ -161,9 +161,8 @@ class WebController extends PluginController
 
     private static function signedInPerson(): ?User
     {
-        $current = $GLOBALS['user'] ?? null;
-        $id = is_object($current) && isset($current->id) ? (string) $current->id : '';
-        return $id !== '' && $id !== 'nobody' ? User::find($id) : null;
+        $current = User::findCurrent();
+        return $current !== null && $current->id !== 'nobody' ? $current : null;
     }
 
     private function seeOther(string $location): void
