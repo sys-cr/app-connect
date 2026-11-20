@@ -17,6 +17,7 @@
  *   lock USERNAME 1|0         locks or unlocks the account
  *   devices USERNAME          the device rows of the account
  *   reset-limits              clears the counters of the rate limits
+ *   export USERNAME           the plugin's part of the data export of the account
  */
 
 declare(strict_types=1);
@@ -134,6 +135,14 @@ switch ($args[0] ?? '') {
             'SELECT `id`, `device_id`, `paired_via`, `access_token_id`, `refresh_token_id`, `revoked_at`
                FROM `app_connect_devices` WHERE `user_id` = ? ORDER BY `id`',
             [user((string) $args[1])->id]
+        ));
+        break;
+    case 'export':
+        $storage = new StoredUserData(user((string) $args[1])->id);
+        AppConnect\Privacy\UserDataExport::export($storage);
+        out(array_map(
+            static fn (array $table): array => ['key' => $table['key'], 'rows' => $table['value']],
+            $storage->getTabularData()
         ));
         break;
     case 'reset-limits':
