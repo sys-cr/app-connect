@@ -11,9 +11,10 @@ namespace AppConnect\Logo;
  * {@see HttpFetcher} with the curl extension, which Stud.IP requires: https
  * only, five seconds in all, no redirects, no cookies, certificate checked.
  * The host is pinned to the address {@see LogoFetch} checked, so a second
- * DNS answer cannot lead the request elsewhere. With a proxy (the core's
- * HTTP_PROXY) the proxy connects; the check of the resolved addresses still
- * applies.
+ * DNS answer cannot lead the request elsewhere: CURLOPT_RESOLVE for a direct
+ * connection, CURLOPT_CONNECT_TO for a proxy (the core's HTTP_PROXY), which
+ * then opens its tunnel to that address instead of resolving the name
+ * itself. The certificate is still checked against the host name.
  */
 final class CurlHttpFetcher implements HttpFetcher
 {
@@ -47,6 +48,7 @@ final class CurlHttpFetcher implements HttpFetcher
             CURLOPT_SSL_VERIFYPEER => true,
             CURLOPT_SSL_VERIFYHOST => 2,
             CURLOPT_RESOLVE => [$host . ':' . $port . ':' . $pinned],
+            CURLOPT_CONNECT_TO => [$host . ':' . $port . ':' . $pinned . ':' . $port],
             CURLOPT_USERAGENT => 'app-connect (Stud.IP plugin)',
             CURLOPT_HTTPHEADER => ['Accept: image/png, image/jpeg, image/webp'],
             CURLOPT_HEADERFUNCTION => static function ($handle, string $line) use (&$location): int {
