@@ -15,7 +15,6 @@ use AppConnect\OAuth2\TokenRevocation;
 use AppConnect\RateLimit\Limits;
 use AppConnect\RateLimit\RateLimiter;
 use AppConnect\RateLimit\DatabaseCounterStore;
-use AppConnect\Runtime;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
@@ -26,11 +25,11 @@ use Psr\Http\Message\ServerRequestInterface as Request;
  * out: the named token, the other token of its pair and the device bound to
  * the pair end at once. The rules are in {@see TokenRevocation}.
  */
-final class TokenRevocationCreate extends \JsonApi\NonJsonApiController
+final class TokenRevocationCreate extends Route
 {
     public function __invoke(Request $request, Response $response, $args): Response
     {
-        $settings = Runtime::settings();
+        $settings = $this->settings;
         $clientId = $settings->clientId();
         if (!$settings->isConnected() || $clientId === null) {
             return JsonErrors::write($response, 404, 'app-connect-disabled', 'App connection is switched off');

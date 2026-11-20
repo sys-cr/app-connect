@@ -27,13 +27,13 @@ use Psr\Http\Message\ServerRequestInterface as Request;
  * Basic); other OAuth2 clients and web sessions may not, so a third-party
  * token never turns into a web session.
  */
-final class WebLoginCreate extends \JsonApi\NonJsonApiController
+final class WebLoginCreate extends Route
 {
     public const ENTER_PATH = 'plugins.php/appconnect/web/enter';
 
     public function __invoke(Request $request, Response $response, $args): Response
     {
-        $settings = Runtime::settings();
+        $settings = $this->settings;
         if (!$settings->isConnected()) {
             return JsonErrors::write($response, 404, 'app-connect-disabled', 'App connection is switched off');
         }

@@ -9,7 +9,6 @@ namespace AppConnect\Routes;
 
 use AppConnect\Places\GeoCoordinates;
 use AppConnect\Places\PlaceQuery;
-use AppConnect\Runtime;
 use AppConnect\Settings\OperatorConfig;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -21,14 +20,14 @@ use Psr\Http\Message\ServerRequestInterface as Request;
  * finder, or the free-text room. The core API only carries the free text.
  * Dates the person may not see are left out without a word.
  */
-final class CourseDatePlacesShow extends \JsonApi\NonJsonApiController
+final class CourseDatePlacesShow extends Route
 {
     /** Parent levels searched for coordinates: room → building → location. */
     private const COORDINATE_DEPTH = 3;
 
     public function __invoke(Request $request, Response $response, $args): Response
     {
-        $settings = Runtime::settings();
+        $settings = $this->settings;
         if (!$settings->isConnected()) {
             return JsonErrors::write($response, 404, 'app-connect-disabled', 'App connection is switched off');
         }

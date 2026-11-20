@@ -8,7 +8,6 @@ declare(strict_types=1);
 namespace AppConnect\Routes;
 
 use AppConnect\Calendar\UserEvents;
-use AppConnect\Runtime;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
@@ -19,11 +18,11 @@ use Psr\Http\Message\ServerRequestInterface as Request;
  * The core route `users/{id}/events` only carries the personal entries and
  * no colour; this route adds the rest without a change to the core.
  */
-final class UserEventsShow extends \JsonApi\NonJsonApiController
+final class UserEventsShow extends Route
 {
     public function __invoke(Request $request, Response $response, $args): Response
     {
-        $settings = Runtime::settings();
+        $settings = $this->settings;
         if (!$settings->isConnected()) {
             return JsonErrors::write($response, 404, 'app-connect-disabled', 'App connection is switched off');
         }

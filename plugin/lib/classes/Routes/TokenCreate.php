@@ -8,7 +8,6 @@ declare(strict_types=1);
 namespace AppConnect\Routes;
 
 use AppConnect\OAuth2\TokenServer;
-use AppConnect\Runtime;
 use League\OAuth2\Server\Exception\OAuthServerException;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -19,11 +18,11 @@ use Psr\Http\Message\ServerRequestInterface as Request;
  * (browser sign-in), refresh_token (keeps the device binding on the current
  * pair) and the pairing grant.
  */
-final class TokenCreate extends \JsonApi\NonJsonApiController
+final class TokenCreate extends Route
 {
     public function __invoke(Request $request, Response $response, $args): Response
     {
-        $settings = Runtime::settings();
+        $settings = $this->settings;
         if (!$settings->isConnected()) {
             return JsonErrors::write($response, 404, 'app-connect-disabled', 'App connection is switched off');
         }
